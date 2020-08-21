@@ -1,5 +1,14 @@
-.vagrant/
+# # ignore terraform module / build folder
+# terraform/.terraform/
 
-**.deb
-**.rpm
-**.msi
+# # ignore terraform state files
+# *.tfstate
+
+# ignore .vagrant build folder
+**.vagrant/
+
+# ignore packer cache
+**packer_cache/
+
+# ignore iso files
+**iso/*.iso
