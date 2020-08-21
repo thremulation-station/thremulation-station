@@ -7,36 +7,36 @@ sudo apt-get update
 #Depackageandinstallsplunk
 
 # Check if Splunk is already installed
-  if [ -f "/opt/splunk/bin/splunk" ]; then
+if [ -f "/opt/splunk/bin/splunk" ]; then
     echo "[$(date +%H:%M:%S)]: Splunk is already installed"
-  else
+else
     echo "[$(date +%H:%M:%S)]: Installing Splunk..."
-    # Get download.splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
-    dig @8.8.8.8 download.splunk.com >/dev/null
-    dig @8.8.8.8 splunk.com >/dev/null
-    dig @8.8.8.8 www.splunk.com >/dev/null
+# Get download.splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
+dig @8.8.8.8 download.splunk.com >/dev/null
+dig @8.8.8.8 splunk.com >/dev/null
+dig @8.8.8.8 www.splunk.com >/dev/null
 
-    # Try to resolve the latest version of Splunk by parsing the HTML on the downloads page
-    echo "[$(date +%H:%M:%S)]: Attempting to autoresolve the latest version of Splunk..."
-    LATEST_SPLUNK=$(curl https://www.splunk.com/en_us/download/splunk-enterprise.html | grep -i deb | grep -Eo "data-link=\"................................................................................................................................" | cut -d '"' -f 2)
-    # Sanity check what was returned from the auto-parse attempt
-    if [[ "$(echo "$LATEST_SPLUNK" | grep -c "^https:")" -eq 1 ]] && [[ "$(echo "$LATEST_SPLUNK" | grep -c "\.deb$")" -eq 1 ]]; then
-      echo "[$(date +%H:%M:%S)]: The URL to the latest Splunk version was automatically resolved as: $LATEST_SPLUNK"
-      echo "[$(date +%H:%M:%S)]: Attempting to download..."
-      wget --progress=bar:force -P /opt "$LATEST_SPLUNK"
-    else
-      echo "[$(date +%H:%M:%S)]: Unable to auto-resolve the latest Splunk version. Falling back to hardcoded URL..."
-      # Download Hardcoded Splunk
-      wget --progress=bar:force -O /opt/splunk-8.0.5-a7f645ddaf91-linux-2.6-amd64.deb 'https://download.splunk.com/products/splunk/releases/8.0.5/linux/splunk-8.0.2-a7f645ddaf91-linux-2.6-amd64.deb&wget=true'
-    fi
-    if ! ls /opt/splunk*.deb 1>/dev/null 2>&1; then
-      echo "Something went wrong while trying to download Splunk. This script cannot continue. Exiting."
-      exit 1
-    fi
-    if ! dpkg -i /opt/splunk*.deb >/dev/null; then
-      echo "Something went wrong while trying to install Splunk. This script cannot continue. Exiting."
-      exit 1
-    fi
+# Try to resolve the latest version of Splunk by parsing the HTML on the downloads page
+echo "[$(date +%H:%M:%S)]: Attempting to autoresolve the latest version of Splunk..."
+LATEST_SPLUNK=$(curl https://www.splunk.com/en_us/download/splunk-enterprise.html | grep -i deb | grep -Eo "data-link=\"................................................................................................................................" | cut -d '"' -f 2)
+# Sanity check what was returned from the auto-parse attempt
+if [[ "$(echo "$LATEST_SPLUNK" | grep -c "^https:")" -eq 1 ]] && [[ "$(echo "$LATEST_SPLUNK" | grep -c "\.deb$")" -eq 1 ]]; then
+echo "[$(date +%H:%M:%S)]: The URL to the latest Splunk version was automatically resolved as: $LATEST_SPLUNK"
+echo "[$(date +%H:%M:%S)]: Attempting to download..."
+wget --progress=bar:force -P /opt "$LATEST_SPLUNK"
+else
+echo "[$(date +%H:%M:%S)]: Unable to auto-resolve the latest Splunk version. Falling back to hardcoded URL..."
+# Download Hardcoded Splunk
+wget --progress=bar:force -O /opt/splunk-8.0.2-a7f645ddaf91-linux-2.6-amd64.deb 'https://download.splunk.com/products/splunk/releases/8.0.2/linux/splunk-8.0.2-a7f645ddaf91-linux-2.6-amd64.deb&wget=true'
+fi
+if ! ls /opt/splunk*.deb 1>/dev/null 2>&1; then
+echo "Something went wrong while trying to download Splunk. This script cannot continue. Exiting."
+exit 1
+fi
+if ! dpkg -i /opt/splunk*.deb >/dev/null; then
+echo "Something went wrong while trying to install Splunk. This script cannot continue. Exiting."
+exit 1
+fi
 
 #Setupsplunk
 
@@ -67,11 +67,19 @@ sudo apt-get update -y
 
 sudo apt-get upgrade -y
 
+sudo apt install apt-transport-https
+
 #InstallPowershell
 
-sudo dpkg -i powershell-lts_7.0.3-1.ubuntu.16.04_amd64.deb
+cd /home/vagrant
 
-sudo apt-get install -f -y
+wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
+
+sudo dpkg -i packages-microsoft-prod.deb
+
+sudo apt-get update -y
+
+sudo apt-get install -y powershell
 
 #CloneandDownloadAtomicRedTeam
 
@@ -86,5 +94,8 @@ pwsh install-atomicredteam.ps1
 pwsh install-atomicsfolder.ps1
 
 pwsh -command import-module /remote/binaries/invoke-atomicredteam/Invoke-AtomicRedTeam.psm1 -Force
+
+
+
 
 
