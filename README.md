@@ -22,15 +22,13 @@ The goal of this project is to create a [Vagrant Multi-Machine]() training envir
 
 1. Update brew: `brew update`
 
-1. Install Terrafrom: `brew install terraform`
-
 
 ### Virtualbox Install
 
-1. Install Terrafrom: `brew cask install virtualbox`
+1. Install Virtualbox: `brew cask install virtualbox`
 
 
 ### Vagrant Install
 
-1. Install Terrafrom: `brew install vagrant`
+1. Install Vagrant: `brew install vagrant`
 1. Install disk syntax plugin: `brew install vagrant-disksize`
