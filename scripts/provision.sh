@@ -75,10 +75,6 @@ elasticsearch soft memlock unlimited
 elasticsearch hard memlock unlimited
 EOF
 
-#Ensure Elasticsearch is the owner of the /etc/elasticsearch directory
-
-sudo chown -R elasticsearch:elasticsearch /etc/elasticsearch 
-
 #Start Elasticsearch
 
 sudo systemctl daemon-reload
@@ -88,6 +84,10 @@ sudo systemctl enable elasticsearch.service
 sudo systemctl start elasticsearch.service
 
 sudo systemctl status elasticsearch.service
+
+#Ensure Elasticsearch is the owner of the /etc/elasticsearch directory
+
+sudo chown -R elasticsearch:elasticsearch /etc/elasticsearch 
 
 #Create Kibana repo file and add necesary contents 
 
@@ -114,10 +114,6 @@ sudo sed -i 's/#server.port: 5601/server.port: 5601/' /etc/kibana/kibana.yml
 
 sudo sed -i 's/#elasticsearch.hosts: \["http:\/\/localhost:9200"\]/elasticsearch.hosts: "http:\/\/localhost:9200"/' /etc/kibana/kibana.yml
 
-#Ensure Kibana is the owner of the /etc/kibana directory
-
-sudo chown -R kibana:kibana /etc/kibana
-
 #Start Kibana
 
 sudo systemctl daemon-reload
@@ -127,6 +123,10 @@ sudo systemctl enable kibana.service
 sudo systemctl start kibana.service
 
 sudo systemctl status kibana.service
+
+#Ensure Kibana is the owner of the /etc/kibana directory
+
+sudo chown -R kibana:kibana /etc/kibana
 
 #Install Powershell
 
@@ -148,7 +148,7 @@ sudo pwsh install-atomicsfolder.ps1
 
 sudo pwsh -command import-module ./Invoke-AtomicRedTeam.psm1 -Force
 
-#Install Elasticsearch X-Pack
+
 
 
 
