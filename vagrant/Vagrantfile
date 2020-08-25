@@ -1,0 +1,22 @@
+
+
+Vagrant.configure("2") do |config|
+ 
+  config.vm.define "elastic" do |elastic|
+    elastic.vm.box = "elastic"
+    elastic.vm.box = "centos/7"
+    elastic.disksize.size = "256GB"
+    elastic.vm.network "private_network", ip: "192.168.33.10", auto_config: true
+    elastic.vm.network "forwarded_port", guest: 5601, host: 5601
+    elastic.vm.network "forwarded_port", guest: 9200, host: 9200
+    elastic.vm.provision "shell", path: "./scripts/provision.sh"
+  end
+
+  config.vm.provider "virtualbox" do |v|
+    v.name = "elastic"
+    v.memory = 4096
+    v.cpus = 2
+    v.customize ["modifyvm", :id, "--cableconnected1", "on"]
+  end
+
+end
