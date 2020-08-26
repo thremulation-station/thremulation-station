@@ -19,17 +19,20 @@ If (-not ($service)) {
 
   $confFile = @"
 winlogbeat.event_logs:
-    ignore_older: 15m
+
+  ignore_older: 15m
+  
   - name: Security
   - name: Application
   - name: System
   - name: Windows Powershell
+  
 setup.kibana:
   host: "192.168.33.10:5601"
-  username: vagrant
-  password: vagrant
+  
 setup.dashboards.enabled: true
 setup.ilm.enabled: false
+
 output.elasticsearch:
   hosts: ["192.168.33.10:9200"]
 "@
