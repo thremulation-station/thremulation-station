@@ -1,41 +1,31 @@
 Vagrant.configure("2") do |config|
 
-  config.vm.define "elk" do |elk|
-    elk.vm.box = "elk"
-    elk.vm.box = "centos/7"
-    elk.disksize.size = "256GB"
-    elk.vm.network "private_network", ip: "192.168.33.10", auto_config: true
-    elk.vm.network "forwarded_port", guest: 5601, host: 5601
-    elk.vm.network "forwarded_port", guest: 9200, host: 9200
-    elk.vm.provision "shell", path: "./scripts/provision.sh"
-
-    config.vm.provider "virtualbox" do |v, override|
-      v.name = "elk"
-      v.memory = 4096
-      v.cpus = 2
-      v.customize ["modifyvm", :id, "--cableconnected1", "on"]
+  config.vm.define "elastic" do |cfg|
+    cfg.vm.box = "centos/7"
+    cfg.vm.hostname = "elk"
+    cfg.disksize.size = "256GB"
+    cfg.vm.network "private_network", ip: "192.168.33.10", auto_config: true
+    cfg.vm.network "forwarded_port", guest: 5601, host: 5601
+    cfg.vm.network "forwarded_port", guest: 9200, host: 9200
+    cfg.vm.provision "shell", path: "./scripts/provision.sh"
+    cfg.vm.provider :virtualbox do |vb|
+      vb.name = "elastic"
+      vb.memory = 4096
+      vb.cpus = 2
+      vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
     end
   end
 
-  config.vm.define "win10" do |win10|
-    win10.vm.box = "seven62/windows10"
-    win10.vm.hostname = "win10"
-    win10.vm.boot_timeout = 1200
-    win10.vm.communicator = "winrm"
-    win10.winrm.basic_auth_only = true
-    win10.winrm.timeout = 1200
-    win10.winrm.retry_limit = 20
-    win10.vm.network :private_network, ip: "192.168.33.11", auto_config: true
-    win10.vm.provision "shell", path: "./scripts/install-winlogbeat.ps1", privileged: true
+  config.vm.define "windows10" do |cfg|
+    cfg.vm.box = "seven62/windows10"
+    cfg.vm.hostname = "win10"
+    cfg.vm.network "private_network", ip: "192.168.33.11", auto_config: true
+    cfg.vm.provision "shell", path: "./scripts/install-winlogbeat.ps1"
+    cfg.vm.provider :virtualbox do |vb|
+      vb.name = "windows10"
+      vb.memory = 2048
+      vb.cpus = 2
+    end
+  end
   
-    config.vm.provider "virtualbox" do |v, override|
-      v.gui = false
-      v.name = "win10"
-      v.customize ["modifyvm", :id, "--memory", 2048]
-      v.customize ["modifyvm", :id, "--cpus", 2]
-      v.customize ["modifyvm", :id, "--vram", "32"]
-      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-      v.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
-    end
-  end
 end
