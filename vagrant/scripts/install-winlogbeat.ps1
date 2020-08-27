@@ -19,26 +19,22 @@ If (-not ($service)) {
 
   $confFile = @"
 winlogbeat.event_logs:
-
-  ignore_older: 15m
-  
   - name: Security
   - name: Application
   - name: System
   - name: Windows Powershell
-  
 setup.kibana:
   host: "192.168.33.10:5601"
-  
 setup.dashboards.enabled: true
 setup.ilm.enabled: false
-
 output.elasticsearch:
   hosts: ["192.168.33.10:9200"]
 "@
   $confFile | Out-File -FilePath C:\ProgramData\chocolatey\lib\winlogbeat\tools\winlogbeat.yml -Encoding ascii
 
   winlogbeat --path.config C:\ProgramData\chocolatey\lib\winlogbeat\tools setup
+  
+  C:\ProgramData\chocolatey\lib\winlogbeat\tools\winlogbeat.exe test config -c .\winlogbeat.yml -e
 
   sc.exe failure winlogbeat reset= 30 actions= restart/5000
   Start-Service winlogbeat

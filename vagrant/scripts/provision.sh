@@ -134,6 +134,8 @@ sudo curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc
 
 sudo yum install -y powershell
 
+sudo pwsh -command Enable-PSRemoting -Force
+
 #Clone, Download and Install AtomicRedTeam
 
 sudo yum install git -y
