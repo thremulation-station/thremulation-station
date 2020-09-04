@@ -18,6 +18,8 @@ sudo firewall-cmd --add-port=9200/tcp --permanent
 
 sudo firewall-cmd --add-port=5601/tcp --permanent
 
+sudo firewall-cmd --add-port=8487/tcp --permanent 
+
 sudo firewall-cmd --reload
 
 #Prepare to install Elasticsearch
@@ -25,6 +27,22 @@ sudo firewall-cmd --reload
 sudo yum -y install java-11-openjdk  java-11-openjdk-devel
 
 sudo yum install -y nano
+
+sudo yum install -y git
+
+sudo yum install -y openssl-devel
+
+#Install MitreAssistant 
+
+sudo yum install -y cargo
+
+sudo git clone https://github.com/dfirence/mitre-assistant.git
+
+cd mitre-assistant
+
+sudo cargo build --release 
+
+sudo mv /home/vagrant/mitre-assistant/target/release/mitre-assistant /usr/bin 
 
 #Add Elastic GPG Key
 
@@ -49,11 +67,25 @@ sudo yum install -y --enablerepo=elasticsearch elasticsearch
 
 #Configure Elasticsearch
 
+printf vagrant | /usr/share/elasticsearch/bin/elasticsearch-keystore add -x "bootstrap.password" -f
+/usr/share/elasticsearch/bin/elasticsearch-users useradd vagrant -p vagrant -r superuser
+
 sudo sed -i 's/#network.host: 192.168.0.1/network.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml
 
 sudo sed -i 's/#http.port: 9200/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
 
 sudo sed -i 's/#discovery.seed_hosts: \["host1", "host2"\]/discovery.type: single-node/' /etc/elasticsearch/elasticsearch.yml
+
+sudo sed -i 's/#action.destructive_requires_name: true/xpack.security.enabled: true/' /etc/elasticsearch/elasticsearch.yml
+
+sudo cat >> /etc/elasticsearch/elasticsearch.yml <<EOF
+xpack.security.authc:
+        api_key.enabled: true
+        anonymous:
+                username: anonymous
+                roles: superuser
+                authz_exception: false
+EOF
 
 sudo cat > /etc/default/elasticsearch <<EOF
 ES_PATH_CONF=/etc/elasticsearch
@@ -114,6 +146,20 @@ sudo sed -i 's/#server.port: 5601/server.port: 5601/' /etc/kibana/kibana.yml
 
 sudo sed -i 's/#elasticsearch.hosts: \["http:\/\/localhost:9200"\]/elasticsearch.hosts: "http:\/\/localhost:9200"/' /etc/kibana/kibana.yml
 
+# sudo sed -i 's/#elasticsearch.username: "kibana_system"/elasticsearch.username: "kibana"' /etc/kibana/kibana.yml
+
+# sudo sed -i 's/#elasticsearch.password: "pass"/elasticsearch.password: P@$$w0rd' /etc/kibana/kibana.yml
+
+sudo echo "xpack.security.enabled: true" >> /etc/kibana/kibana.yml
+
+sudo echo "telemetry.enabled: false" >> /etc/kibana/kibana.yml
+
+sudo echo "telemetry.optIn: false" >> /etc/kibana/kibana.yml
+
+sudo echo "xpack.ingestManager.fleet.tlsCheckDisabled: true" >> /etc/kibana/kibana.yml
+
+sudo echo "xpack.encryptedSavedObjects.encryptionKey: 'fhjskloppd678ehkdfdlliverpoolfcr'" >> /etc/kibana/kibana.yml
+
 #Start Kibana
 
 sudo systemctl daemon-reload
@@ -128,32 +174,23 @@ sudo systemctl status kibana.service
 
 sudo chown -R kibana:kibana /etc/kibana
 
+#Load SIEM prebuilt rules
+
+sudo curl -s -uvagrant:vagrant -XPOST "192.168.33.10:5601/api/detection_engine/index" -H 'kbn-xsrf: true' -H 'Content-Type: application/json'
+sudo curl -s -uvagrant:vagrant -XPUT "192.168.33.10:5601/api/detection_engine/rules/prepackaged" -H 'kbn-xsrf: true' -H 'Content-Type: application/json'
+
 #Install Powershell
 
 sudo curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc/yum.repos.d/microsoft.repo
 
 sudo yum install -y powershell
 
-#Clone, Download and Install AtomicRedTeam
+sudo pwsh -Command {Enable-PSRemoting -Force}
 
-sudo yum install git -y
+sudo sed -i 's/#   PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/ssh_config
 
-sudo git clone https://github.com/redcanaryco/invoke-atomicredteam.git
+sudo pwsh -Command {Add-Content -Path /etc/ssh/ssh_config -Value 'PubkeyAuthentication yes'}
 
-cd invoke-atomicredteam
+sudo pwsh -Command {Add-Content -Path /etc/ssh/ssh_config -Value 'Subsystem powershell /usr/bin/pwsh -sshs -NoLogo'}
 
-sudo pwsh install-atomicredteam.ps1
-
-sudo pwsh install-atomicsfolder.ps1
-
-sudo pwsh -command import-module ./Invoke-AtomicRedTeam.psm1 -Force
-
-
-
-
-
-
-
-
-
-
+sudo service sshd restart
