@@ -17,14 +17,30 @@ $service = Get-WmiObject -Class Win32_Service -Filter "Name='winlogbeat'"
 If (-not ($service)) {
   choco install winlogbeat -y
 
+  choco install git -y
+
   $confFile = @"
 winlogbeat.event_logs:
   - name: Security
+    ignore_older: 30m
   - name: Application
+    ignore_older: 30m
   - name: System
+    ignore_older: 30m
   - name: Windows Powershell
+    ignore_older: 30m
+  - name: Microsoft-windows-Sysmon/Operational
+    ignore_older: 30m
+  - name: Microsoft-windows-PowerShell/Operational
+    ignore_older: 30m
+    event_id: 4103, 4104
+  - name: Microsoft-Windows-WMI-Activity/Operational
+    ignore_older: 30m
+    event_id: 5857,5858,5859,5860,5861
 setup.kibana:
   host: "192.168.33.10:5601"
+  username: vagrant
+  password: vagrant
 setup.dashboards.enabled: true
 setup.ilm.enabled: false
 output.elasticsearch:

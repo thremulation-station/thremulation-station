@@ -14,4 +14,3 @@ cd "C:\Users\vagrant\audit"
 
 .\Set_User_Registry_Auditing.ps1
 
-
