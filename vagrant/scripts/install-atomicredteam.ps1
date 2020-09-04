@@ -16,13 +16,17 @@ sudo pwsh -ex Unrestricted -c {Add-COntent -Path $PROFILE.AllUsersAllHosts -Valu
 
 sudo pwsh -ex Unrestricted -c {Add-Content -Path $PROFILE.AllUsersAllHosts -Value 'Import-Module -Name powershell-yaml -Force'}
 
+sudo pwsh -ex Unrestricted -c {Add-Content -Path $PROFILE.AllUsersAllHosts -Value 'mitre-assistant download -m enterprise'}
+
+sudo pwsh -ex Unrestricted -c {Add-Content -Path $PROFILE.AllUsersAllHosts -Value 'mitre-assistant baseline -m enterprise'}
+
 sudo pwsh -ex Unrestricted -c {& $PROFILE.AllUsersAllHosts}
 
 Find-Module -Name powershell-yaml | Install-Module
 
 sudo sed -i '/start-process http:\/\/localhost:$port/d' /home/vagrant/AtomicRedTeam/invoke-atomicredteam/Public/Start-AtomicGUI.ps1
 
-sudo sed -i 's/Start-UDDashboard -port $port -Dashboard $db -Name "AtomicGUI" -ListenAddress 127.0.0.1/Start-UDDashboard -port $port -Dashboard $db -Name "AtomicGUI" -ListenAddress 0.0.0.0/g' /home/vagrant/AtomicRedTeam/invoke-atomicredteam/Public/Start-AtomicGUI.ps1
+sudo sed -i 's/-ListenAddress 127.0.0.1/-ListenAddress 0.0.0.0/' /home/vagrant/AtomicRedTeam/invoke-atomicredteam/Public/Start-AtomicGUI.ps1
 
 
 

@@ -16,9 +16,12 @@ sudo pwsh -ex Unrestricted -c {Add-Content -Path $PROFILE.AllUsersAllHosts -Valu
 
 sudo pwsh -ex Unrestricted -c {& $PROFILE.AllUsersAllHosts}
 
-Import-Module "/home/vagrant/Invoke-AtomicTest-By/InvokeAtomicBy.ps1" -Force
+sudo pwsh -ex Unrestricted -c {Import-Module "/home/vagrant/Invoke-AtomicTest-By/InvokeAtomicBy.ps1" -Force}
 
-Import-Module "home/vagrant/Invoke-AtomicTest-By/Install-CTI.ps1" -Force 
+sudo pwsh -ex Unrestricted -c {Import-Module "/home/vagrant/Invoke-AtomicTest-By/Install-CTI.ps1" -Force}
+
+sudo pwsh -ex Unrestricted -c {Install-CTIFolder -InstallPath /home/vagrant/AtomicRedTeam/ -DownloadPath /home/vagrant/AtomicRedTeam/ -Force}
+
 
 
 

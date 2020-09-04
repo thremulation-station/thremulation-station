@@ -44,10 +44,6 @@ sudo cargo build --release
 
 sudo mv /home/vagrant/mitre-assistant/target/release/mitre-assistant /usr/bin 
 
-sudo mitre-assistant download -m enterprise
-
-sudo mitre-assistant baseline -m enterprise
-
 #Add Elastic GPG Key
 
 sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
