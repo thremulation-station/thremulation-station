@@ -42,7 +42,7 @@ cd mitre-assistant
 
 sudo cargo build --release 
 
-sudo mv /home/vagrant/mitre-assistant/target/release /usr/bin 
+sudo mv /home/vagrant/mitre-assistant/target/release/mitre-assistant /usr/bin 
 
 sudo mitre-assistant download -m enterprise
 

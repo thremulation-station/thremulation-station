@@ -24,8 +24,6 @@ sudo sed -i '/start-process http:\/\/localhost:$port/d' /home/vagrant/AtomicRedT
 
 sudo sed -i 's/Start-UDDashboard -port $port -Dashboard $db -Name "AtomicGUI" -ListenAddress 127.0.0.1/Start-UDDashboard -port $port -Dashboard $db -Name "AtomicGUI" -ListenAddress 0.0.0.0/g' /home/vagrant/AtomicRedTeam/invoke-atomicredteam/Public/Start-AtomicGUI.ps1
 
-Start-AtomicGUI
-
 
 
 
