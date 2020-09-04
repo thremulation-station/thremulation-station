@@ -28,7 +28,6 @@ winlogbeat.event_logs:
   - name: System
     ignore_older: 30m
   - name: Windows Powershell
-<<<<<<< HEAD
     ignore_older: 30m
   - name: Microsoft-windows-Sysmon/Operational
     ignore_older: 30m
@@ -42,10 +41,6 @@ setup.kibana:
   host: "192.168.33.10:5601"
   username: vagrant
   password: vagrant
-=======
-setup.kibana:
-  host: "192.168.33.10:5601"
->>>>>>> d2ddc689401b5406a04d577e3e12e2cbe8faeedd
 setup.dashboards.enabled: true
 setup.ilm.enabled: false
 output.elasticsearch:
