@@ -25,8 +25,6 @@ winlogbeat.event_logs:
     ignore_older: 30m
   - name: Application
     ignore_older: 30m
-  - name: System
-    ignore_older: 30m
   - name: Windows Powershell
     ignore_older: 30m
   - name: Microsoft-windows-Sysmon/Operational
