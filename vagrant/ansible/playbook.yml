@@ -1,0 +1,246 @@
+---
+  - hosts: all
+    become: yes
+    gather_facts: no
+
+    tasks:
+  
+    - name: Import RPM Keys
+      rpm_key:
+        state: present
+        key: "{{ item }}"
+      loop:
+        - https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+        - https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+
+    - name: Add EPEL Repository
+      yum:
+        name: epel-release
+
+
+    - name: Add Elastic Repository
+      yum_repository:
+        name: elastic
+        description: Elasticsearch repository for 7.x packages
+        enabled: yes
+        gpgcheck: yes
+        baseurl: https://artifacts.elastic.co/packages/7.x/yum
+        gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        file: elastic
+
+
+    - name: Clean Yum Cache
+      command: yum clean all
+    
+    
+    - name: Install System Tools
+      yum:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - vim
+          - nano
+          - tmux
+          - cockpit
+
+    - name: Start Firewalld Service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Add Cockpit Firewall Rule
+      firewalld:
+        zone: public
+        port: 9090/tcp
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+
+###################################
+# Web Server
+###################################
+
+    - name: Install Nginx Webserver
+      yum: 
+        name: nginx
+        state: present
+
+    - name: Start & Enable Nginx Webserver
+      systemd: 
+        name: nginx
+        state: started
+        enabled: yes
+    
+    - name: Add Nginx Firewall Rule
+      firewalld:
+        zone: public
+        service: http
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+
+####################################
+# Auditd
+# base image has auditd already installed and enabled
+###################################
+
+    # - name: Configure Auditd
+    #   copy:
+    #     src: ./files/audit.rules
+    #     dest: /etc/audit/rules.d/audit.rules
+    #     owner: root
+    #     group: root
+    #     mode: '0700'
+ 
+
+
+###################################
+# Syslog Server
+# base image has rsyslog already installed and enabled
+###################################
+
+    # - name: Install Rsyslog
+    #   yum:
+    #     name: rsyslog
+    #     state: started
+    #     enabled: yes
+
+    # - name: Configure Rsyslog
+
+
+
+###################################
+# Samba Server
+# Initial effort is anonymous file sharing
+###################################
+
+    - name: Install Samba Server
+      yum:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - samba
+          - samba-client
+          - samba-common
+    
+    - name: Start & Enable Samba
+      systemd: 
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Add Samba Firewall Rule
+      firewalld:
+        zone: public
+        service: samba
+        permanent: yes
+        immediate: yes
+        state: enabled
+    
+    - name: Create Samba Share Directory
+      file:
+        path: /srv/samba/anonymous
+        state: directory
+        mode: '0755'
+        owner: nobody
+        group: nobody
+      
+    - name: Set SELinux Context on Samba Share
+      command: chcon -t samba_share_t /srv/samba/anonymous
+
+    - name: Configure Samba
+      copy:
+        src: ./files/smb.conf
+        dest: /etc/samba/smb.conf
+        owner: root
+        group: root
+        mode: '0544'
+
+
+###################################
+# Filebeat Setup
+###################################
+
+    - name: Install Filebeat
+      yum:
+        name: filebeat
+        state: present    
+
+    - name: Copy Filebeat Configuration
+      copy:
+        src: ./files/filebeat.yml
+        dest: /etc/filebeat/filebeat.yml
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Enable Filebeat Modules
+      command: "filebeat modules enable nginx system"
+
+    - name: Run Filebeat Setup
+      command: "filebeat setup"
+
+    - name: Start & Enable Filebeat
+      systemd:
+        name: filebeat
+        state: started
+        enabled: yes    
+
+  
+###################################
+# Auditbeat Setup
+###################################
+
+    - name: Install Auditbeat
+      yum:
+        name: auditbeat
+        state: present
+
+    - name: Copy Auditbeat Configuration
+      copy:
+        src: ./files/auditbeat.yml
+        dest: /etc/auditbeat/auditbeat.yml
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Run Filebeat Setup
+      command: filebeat setup
+
+    - name: Start & Enable Auditbeat
+      systemd:
+        name: auditbeat
+        state: started
+        enabled: yes
+
+
+###################################
+# Journalbeat Setup
+###################################
+
+    - name: Install Journalbeat
+      yum:
+        name: journalbeat
+        state: present
+
+    - name: Start & Enable Journalbeat
+      systemd:
+        name: filebeat
+        state: started
+        enabled: yes    
+
+    - name: Configure Journalbeat
+      copy:
+        src: ./files/journalbeat.yml
+        dest: /etc/journalbeat/journalbeat.yml
+        owner: root
+        group: root
+    
+
+
