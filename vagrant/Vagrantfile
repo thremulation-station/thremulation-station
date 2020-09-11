@@ -38,16 +38,15 @@ Vagrant.configure("2") do |config|
   config.vm.define "centos" do |cfg|
     cfg.vm.box = "centos/7"
     cfg.vm.hostname = "centos"
-    cfg.disksize.size = "25GB"
     cfg.vm.network "private_network", ip: "192.168.33.12", auto_config: true
-    cfg.vm.network "forwarded_port", guest: 80, host: 80
-    cfg.vm.network "forwarded_port", guest: 9090, host: 9090
+    cfg.vm.network "forwarded_port", guest: 80, host: 8080
+    cfg.vm.network "forwarded_port", guest: 9090, host: 9091
     cfg.vm.provider :virtualbox do |vb|
       vb.name = "centos"
       vb.memory = 2048
       vb.cpus = 2
       vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
-    config.vm.provision "ansible" do |ansible|
+    cfg.vm.provision "ansible" do |ansible|
       ansible.playbook = "./ansible/playbook.yml"
     end
   end

@@ -29,6 +29,16 @@
         gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
         file: elastic
 
+    - name: Add Microsoft Repository
+      yum_repository:
+        name: packages-microsoft-com-prod
+        description: Microsoft Repo for RHEL-based
+        enabled: yes
+        gpgcheck: yes
+        baseurl: https://packages.microsoft.com/rhel/7/prod/
+        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+        file: prod
+
 
     - name: Clean Yum Cache
       command: yum clean all
@@ -210,8 +220,8 @@
         group: root
         mode: '0600'
 
-    - name: Run Filebeat Setup
-      command: filebeat setup
+    - name: Run Auditbeat Setup
+      command: auditbeat setup --dashboards
 
     - name: Start & Enable Auditbeat
       systemd:
@@ -224,23 +234,75 @@
 # Journalbeat Setup
 ###################################
 
-    - name: Install Journalbeat
-      yum:
-        name: journalbeat
-        state: present
+    # - name: Install Journalbeat
+    #   yum:
+    #     name: journalbeat
+    #     state: present
 
-    - name: Start & Enable Journalbeat
-      systemd:
-        name: filebeat
-        state: started
-        enabled: yes    
+    # - name: Start & Enable Journalbeat
+    #   systemd:
+    #     name: filebeat
+    #     state: started
+    #     enabled: yes    
 
-    - name: Configure Journalbeat
-      copy:
-        src: ./files/journalbeat.yml
-        dest: /etc/journalbeat/journalbeat.yml
-        owner: root
-        group: root
+    # - name: Configure Journalbeat
+    #   copy:
+    #     src: ./files/journalbeat.yml
+    #     dest: /etc/journalbeat/journalbeat.yml
+    #     owner: root
+    #     group: root
     
 
 
+###################################
+# Powershell Setup
+###################################
+
+    - name: Install Powershell
+      yum:
+        name: powershell
+        state: present
+
+    - name: Enable Powershell Remoting
+      command: pwsh -Command {Enable-PSRemoting -Force}
+
+    - name: Uncomment Pass Auth Yes
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#PasswordAuthentication\s+yes'
+        line: PasswordAuthentication yes
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Comment out Passauth No
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication\s+no'
+        line: '# PasswordAuthentication no'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Allow SSH Pubkey Auth
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#PubkeyAuthentication\s+yes'
+        line: 'PubkeyAuthentication yes'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Add PS Subsystem to PS remote over SSH
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: 'Subsystem powershell /usr/bin/pwsh -sshs -NoLogo'
+        create: yes
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Restart sshd service
+      systemd:
+        name: sshd
+        state: restarted
