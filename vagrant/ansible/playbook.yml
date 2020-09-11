@@ -69,6 +69,12 @@
         immediate: yes
         state: enabled
 
+    - name: Enable Cockpit Service
+      systemd: 
+        name: cockpit
+        state: started
+        enabled: yes 
+
 
 ###################################
 # Web Server
@@ -99,13 +105,13 @@
 # base image has auditd already installed and enabled
 ###################################
 
-    # - name: Configure Auditd
-    #   copy:
-    #     src: ./files/audit.rules
-    #     dest: /etc/audit/rules.d/audit.rules
-    #     owner: root
-    #     group: root
-    #     mode: '0700'
+    - name: Configure Auditd
+      copy:
+        src: ./files/audit.rules
+        dest: /etc/audit/rules.d/audit.rules
+        owner: root
+        group: root
+        mode: '0700'
  
 
 
@@ -141,9 +147,13 @@
     
     - name: Start & Enable Samba
       systemd: 
-        name: nginx
+        name: "{{ services }}"
         state: started
         enabled: yes
+      vars:
+        services:
+          - smb
+          - nmb
 
     - name: Add Samba Firewall Rule
       firewalld:
@@ -171,6 +181,11 @@
         owner: root
         group: root
         mode: '0544'
+
+    - name: Copy Data to SMB Share
+      copy:
+        src: ./files/executive-credentials.secret
+        dest: /srv/samba/anonymous
 
 
 ###################################
