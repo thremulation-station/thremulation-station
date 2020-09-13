@@ -16,12 +16,15 @@ The goal of this project is to create a [Vagrant Multi-Machine]() training envir
 - Vagrant vagrant-disksize plugin
 - Ansible
 
-
 #### Homebrew Install
 
 1. Ensure that you have the [Brew](https://brew.sh/) package manager installed, as you will use `brew` to install everything else.
 
 1. Update brew: `brew update`
+
+#### Git Install
+
+1. Install Git so that you can download this repository with `brew install git`.
 
 
 #### Virtualbox Install
@@ -31,14 +34,16 @@ The goal of this project is to create a [Vagrant Multi-Machine]() training envir
 
 #### Vagrant Install
 
-1. Install Vagrant: `brew install vagrant`
-1. Install disk syntax plugin: `brew install vagrant-disksize`
+1. Install Vagrant: `brew cask install vagrant`
+1. Install disk syntax plugin: `vagrant plugin install vagrant-disksize`
 
 #### Ansible Install
 
 1. Install Ansible: `brew install ansible`
 
+#### Collect the Repository
 
+1. Collect the repository, which includes everyihtng else you will need with `git clone https://github.com/mocyber/ThreatEmulation-DetectionLab.git`
 
 ## Basic Usage
 
