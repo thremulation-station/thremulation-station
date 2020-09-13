@@ -59,11 +59,11 @@ Now that you have all the necessary tools and files, let's get started.
 
 #### Building the Range
 
-1. Move into this repo's vagrant directory: `<THISREPO>/vagrant`
+1. Move into this repo's vagrant directory: `cd ThreatEmulation-DetectionLab/vagrant`
 
 1. Kick of the import / build / provisioning of all machines: `vagrant up`
 
-1. Get yourself some :coffee: , this will take a sec.
+1. Get yourself some :coffee: , this will take a sec <- by second, @seven62 means like an hour. Drink you cup very very slowly.
 
 
 #### Primary Access
