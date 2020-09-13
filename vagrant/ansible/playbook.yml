@@ -154,15 +154,17 @@
           - samba-client
           - samba-common
     
-    - name: Start & Enable Samba
+    - name: Start & Enable SMB Service
       systemd: 
-        name: "{{ services }}"
+        name: smb
         state: started
         enabled: yes
-      vars:
-        services:
-          - smb
-          - nmb
+        
+    - name: Start & Enable NMB Service
+      systemd: 
+        name: nmb
+        state: started
+        enabled: yes
 
     - name: Add Samba Firewall Rule
       firewalld:
