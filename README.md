@@ -10,6 +10,8 @@ The goal of this project is to create a [Vagrant Multi-Machine]() training envir
 
 ### Requirements
 
+The following tools are required to get the project started on your local system:
+
 - Homebrew
 - Virtualbox
 - Vagrant
@@ -17,37 +19,44 @@ The goal of this project is to create a [Vagrant Multi-Machine]() training envir
 - Ansible
 
 
-#### Homebrew Install
+#### Homebrew
 
-1. Ensure that you have the [Brew](https://brew.sh/) package manager installed, as you will use `brew` to install everything else.
+It is recommended to use [Homebrew](https://brew.sh/) which simplifies package management and installation for all requirements
+
+1. Follow the instructions at the above link to use the "one-liner" install method.
 
 1. Update brew: `brew update`
 
 
-#### Virtualbox Install
+#### Installation
 
-1. Install Virtualbox: `brew cask install virtualbox`
+Now that `brew` is available let's grab the rest of the requirements. You can copy / paste the following into your terminal:
 
+```sh
+brew cask install virtualbox
 
-#### Vagrant Install
+brew install vagrant \
+vagrant-disksize \
+ansible \
+git
+```
 
-1. Install Vagrant: `brew install vagrant`
-1. Install disk syntax plugin: `brew install vagrant-disksize`
+### Cloning the Project
 
-#### Ansible Install
+Once all requirements are installed it's time to clone the project locally with git.
 
-1. Install Ansible: `brew install ansible`
+1. `git clone https://github.com/mocyber/ThreatEmulation-DetectionLab.git`
 
-
+---
 
 ## Basic Usage
 
-Now that you have all the necessary tools, let's get started:
+Now that you have all the necessary tools and files, let's get started.
 
 
-#### Building Range
+#### Building the Range
 
-1. Move into this repo's vagrant directory: `ThreatEmulation-DetectionLab/vagrant`
+1. Move into this repo's vagrant directory: `<THISREPO>/vagrant`
 
 1. Kick of the import / build / provisioning of all machines: `vagrant up`
 
@@ -60,9 +69,9 @@ Once the lab has finished building let's ensure you can access things:
 
 1. To reach Kibana browse to `localhost:5601`
 
-1. The credentials for Kibana are:
-    user: `vagrant`
-    pass: `vagrant`
+        Kibana Credentials
+        user: vagrant
+        pass: vagrant
 
 1. Once in Kibana click the 3 hash dropdown menu in the upper left corner of the UI and select the "Discover" tab.
 
@@ -72,7 +81,7 @@ Once the lab has finished building let's ensure you can access things:
 
 #### First Threat (Functions Check)
 
-1. Now from your terminal run $`vagrant ssh elastic` to remotely access the "elastic" logger / attacker box.
+1. From your terminal run $`vagrant ssh elastic` to remotely access the "elastic" logger / attacker box.
 
 > Your prompt will update to the following `[vagrant@elk ~]$`.
 
