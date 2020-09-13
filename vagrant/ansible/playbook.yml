@@ -105,13 +105,19 @@
 # base image has auditd already installed and enabled
 ###################################
 
-    - name: Configure Auditd
+    - name: Copy Auditd Configuration
       copy:
         src: ./files/audit.rules
-        dest: /etc/audit/rules.d/audit.rules
+        dest: /etc/audit/audit.rules
         owner: root
         group: root
         mode: '0700'
+
+    - name: Stop and Disable Auditd Service
+      systemd:
+        name: auditd
+        state: stopped
+        enabled: no
  
 
 
@@ -120,13 +126,16 @@
 # base image has rsyslog already installed and enabled
 ###################################
 
-    # - name: Install Rsyslog
-    #   yum:
-    #     name: rsyslog
-    #     state: started
-    #     enabled: yes
+    - name: Install Rsyslog
+      yum:
+        name: rsyslog
+        state: present
 
-    # - name: Configure Rsyslog
+    - name: Start and Enable Rsyslog
+      systemd: 
+        name: rsyslog
+        state: started
+        enabled: yes
 
 
 
@@ -170,9 +179,6 @@
         mode: '0755'
         owner: nobody
         group: nobody
-      
-    - name: Set SELinux Context on Samba Share
-      command: chcon -t samba_share_t /srv/samba/anonymous
 
     - name: Configure Samba
       copy:
@@ -186,6 +192,9 @@
       copy:
         src: ./files/executive-credentials.secret
         dest: /srv/samba/anonymous
+        
+    - name: Set SELinux Context on Samba Share
+      command: chcon -Rt samba_share_t /srv/samba/anonymous
 
 
 ###################################

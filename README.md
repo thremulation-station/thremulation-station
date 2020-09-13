@@ -10,74 +10,91 @@ The goal of this project is to create a [Vagrant Multi-Machine]() training envir
 
 ### Requirements
 
+The following tools are required to get the project started on your local system:
+
 - Homebrew
 - Virtualbox
 - Vagrant
 - Vagrant vagrant-disksize plugin
 - Ansible
 
-#### Homebrew Install
 
-1. Ensure that you have the [Brew](https://brew.sh/) package manager installed, as you will use `brew` to install everything else.
+#### Homebrew
+
+It is recommended to use [Homebrew](https://brew.sh/) which simplifies package management and installation for all requirements
+
+1. Follow the instructions at the above link to use the "one-liner" install method.
 
 1. Update brew: `brew update`
 
-#### Git Install
 
-1. Install Git so that you can download this repository with `brew install git`.
+#### Installation
+
+Now that Brew is available let's grab the rest of the requirements. You can copy / paste the following into your terminal:
+
+```sh
+brew cask install virtualbox
+
+brew install vagrant \
+vagrant-disksize \
+ansible \
+git
+```
 
 
-#### Virtualbox Install
+### Cloning the Project
 
-1. Install Virtualbox: `brew cask install virtualbox`
+Once all requirements are installed it's time to clone the project locally with git.
+
+1. `git clone https://github.com/mocyber/ThreatEmulation-DetectionLab.git`
 
 
-#### Vagrant Install
-
-1. Install Vagrant: `brew cask install vagrant`
-1. Install disk syntax plugin: `vagrant plugin install vagrant-disksize`
-
-#### Ansible Install
-
-1. Install Ansible: `brew install ansible`
-
-#### Collect the Repository
-
-1. Collect the repository, which includes everyihtng else you will need with `git clone https://github.com/mocyber/ThreatEmulation-DetectionLab.git`
+---
 
 ## Basic Usage
 
-Now that you have all the necessary tools, let's get started:
+Now that you have all the necessary tools and files, let's get started.
 
 
-#### Building Range
+#### Building the Range
 
-1. Move into this repo's vagrant directory: `ThreatEmulation-DetectionLab/vagrant`
+1. Move into this repo's vagrant directory: `<THISREPO>/vagrant`
 
 1. Kick of the import / build / provisioning of all machines: `vagrant up`
 
 1. Get yourself some :coffee: , this will take a sec.
 
 
-#### Initial Access
+#### Primary Access
 
-Once the lab has finished building let's ensure you can access things:
+This lab environment is designed for users to execute and detect threats by interacting with 2 primary interfaces:
 
-1. To reach Kibana browse to `localhost:5601`
+1. **Kibana WebUI**
 
-1. The credentials for Kibana are:
-    user: `vagrant`
-    pass: `vagrant`
+- to reach Kibana browse to `localhost:5601`
 
-1. Once in Kibana click the 3 hash dropdown menu in the upper left corner of the UI and select the "Discover" tab.
+        Kibana Credentials
+        user: vagrant
+        pass: vagrant
 
-1. Update the timeframe to "last hour" to verify you are seeing logs.
+- once in Kibana click the 3 hash dropdown menu in the upper left corner of the UI and select the "Discover" tab.
+
+> Ensure that the timepicker is set to the most recent timeframe, example "Last 24 hours".
+
+1. **Atomic Redteam**
+
+This adversary emulation toolset is accessed by sshing into the "elastic" box and starting a powershell session.
+
+- ssh to the elastic vbox:
+    - $`vagrant ssh elastic`
+- start a powershell session
+    - $`pwsh`
 
 
 
 #### First Threat (Functions Check)
 
-1. Now from your terminal run $`vagrant ssh elastic` to remotely access the "elastic" logger / attacker box.
+1. From your terminal run $`vagrant ssh elastic` to remotely access the "elastic" logger / attacker box.
 
 > Your prompt will update to the following `[vagrant@elk ~]$`.
 
