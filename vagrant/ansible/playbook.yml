@@ -118,7 +118,7 @@
   
     - name: Disable Auditd Service
       systemd:
-        name: audit
+        name: auditd
         enabled: no
 
 
