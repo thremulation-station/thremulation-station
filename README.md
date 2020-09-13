@@ -41,11 +41,13 @@ ansible \
 git
 ```
 
+
 ### Cloning the Project
 
 Once all requirements are installed it's time to clone the project locally with git.
 
 1. `git clone https://github.com/mocyber/ThreatEmulation-DetectionLab.git`
+
 
 ---
 
