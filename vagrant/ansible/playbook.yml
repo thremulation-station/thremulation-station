@@ -113,12 +113,13 @@
         group: root
         mode: '0700'
 
-    - name: Stop and Disable Auditd Service
+    - name: Stop Auditd Service
+      command: service auditd stop
+  
+    - name: Disable Auditd Service
       systemd:
-        name: auditd
-        state: stopped
+        name: audit
         enabled: no
- 
 
 
 ###################################
