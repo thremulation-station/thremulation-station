@@ -36,9 +36,10 @@ Now that Brew is available let's grab the rest of the requirements. You can copy
 brew cask install virtualbox
 
 brew install vagrant \
-vagrant-disksize \
 ansible \
 git
+
+vagrant plugin install vagrant-disksize
 ```
 
 
