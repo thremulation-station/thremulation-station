@@ -30,7 +30,7 @@ It is recommended to use [Homebrew](https://brew.sh/) which simplifies package m
 
 #### Installation
 
-Now that `brew` is available let's grab the rest of the requirements. You can copy / paste the following into your terminal:
+Now that Brew is available let's grab the rest of the requirements. You can copy / paste the following into your terminal:
 
 ```sh
 brew cask install virtualbox
@@ -63,19 +63,30 @@ Now that you have all the necessary tools and files, let's get started.
 1. Get yourself some :coffee: , this will take a sec.
 
 
-#### Initial Access
+#### Primary Access
 
-Once the lab has finished building let's ensure you can access things:
+This lab environment is designed for users to execute and detect threats by interacting with 2 primary interfaces:
 
-1. To reach Kibana browse to `localhost:5601`
+1. **Kibana WebUI**
+
+- to reach Kibana browse to `localhost:5601`
 
         Kibana Credentials
         user: vagrant
         pass: vagrant
 
-1. Once in Kibana click the 3 hash dropdown menu in the upper left corner of the UI and select the "Discover" tab.
+- once in Kibana click the 3 hash dropdown menu in the upper left corner of the UI and select the "Discover" tab.
 
-1. Update the timeframe to "last hour" to verify you are seeing logs.
+> Ensure that the timepicker is set to the most recent timeframe, example "Last 24 hours".
+
+1. **Atomic Redteam**
+
+This adversary emulation toolset is accessed by sshing into the "elastic" box and starting a powershell session.
+
+- ssh to the elastic vbox:
+    - $`vagrant ssh elastic`
+- start a powershell session
+    - $`pwsh`
 
 
 
