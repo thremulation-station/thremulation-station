@@ -33,11 +33,9 @@ It is recommended to use [Homebrew](https://brew.sh/) which simplifies package m
 Now that Brew is available let's grab the rest of the requirements. You can copy / paste the following into your terminal:
 
 ```sh
-brew cask install virtualbox
+brew cask install virtualbox vagrant
 
-brew install vagrant \
-ansible \
-git
+brew install ansible git
 
 vagrant plugin install vagrant-disksize
 ```
