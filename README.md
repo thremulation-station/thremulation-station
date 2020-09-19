@@ -16,7 +16,6 @@ The following tools are required to get the project started on your local system
 - Virtualbox
 - Vagrant
 - Vagrant vagrant-disksize plugin
-- Ansible
 
 
 #### Homebrew
@@ -35,7 +34,7 @@ Now that Brew is available let's grab the rest of the requirements. You can copy
 ```sh
 brew cask install virtualbox vagrant
 
-brew install ansible git
+brew install git
 
 vagrant plugin install vagrant-disksize
 ```
