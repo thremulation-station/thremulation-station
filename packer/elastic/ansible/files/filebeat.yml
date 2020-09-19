@@ -1,0 +1,29 @@
+# Reference
+# https://www.elastic.co/guide/en/beats/filebeat/current/configuring-howto-filebeat.html
+
+filebeat.config.modules:  
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: true  
+  reload.period: 10s
+
+
+filebeat.inputs:
+- type: log  
+  enabled: true 
+  paths:    
+    - /var/log/auth.log
+    - /var/log/syslog
+    - /var/log/samba/*
+    - /var/log/nginx/access.log
+
+  
+output.elasticsearch:  
+  hosts: ["192.168.33.10:9200"]
+
+
+setup.kibana:  
+  host: "192.168.33.10:5601"  
+  username: vagrant  
+  password: vagrant
+  setup.dashboards.enabled: true
+  setup.ilm.enabled: false

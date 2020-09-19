@@ -13,11 +13,9 @@
         - https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
         - https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
-
     - name: Add EPEL Repository
       yum:
         name: epel-release
-
 
     - name: Add Elastic Repository
       yum_repository:
@@ -39,11 +37,9 @@
         gpgkey: https://packages.microsoft.com/keys/microsoft.asc
         file: prod
 
-
     - name: Clean Yum Cache
       command: yum clean all
-    
-    
+
     - name: Install System Tools
       yum:
         name: "{{ packages }}"
@@ -54,12 +50,18 @@
           - nano
           - tmux
           - cockpit
+          - git
+          - wget
 
     - name: Start Firewalld Service
       systemd:
         name: firewalld
         state: started
         enabled: yes
+
+###################################
+# Cockpit
+###################################
 
     - name: Add Cockpit Firewall Rule
       firewalld:
@@ -69,11 +71,16 @@
         immediate: yes
         state: enabled
 
+    - name: Install Cockpit
+      yum: 
+        name: cockpit
+        state: present
+
     - name: Enable Cockpit Service
       systemd: 
         name: cockpit
         state: started
-        enabled: yes 
+        enabled: yes
 
 
 ###################################
@@ -102,7 +109,6 @@
 
 ####################################
 # Auditd
-# base image has auditd already installed and enabled
 ###################################
 
     - name: Copy Auditd Configuration
@@ -124,7 +130,6 @@
 
 ###################################
 # Syslog Server
-# base image has rsyslog already installed and enabled
 ###################################
 
     - name: Install Rsyslog
@@ -137,7 +142,6 @@
         name: rsyslog
         state: started
         enabled: yes
-
 
 
 ###################################
@@ -201,7 +205,7 @@
 
 
 ###################################
-# Filebeat Setup
+# Filebeat
 ###################################
 
     - name: Install Filebeat
@@ -220,8 +224,8 @@
     - name: Enable Filebeat Modules
       command: "filebeat modules enable nginx system"
 
-    - name: Run Filebeat Setup
-      command: "filebeat setup"
+    # - name: Run Filebeat Setup
+    #   command: "filebeat setup"
 
     - name: Start & Enable Filebeat
       systemd:
@@ -229,9 +233,9 @@
         state: started
         enabled: yes    
 
-  
+
 ###################################
-# Auditbeat Setup
+# Auditbeat
 ###################################
 
     - name: Install Auditbeat
@@ -247,8 +251,8 @@
         group: root
         mode: '0600'
 
-    - name: Run Auditbeat Setup
-      command: auditbeat setup --dashboards
+    # - name: Run Auditbeat Setup
+    #   command: auditbeat setup --dashboards
 
     - name: Start & Enable Auditbeat
       systemd:
@@ -258,31 +262,7 @@
 
 
 ###################################
-# Journalbeat Setup
-###################################
-
-    # - name: Install Journalbeat
-    #   yum:
-    #     name: journalbeat
-    #     state: present
-
-    # - name: Start & Enable Journalbeat
-    #   systemd:
-    #     name: filebeat
-    #     state: started
-    #     enabled: yes    
-
-    # - name: Configure Journalbeat
-    #   copy:
-    #     src: ./files/journalbeat.yml
-    #     dest: /etc/journalbeat/journalbeat.yml
-    #     owner: root
-    #     group: root
-    
-
-
-###################################
-# Powershell Setup
+# Powershell
 ###################################
 
     - name: Install Powershell
@@ -292,6 +272,11 @@
 
     - name: Enable Powershell Remoting
       command: pwsh -Command {Enable-PSRemoting -Force}
+
+
+###################################
+# SSH Configuration
+###################################
 
     - name: Uncomment Pass Auth Yes
       lineinfile:
@@ -325,6 +310,40 @@
         path: /etc/ssh/sshd_config
         line: 'Subsystem powershell /usr/bin/pwsh -sshs -NoLogo'
         create: yes
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Create Vagrant User SSH Directory
+      file:
+        path: /home/vagrant/.ssh
+        state: directory
+        owner: vagrant
+        mode: '0700'
+
+    - name: Retrieve Default Vagrant Pub Key
+      command: wget --no-check-certificate https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub -O /home/vagrant/.ssh/authorized_keys
+
+    # - name: Copy Authorizedkeys File
+    #   copy:
+    #     src: ./files/authorizedkeys
+    #     dest: /home/vagrant/.ssh/authorizedkeys
+    #     owner: vagrant
+    #     group: vagrant
+    #     mode: '0600'
+  
+    - name: Update Permissions of SSH Key
+      file:
+        path: /home/vagrant/.ssh/authorized_keys
+        state: file
+        owner: vagrant
+        mode: '0600'
+  
+    - name: Add AuthorizedKeysFile to Config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AuthorizedKeysFile\s+\.ssh/authorized_keys'
+        line: 'AuthorizedKeysFile %h/.ssh/authorized_keys'
         owner: root
         group: root
         mode: '0600'

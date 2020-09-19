@@ -46,7 +46,8 @@ output.elasticsearch:
 "@
   $confFile | Out-File -FilePath C:\ProgramData\chocolatey\lib\winlogbeat\tools\winlogbeat.yml -Encoding ascii
 
-  winlogbeat --path.config C:\ProgramData\chocolatey\lib\winlogbeat\tools setup
+  # The setup command is shifted to a separate standalone script called in the Vagrantfile
+  # winlogbeat --path.config C:\ProgramData\chocolatey\lib\winlogbeat\tools setup
   
   C:\ProgramData\chocolatey\lib\winlogbeat\tools\winlogbeat.exe test config -c .\winlogbeat.yml -e
 
