@@ -36,7 +36,7 @@ brew cask install virtualbox vagrant
 
 brew install git
 
-vagrant plugin install vagrant-disksize
+vagrant plugin install vagrant-vbguest vagrant-disksize
 ```
 
 
