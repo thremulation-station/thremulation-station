@@ -65,7 +65,8 @@
       "./scripts/install-sysmon.ps1",
       "./scripts/install-pwshssh.ps1",
       "./scripts/install-advaudit.ps1",
-      "./scripts/disable-windef.ps1"
+      "./scripts/disable-windef.ps1",
+      "./scripts/cleanup.ps1"
     ]},
   {
     "type": "windows-restart",
