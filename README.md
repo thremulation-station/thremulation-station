@@ -2,12 +2,6 @@
 
 The goal of this project is to create a [Vagrant Multi-Machine]() training environment in order to conduct threat detection classes during drill weekend classes.
 
-
-## Setup
-
-> Note: This section assumes that you're using macOS for your local development system (contributions welcome).
-
-
 ### Requirements
 
 The following tools are required to get the project started on your local system:
@@ -19,33 +13,60 @@ The following tools are required to get the project started on your local system
 - Ansible
 
 
-#### Homebrew
+## Installation
+<details>
+  <summary>macOS Setup</summary>
+  
+  1. Install and Update Homebrew
+        * It is recommended to use [Homebrew](https://brew.sh/) which simplifies package management and installation for all requirements
+        * Follow the instructions at the above link to use the "one-liner" install method.
+        * Update brew: `brew update`
+  1. Install remaining requirements. You can copy / paste the following into your terminal:
 
-It is recommended to use [Homebrew](https://brew.sh/) which simplifies package management and installation for all requirements
+        ```sh
+        brew cask install virtualbox vagrant
 
-1. Follow the instructions at the above link to use the "one-liner" install method.
+        brew install ansible git
 
-1. Update brew: `brew update`
+        vagrant plugin install vagrant-disksize
+        ```
+  1. Clone the Project
+        * `git clone https://github.com/mocyber/ThreatEmulation-DetectionLab.git`
+</details>
+
+<details>
+  <summary>Linux Setup</summary>
+  <br>
+
+  This section assumes that you're using a RHEL-based distro, preferrably 
+  **Centos 7**. All commands assume a root shell (`sudo -s`).
+  
+  1. Install requirements
+        ```sh
+        yum groupinstall -y "Development Tools"
+
+        yum install -y \
+        kernel-devel \
+        kernel-devel-3.10.0-1127.el7.x86_64 \
+        epel-release \
+
+        yum install -y ansible
+        ```
+  
+  1. Install Vagrant
+        * `yum install -y https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.rpm`
+        * `vagrant plugin install vagrant-disksize`
+
+  1. Install VirtualBox
+        * `curl -o /etc/yum.repos.d/virtualbox.repo http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo`
+        * `rpm --import https://www.virtualbox.org/download/oracle_vbox.asc
+        * `yum install -y VirtualBox-6.0`
+
+  1. Clone the Project
+        * `git clone https://github.com/mocyber/ThreatEmulation-DetectionLab.git`
+</details>
 
 
-#### Installation
-
-Now that Brew is available let's grab the rest of the requirements. You can copy / paste the following into your terminal:
-
-```sh
-brew cask install virtualbox vagrant
-
-brew install ansible git
-
-vagrant plugin install vagrant-disksize
-```
-
-
-### Cloning the Project
-
-Once all requirements are installed it's time to clone the project locally with git.
-
-1. `git clone https://github.com/mocyber/ThreatEmulation-DetectionLab.git`
 
 
 ---
@@ -61,7 +82,9 @@ Now that you have all the necessary tools and files, let's get started.
 
 1. Kick of the import / build / provisioning of all machines: `vagrant up`
 
-1. Get yourself some :coffee: , this will take a sec <- by "a sec", @seven62 means like an hour. Drink you cup very very slowly.
+1. Get yourself some :coffee: , this will take a sec
+
+> By a "sec", @seven62 means like 15-20 min. Drink you cup very very slowly.
 
 
 #### Primary Access

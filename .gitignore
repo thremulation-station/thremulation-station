@@ -13,4 +13,9 @@
 # ignore iso files
 **iso/*.iso
 
+# ignore packer output .box files
+packer/output/*.box
+
 **.vbox-extpack
+
+**output-virtualbox-iso/

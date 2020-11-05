@@ -1,6 +1,6 @@
 {
   "variables": {
-    "iso_path": "../iso/10240.16384.150709-1700.TH1_CLIENTENTERPRISEEVAL_OEMRET_X64FRE_EN-US.ISO",
+    "iso_path": "/Users/seven62/vm-iso/10240.16384.150709-1700.TH1_CLIENTENTERPRISEEVAL_OEMRET_X64FRE_EN-US.ISO",
     "iso_md5": "6cd2f47f2c32faa7be85f1dc81af3220",
     "switch_name": "Default Switch"
   },
@@ -55,12 +55,17 @@
   {
     "type": "powershell",
     "scripts": [
-      "install-guest-tools.ps1",
-      "enable-rdp.ps1",
-      "disable-hibernate.ps1",
-      "disable-autologin.ps1",
-      "enable-uac.ps1",
-      "no-expiration.ps1"
+      "./scripts/install-guest-tools.ps1",
+      "./scripts/enable-rdp.ps1",
+      "./scripts/disable-hibernate.ps1",
+      "./scripts/disable-autologin.ps1",
+      "./scripts/enable-uac.ps1",
+      "./scripts/no-expiration.ps1",
+      "./scripts/install-winlogbeat.ps1",
+      "./scripts/install-sysmon.ps1",
+      "./scripts/install-pwshssh.ps1",
+      "./scripts/install-advaudit.ps1",
+      "./scripts/disable-windef.ps1"
     ]},
   {
     "type": "windows-restart",
@@ -74,7 +79,7 @@
     {
       "type": "vagrant",
       "keep_input_artifact": false,
-      "output": "{{.Provider}}_windows-10-{{timestamp}}.box",
+      "output": "../output/{{.Provider}}_windows-10-{{timestamp}}.box",
       "vagrantfile_template": "vagrantfile.template"
     }
   ]
