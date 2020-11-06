@@ -53,7 +53,7 @@
     },
     {
       "type": "shell",
-      "scripts": "./scripts/install-invokeatomictestby.ps1"
+      "scripts": "./scripts/install-caldera.ps1"
     },
     {
       "type": "shell",
