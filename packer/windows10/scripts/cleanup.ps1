@@ -1,3 +1,15 @@
+if (Get-Command -cmdname 'Uninstall-WindowsFeature') {
+    Write-Host "Removing unused features..."
+    Remove-WindowsFeature -Name 'Powershell-ISE'
+    Get-WindowsFeature | 
+    ? { $_.InstallState -eq 'Available' } | 
+    Uninstall-WindowsFeature -Remove
+}
+
+Write-Host "Removing page file"
+$pageFileMemoryKey = "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management"
+Set-ItemProperty -Path $pageFileMemoryKey -Name PagingFiles -Value ""
+
 Write-Host "Cleaning Temp Files"
 try {
   Takeown /d Y /R /f "C:\Windows\Temp\*"
@@ -33,3 +45,8 @@ finally {
 }
  
 Remove-Item $FilePath
+
+Write-Host "Recreate pagefile"
+$System = GWMI Win32_ComputerSystem -EnableAllPrivileges
+$System.AutomaticManagedPagefile = $true
+$System.Put()
