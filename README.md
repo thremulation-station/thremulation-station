@@ -56,6 +56,7 @@ The following tools are required to get the project started on your local system
   1. Install Vagrant
         * `yum install -y https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.rpm`
         * `vagrant plugin install vagrant-disksize`
+        * `vagrant plugin install vagrant-vbguest`
 
   1. Install VirtualBox
         * `curl -o /etc/yum.repos.d/virtualbox.repo http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo`
