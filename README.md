@@ -29,6 +29,7 @@ The following tools are required to get the project started on your local system
         brew install ansible git
 
         vagrant plugin install vagrant-disksize
+        vagrant plugin install vagrant-vbguest
         ```
   1. Clone the Project
         * `git clone https://github.com/mocyber/ThreatEmulation-DetectionLab.git`
