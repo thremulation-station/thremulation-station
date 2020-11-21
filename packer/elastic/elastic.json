@@ -53,7 +53,7 @@
     },
     {
       "type": "shell",
-      "scripts": "./scripts/install-caldera.ps1"
+      "scripts": "./scripts/install-caldera.sh"
     },
     {
       "type": "shell",

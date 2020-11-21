@@ -19,3 +19,7 @@ packer/output/*.box
 **.vbox-extpack
 
 **output-virtualbox-iso/
+
+**.DS_Store
+
+**.log
