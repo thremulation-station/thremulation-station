@@ -1,4 +1,5 @@
-# ThreatEmulation-DetectionLab
+# Thremulation Station
+Threat Hunting... the best video game of all!
 
 The goal of this project is to create a [Vagrant Multi-Machine]() training environment in order to conduct threat detection classes during drill weekend classes.
 
