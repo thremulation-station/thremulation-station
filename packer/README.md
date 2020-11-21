@@ -19,8 +19,7 @@ Here's a high-level overview of how each box is set up.
 
 * Elasticsearch
 * Kibana
-* MitreAsssistant
-* Mitreattack UI
+* Atomic Redteam UI
 * Powershell
 * Winlogbeat
 
