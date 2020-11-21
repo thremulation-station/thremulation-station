@@ -16,10 +16,6 @@ sudo pwsh -ex Unrestricted -c {Add-COntent -Path $PROFILE.AllUsersAllHosts -Valu
 
 sudo pwsh -ex Unrestricted -c {Add-Content -Path $PROFILE.AllUsersAllHosts -Value 'Import-Module -Name powershell-yaml -Force'}
 
-sudo pwsh -ex Unrestricted -c {Add-Content -Path $PROFILE.AllUsersAllHosts -Value 'mitre-assistant download -m enterprise'}
-
-sudo pwsh -ex Unrestricted -c {Add-Content -Path $PROFILE.AllUsersAllHosts -Value 'mitre-assistant baseline -m enterprise'}
-
 sudo pwsh -ex Unrestricted -c {& $PROFILE.AllUsersAllHosts}
 
 Find-Module -Name powershell-yaml | Install-Module
