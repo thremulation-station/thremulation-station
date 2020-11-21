@@ -89,7 +89,7 @@
         immediate: yes
         state: enabled
 
-    - name: Add Mitreattack UI Firewall Rule
+    - name: Add AtomicGUI Firewall Rule
       firewalld:
         zone: public
         port: 8487/tcp
@@ -97,30 +97,13 @@
         immediate: yes
         state: enabled
 
-
-###################################
-# MitreAssistant
-###################################
-
-    - name: Create MitreAssistant Directory
-      file:
-        path: /home/vagrant/mitre-assistant
-        state: directory
-        mode: '0755'
-
-    - name: Clone MitreAssistant
-      git: 
-        repo: 'https://github.com/dfirence/mitre-assistant.git'
-        dest: /home/vagrant/mitre-assistant
-
-    - name: Build MitreAssistant
-      shell: /usr/bin/cargo build --release
-      args:
-        chdir: /home/vagrant/mitre-assistant
-        executable: /bin/bash
-
-    - name: Move MitreAssistant Binary
-      command: mv /home/vagrant/mitre-assistant/target/release/mitre-assistant /usr/bin
+    - name: Add Caldera Firewall Rule
+      firewalld:
+        zone: public
+        port: 8888/tcp
+        permanent: yes
+        immediate: yes
+        state: enabled
 
 
 ###################################
