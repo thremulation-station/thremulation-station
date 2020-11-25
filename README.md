@@ -35,6 +35,26 @@ The following tools are required to get the project started on your local system
   1. Clone the Project
         * `git clone https://github.com/mocyber/ThreatEmulation-DetectionLab.git`
 </details>
+<details>
+  <summary>Windows</summary>
+  
+  1. Install and Update Homebrew
+        * It is recommended to use [Homebrew](https://brew.sh/) which simplifies package management and installation for all requirements
+        * Follow the instructions at the above link to use the "one-liner" install method.
+        * Update brew: `brew update`
+  1. Install remaining requirements. You can copy / paste the following into your terminal:
+
+        ```sh
+        choco install virtualbox vagrant
+        refreshenv
+        choco install ansible git
+
+        vagrant plugin install vagrant-disksize
+        vagrant plugin install vagrant-vbguest
+        ```
+  1. Clone the Project
+        * `git clone https://github.com/mocyber/ThreatEmulation-DetectionLab.git`
+</details>
 
 <details>
   <summary>Linux Setup</summary>
