@@ -1,0 +1,51 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build Centos
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ actions-packer-build ]
+  pull_request:
+    branches: [ actions-packer-build ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+          
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel          
+jobs:
+  packer:
+    runs-on: self-hosted
+    name: packer
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout Repository
+        # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+        uses: actions/checkout@v2
+
+#       # fix backwards incompatibilities in template
+#       - name: Fix Template
+#         uses: operatehappy/packer-github-actions@master
+#         with:
+#           command: fix
+
+      # validate templates
+      - name: Validate Template
+        uses: operatehappy/packer-github-actions@master
+        with:
+          command: validate
+          arguments: -syntax-only
+          target: packer/centos/centos.json
+
+      # build artifact
+      - name: Build Artifact
+        uses: operatehappy/packer-github-actions@master
+        with:
+          command: build
+          arguments: "-color=false -on-error=abort"
+          target: packer/centos/centos.json
+
+      # additional steps to process artifacts

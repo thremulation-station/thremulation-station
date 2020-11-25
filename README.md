@@ -37,6 +37,28 @@ The following tools are required to get the project started on your local system
 </details>
 
 <details>
+  <summary>Windows Setup</summary>
+  
+  1. Install and Update Homebrew
+        * It is recommended to use [Chocolatey](https://chocolatey.org/) which simplifies package management and installation for all requirements
+        * Follow the instructions at the above link to use the "one-liner" install method.
+  1. Install remaining requirements. You can copy / paste the following into your terminal:
+
+        ```sh
+        choco install virtualbox vagrant
+        ```
+        Vagrant requires a restart as part of the installation.
+        ```sh
+        choco install ansible git
+
+        vagrant plugin install vagrant-disksize
+        vagrant plugin install vagrant-vbguest
+        ```
+  1. Clone the Project
+        * `git clone https://github.com/mocyber/ThreatEmulation-DetectionLab.git`
+</details>
+
+<details>
   <summary>Linux Setup</summary>
   <br>
 
@@ -176,3 +198,11 @@ Now you can dig into all of the events and start building detections based off o
 1. You can do this by buidling your query using KQL or Lucene and then going to the "Detections" tab in Kibana and selecting "Manage Detection Rules".
 
 Congratulaltions you have executed your first test and hopefully wrote meaningful behavior based detections in order to help detect that activity in the future.
+
+#### Shutdown or "It's broken and I dont know what to fix"
+
+Once you are done playing in your sandbox, you need to clean things up. If you are in the middle of something and want to continue later, invoke a `vagrant suspend`. Otherwise, if you are done for the day invoke a `vagrant halt`. 
+
+Last but not least, if you have goofed up your install you can use `vagrant reload`.
+
+`vagrant --help` is your friend.
