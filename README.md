@@ -176,3 +176,11 @@ Now you can dig into all of the events and start building detections based off o
 1. You can do this by buidling your query using KQL or Lucene and then going to the "Detections" tab in Kibana and selecting "Manage Detection Rules".
 
 Congratulaltions you have executed your first test and hopefully wrote meaningful behavior based detections in order to help detect that activity in the future.
+
+#### Shutdown or "It's broken and I dont know what to fix"
+
+Once you are done playing in your sandbox, you need to clean things up. If you are in the middle of something and want to continue later, invoke a `vagrant suspend`. Otherwise, if you are done for the day invoke a `vagrant halt`. 
+
+Last but not least, if you have goofed up your install you can use `vagrant reload`.
+
+`vagrant --help` is your friend.
