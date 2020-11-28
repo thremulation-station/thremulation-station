@@ -1,5 +1,7 @@
 #! /bin/bash
-echo "Shall we play a game? -WOPR"
+echo "###############################"
+echo "# Shall we play a game? -WOPR #"
+echo "###############################"
 while true; do
     read -p "Do you want install the Windows 10 [Y/N]?" yn
     case $yn in
