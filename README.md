@@ -3,6 +3,8 @@ Threat Hunting... the best video game of all!
 
 The goal of this project is to create a [Vagrant Multi-Machine]() training environment in order to conduct threat detection classes during drill weekend classes.
 
+> **NOTE: ALL BELOW CONTENT IS BEING MIGRATED TO THREMULATION.IO REPO!!
+
 ### Requirements
 
 The following tools are required to get the project started on your local system:
