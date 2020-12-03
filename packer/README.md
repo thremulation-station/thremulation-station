@@ -49,10 +49,10 @@ Here's a high-level overview of how each box is set up.
 * powershell
 
 
-## Get Building
+## Contribution - Get Building
 This guide will assume you zero knowledge of any or all of these systems and want to begin building new custome boxes (work in progress).
 
-#### Requirements
+### Requirements
 
 * **A copy of the [Windows 10 x64 Enterprise Trial](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-10-enterprise)**
 * **Packer / Vagrant** - Tested with Packer 1.2.5 and Vagrant 2.1.2. 
@@ -61,9 +61,9 @@ This guide will assume you zero knowledge of any or all of these systems and wan
 * **[Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)**
 
 
-#### How to Build a Box
+### How to Build a Box
 
-* Install [Vagrant](https://www.vagrantup.com/).
+* Install [Vagrant](https://www.vagrantup.com/)
 * Install [Packer](https://packer.io/)
 * Download and install [Virtualbox](https://www.virtualbox.org/)
 * Ensure you have an RDP client
@@ -71,7 +71,7 @@ This guide will assume you zero knowledge of any or all of these systems and wan
 * Determine the **SHA256 hash** of your iso: 
 * To actually build your VM run `packer build packer.json` 
 * You will see build pause on `Waiting for WinRM to become available` - this is normal! If you actually access the console session on your VM you will see that it is getting updates from Microsoft's servers. This can easily take 30 minutes, so be patient. After the updates are all installed, Windows will turn it's WinRM service back on and Packer will continue with the build. 
-* Add the new `.box` file to the vagrant list of images by running `vagrant box add --name [vagrant box name] [name of .box file]`. The name can be anything you want. For xample, this command is valid for Virtualbox: `vagrant box add --name windows10 virtualbox-iso_windows-10.box`
+* Add the new `.box` file to the vagrant list of images by running `vagrant box add --name [vagrant box name] [name of .box file]`. The name can be anything you want. For example, this command is valid for Virtualbox: `vagrant box add --name windows10 virtualbox-iso_windows-10.box`
 * Make a working directory for your Vagrant VM (macOS suggestion: `mkdir ~/Vagrant_Projects/windows10`) and change to that directory
 * Type `vagrant init [vagrant box name]` - for example `vagrant init windows10`
 * Type `vagrant up` and once the box has been launched type `vagrant rdp`
@@ -79,28 +79,33 @@ This guide will assume you zero knowledge of any or all of these systems and wan
 * Stop the box by typing `vagrant halt`. Destroy the box by typing `vagrant destroy`
 
 
-#### How to Upload a Box
+### How to Upload a Box
+
 Here are instructions to upload new "releases" of these custom boxes (for developers 
 of the project). There is a "mocyber" organization that holds the vagrant boxes. 
-This account is protected with 2FA, contact
+This account is protected with 2FA, contact @seven62 for access.
 
-requirements: generate a sha256 checksum for the laters .box version you will be uploading to vagrantcloud:
+This section assumes that you have completed the following:
+1. Successfully generated a local vagrant box by running `packer build <BOXNAME>.json`
+1. Generated a sha256 checksum for the above box file you will be uploading to vagrantcloud:
+    - `shasum -a 256 /path/to/boxfile`
 
-shasum -a 256 /path/to/boxfile
 
-
-1. browse to vagrant cloud: https://app.vagrantup.com/session
-2. login with mocyber org credentials
-3. click on the box you want update the version of
-4. click new version in top right
-5. add a new incremental version and desc > create version
-6. click "add a provider"
-7. enter required info
+1. Browse to vagrant cloud login with mocyber org credentials: 
+    - https://app.vagrantup.com/session
+1. Click on the OS box you want update
+1. Click new version in top right
+1. Add a new incremental version and description > Create Version
+1. Click "add a provider"
+1. Enter required info
     1. virtualbox
-    2. Filehosting: Upload to vagrant cloud
+    2. "Filehosting: Upload to Vagrant Cloud"
     3. checksum type: SHA256
     4. enter latest checksum
-    5. continue to upload
-8. click the "browse" button and select local .box file to upload via web interface
+1. Click "Continue to upload"
+1. Click the "browse" button and select local .box file to upload via web interface
+1. Finally, you will need to "release" this incremental version for pulling from vagrant cloud
+    - Click "Release..."
+    - Click "Release Version"
 
-> NOTE: update the vm.box_version to the latest release version ex. config.vm.box_version = "0.2"
+> NOTE: The main Vagrantfile that defines the environment will need to be updated with this new version. Example: `config.vm.box_version = "0.X`
