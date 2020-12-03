@@ -1,6 +1,6 @@
 {
   "variables": {
-    "iso_path": "../iso/10240.16384.150709-1700.TH1_CLIENTENTERPRISEEVAL_OEMRET_X64FRE_EN-US.ISO",
+    "iso_path": "/Users/colsonwilhoit/Documents/iso/10240.16384.150709-1700.TH1_CLIENTENTERPRISEEVAL_OEMRET_X64FRE_EN-US.ISO",
     "iso_md5": "6cd2f47f2c32faa7be85f1dc81af3220",
     "switch_name": "Default Switch"
   },
