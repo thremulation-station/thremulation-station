@@ -1,0 +1,94 @@
+#! /bin/bash -eux
+
+
+##################
+# define variables
+##################
+
+
+
+
+
+
+##################
+# define functions
+##################
+
+banner_main() {
+    echo "###########################################"
+    echo "##  TODO: LARGER MAIN WELCOME WITH INFO  ##"
+    echo "###########################################"
+    echo ""
+}
+
+banner_setup() {
+    echo "###########################################"
+    echo "###  SETUP                              ###"
+    echo "###########################################"
+    echo ""
+}
+
+banner_deploy() {
+    echo "###########################################"
+    echo "###  SHALL  WE  PLAY  A  GAME?   WOPR   ###"
+    echo "###########################################"
+    echo ""
+}
+
+banner_manage() {
+    echo "###########################################"
+    echo "###  MANAGE                             ###"
+    echo "###########################################"
+    echo ""
+}
+
+
+# function to install dependencies
+run_setup() {
+    # Host OS Detection
+}
+
+
+# function to select what nodes are deployed
+run_deploy() {
+    while true; do
+        clear
+        banner_deploy
+        read -p "Do you want deploy the Windows10 node [Y/N] ? " yn
+        case $yn in
+            [Yy]* ) WINDOWS="windows10"; break;;
+            [Nn]* ) WINDOWS=""; break;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+    while true; do
+        clear
+        banner_deploy
+        read -p "Do you deploy the Centos7 node [Y/N] ? " yn
+        case $yn in
+            [Yy]* ) CENTOS="centos"; break;;
+            [Nn]* ) CENTOS=""; break;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+    while true; do
+        clear
+        banner_deploy
+        read -p "Do you want to (D)ownload / Download & (E)xecute or (C)ancel ? " yn
+        case $yn in
+            [Ee]* ) vagrant up elastic $CENTOS $WINDOWS; break;;
+            [Dd]* ) vagrant box update elastic $CENTOS $WINDOWS; break;;
+            [Cc]* ) break;;
+            * ) echo "Please answer yes or no or cancel.";;
+        esac
+    done
+}
+
+
+# function to perform management tasks
+run_manage() {
+    #show status of services
+    #restart services
+    #clear indexes and clean house
+}
+
