@@ -4,7 +4,7 @@ Thank you for your interest in contributing to Thremulation Station. We've craft
 
 These guidelines will also help you post meaningful issues that will be more easily understood, considered, and resolved. These guidelines are here to help you whether you are creating a bug report, a feature request, an update to documentation, or just need some help.
 
-## Table of Contents
+## TOC
 
 - [Effective issue creation in Thremulation Station](#effective-issue-creation-in-thremulation-station)
   - [Why we create issues before contributing codes](#why-we-create-issues-before-contributing-code)
