@@ -86,6 +86,8 @@ Always submit your pull against `devel` unless you are making changes for the pe
 
 Then sit back and wait. We will probably have a discussion in the pull request and may request changes before merging. We're not trying to get in the way, but want to work with you to get your contributions in Thremulation Station.
 
+**Once a PR is merged, the branch will be deleted.**
+
 ### What to expect from a code review
 
 After a pull is submitted, it needs to get to reviewed. If you have commit permissions on the Thremulation Station repo you will probably perform these steps while submitting your Pull Request. If not, a member of the project team will do them for you, though you can help by suggesting a reviewer for your changes if you've interacted with someone while working on the issue.
