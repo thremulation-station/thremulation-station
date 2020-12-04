@@ -1,6 +1,6 @@
 # Thremulation Station
 
-**UPDATE: ALL PREVIOUS README CONTENT HAS BEEN MIGRATED TO [THREMULATION.IO]()!!**
+**UPDATE: ALL PREVIOUS README CONTENT HAS BEEN MIGRATED TO [THREMULATION.IO](https://github.com/mocyber/thremulation.io)!!**
 
 ---
 
@@ -55,4 +55,4 @@ A simple user experience is the priority. A brief usage overview looks like this
 
 ## How can I help?
 
-We welcome contributions! But what if you don't know what to do, or how to start? Check out the [Contribution Section](/contribution/index.md). If you're lost, please ask and we can help guide you to the right place to get started. 
+We welcome contributions! But what if you don't know what to do, or how to start? Check out the [Contribution Section](/contribution/README.md). If you're lost, please ask and we can help guide you to the right place to get started. 
