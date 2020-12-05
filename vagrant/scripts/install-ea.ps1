@@ -61,7 +61,7 @@
   $policyId = $ApiKeyActual.item[0].policy_id
 
   # Get list of current packages for an up to date Endpoint Version
-  $packageList = (convertfrom-json(Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/epm/packages" -ContentType "application/json" -Headers $headers -Method GET))
+  $packageList = (convertfrom-json(Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/epm/packages?experimental=true" -ContentType "application/json" -Headers $headers -Method GET))
   $endpointPackageVersion = ($packageList.response | Where-Object {$_.name -eq "endpoint"}).version
 
   # Create a json request format suitable for the configuration id
@@ -87,10 +87,12 @@
   Write-Output "Enable Security Integration into Default Config in Ingest Manager"
   Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/package_policies" -ContentType "application/json" -Headers $headers -Method POST -body $securityConfigDictJson
 
+  $winlogPackageVersion = ($packageList.response | where {$_.name -eq "windows"}).version
+
   # Create a json request format suitable for the configuration id
   $windowsConfigDict = @"
   {
-  "name": "windows-1",
+  "name": "windows",
   "description": "",
   "namespace": "default",
   "policy_id": "$policyId",
@@ -98,9 +100,9 @@
   "output_id": "",
   "inputs": [],
   "package": {
-  "name": "windows-1",
+  "name": "windows",
   "title": "Windows",
-  "version": "$endpointPackageVersion"
+  "version": "$winlogPackageVersion"
   }
   }
 "@ | convertfrom-json
