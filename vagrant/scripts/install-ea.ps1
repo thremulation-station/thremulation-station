@@ -15,7 +15,7 @@ $bodyJson = ConvertTo-Json($bodyMsg)
 $kibana_url = "http://192.168.33.10:5601"
 $elasticsearch_url = "http://192.168.33.10:9200"
 
-#RetrieveVersion
+# Retrieve Stack Version
 Invoke-WebRequest -UseBasicParsing $elasticsearch_url -OutFile version.json
 $agent_version = (Get-Content 'version.json' | ConvertFrom-Json).version.number
 
@@ -160,55 +160,3 @@ if ((Get-Service "Elastic Agent") -eq "Stopped") {
   Write-Output "Starting Agent Service"
   Start-Service "elastic-agent"
 }
-
-# # Update endpoint policy to force a configuration update
-# Invoke-WebRequest -Uri "$kibana_url/api/fleet/package_policies/$policy_id" -ContentType "application/json" -Headers $headers -Method PUT
-
-# # Checking to see if Policy was successfull in deploying.  If not, restart the Endpoint Agent
-# $agentStatusResponse = (
-#   ConvertFrom-Json(
-#     Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/agents" -ContentType "application/json" -Headers $headers -Method GET
-#   )
-# )
-# $agentHostId = $agentStatusResponse.list.local_metadata.host.id
-
-# $agentHostId = "";
-# Get-Content elastic-endpoint.yaml | 
-# ForEach-Object -Begin {
-#   $in_fleet = $false;
-#   $in_host = $false;
-# } -Process {
-#   if ($in_fleet -eq $false) {
-#     if ($_ -match '^fleet:') {
-#       $in_fleet = $true;
-#     }
-#   }
-#   elseif ($in_host -eq $false) {
-#     if ($_ -match '^\s+host:') {
-#       $in_host = $true;
-#     }
-#   }
-#   elseif ($_ -match '^\s+id: (?<NodeId>[\d\w-]+)$') {
-#     $agentHostId = $Matches.NodeId;
-#     break
-#   }
-# } -End {}
-
-# Write-Output "Local Endpoint ID: $agentHostId"; 
-
-# $agentPolicyStatus = "$kibana_url/api/endpoint/policy_response?hostId=$agentHostId"
-
-# $ctr = 0
-# do {
-#   try {
-#     Write-Output "Trying $ctr times to fix policy of agent"
-#     $agentStatusResponse = Invoke-WebRequest -UseBasicParsing -Uri  $agentPolicyStatus -ContentType "application/json" -Headers $headers -Method GET -ErrorAction SilentlyContinue -ErrorVariable SearchError
-#   }
-#   catch {
-#     Write-output "Error Message Array: $searchError"
-#     Restart-Service "Elastic Endpoint" -Force
-#     Start-Sleep -Seconds 60
-#   }
-#   $ctr++
-# }
-# until (($agentStatusResponse.statuscode -eq 200) -or ($ctr -eq 5) )
