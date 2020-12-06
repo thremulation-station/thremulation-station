@@ -1,94 +1,305 @@
-#! /bin/bash -eux
+#! /bin/bash
 
-
+​
 ##################
 # define variables
 ##################
-
-
-
-
-
-
+​
+CENTOS=""
+WINDOWS=""
+​
+​
 ##################
 # define functions
 ##################
-
+​
 banner_main() {
     echo "###########################################"
-    echo "##  TODO: LARGER MAIN WELCOME WITH INFO  ##"
+    echo "##        THREMULATION STATION           ##"
+    echo "##                                       ##"
     echo "###########################################"
     echo ""
+    echo "1. Deploy New Thremulation Range"
+    echo "2. Show Status of Current Range"
+    echo "3. Management of Current Range"
+    echo "(E)xit Program"
 }
-
-banner_setup() {
-    echo "###########################################"
-    echo "###  SETUP                              ###"
-    echo "###########################################"
-    echo ""
-}
-
+​
 banner_deploy() {
     echo "###########################################"
-    echo "###  SHALL  WE  PLAY  A  GAME?   WOPR   ###"
+    echo "###  DEPLOY                             ###"
+    echo "###########################################"
+    echo ""
+    echo "1. Quick Deployment -  Deploy everything"
+    echo "2. Custom Deployment - Deploy with choice."
+    echo "(B)ack to Main Menu"
+}
+​
+banner_deployquick() {
+    echo "###########################################"
+    echo "###  DEPLOY QUICK                       ###"
+    echo "###########################################"
+    echo ""
+    echo "(B)ack to Deploy Menu"
+}
+​
+banner_deploycustom() {
+    echo "###########################################"
+    echo "###  DEPLOY CUSTOM                      ###"
+    echo "###########################################"
+    echo ""
+    echo "(B)ack to Deploy Menu"
+}
+​
+banner_check() {
+    echo "###########################################"
+    echo "###  RANGE STATUS                       ###"
     echo "###########################################"
     echo ""
 }
-
+​
 banner_manage() {
     echo "###########################################"
     echo "###  MANAGE                             ###"
     echo "###########################################"
     echo ""
+    echo "1. Update - update to latest version"
+    echo "2. Reboot - restart local boxes (troubleshooting"
+    echo "3. Clear data - delete data in all index "
+    echo "4. Soft Reset - revert to original snapshot"
+    echo "5. Hard Reset - remove and redeploy boxes, return to the build menu to redeploy"
+    echo "6. Nuke and Pave - Burn it down and start over, return to the build menu to redeploy"
+    echo "(B)ack to Main Menu"
 }
-
-
-# function to install dependencies
-run_setup() {
-    # Host OS Detection
+​
+### Main Menu
+main() {
+    while true; do
+        clear
+        banner_main
+        echo ""
+        read -p "Enter an action from the above options: " yn
+        case $yn in
+            [1]* ) deploy; break;;
+            [2]* ) check; break;;
+            [3]* ) manage; break;;
+            [Ee]* ) echo "Exiting..."; sleep 1; clear; break;;
+            * ) echo "Selection invalid, try again.";;
+        esac
+    done
 }
-
-
-# function to select what nodes are deployed
-run_deploy() {
+​
+# Main deployment screen, ask for quick or custom
+deploy() {
+    requirements
     while true; do
         clear
         banner_deploy
-        read -p "Do you want deploy the Windows10 node [Y/N] ? " yn
+        echo ""
+        read -p "Select what kind of deployment would you like: " yn
+        case $yn in
+            [1]* ) deploy_quick; break;;
+            [2]* ) deploy_custom; break;;
+            [Bb]* ) clear; main;break;;
+            * ) echo "Selection invalid, try again.";;
+        esac
+    done
+}
+​
+​
+# Quick deploy is all the things
+deploy_quick() {
+    while true; do
+        clear
+        banner_deployquick
+        echo ""
+        echo "------------------------------------------------------------------------"
+        echo "You have chosen to Quick Deploy all nodes, which includes the following:"
+        echo ""
+        echo "    * elastomic -- control node used to EMULATE and DETECT activity"
+        echo ""
+        echo "    * windows10 -- primary windows client target"
+        echo ""
+        echo "    * centos7   -- target linux server"
+        echo ""
+        read -p "Would you like to proceed with this configuration? [Y/N]: " yn
+        case $yn in
+            [Yy]* )
+                clear
+                banner_deployquick
+                echo ""
+                echo "Deploying all nodes with vagrant up!";
+                vagrant up;
+                sleep 5;
+                echo "Capturing snapshot of clean environment...";
+                snapshot;
+                break;;
+            [Nn]* ) deploy; break;;
+            [Bb]* ) clear; deploy;break;;
+            * ) echo "Selection invalid, try again.";;
+        esac
+    done
+}
+​
+​
+# Custom deploy consists of elastomic box PLUS:
+deploy_custom() {
+    while true; do
+        clear
+        banner_deploycustom
+        echo ""
+        echo 'The "elastomic" box is the first and pivotal node.'
+        echo "What TARGET nodes would you like to deploy?"
+        echo ""
+        read -p "Do you want deploy the Windows10 target node? [Y/N]: " yn
         case $yn in
             [Yy]* ) WINDOWS="windows10"; break;;
             [Nn]* ) WINDOWS=""; break;;
-            * ) echo "Please answer yes or no.";;
         esac
     done
     while true; do
         clear
-        banner_deploy
-        read -p "Do you deploy the Centos7 node [Y/N] ? " yn
+        banner_deploycustom
+        read -p "Do you deploy the Centos7 target node? [Y/N]: " yn
         case $yn in
             [Yy]* ) CENTOS="centos"; break;;
             [Nn]* ) CENTOS=""; break;;
+            [Bb]* ) clear; deploy;break;;
             * ) echo "Please answer yes or no.";;
         esac
     done
     while true; do
         clear
-        banner_deploy
-        read -p "Do you want to (D)ownload / Download & (E)xecute or (C)ancel ? " yn
+        banner_deploycustom
+        echo ""
+        echo "You have chosen the following nodes configuration:"
+        echo ""
+        echo "1. Control Node - elastomic (attack & detect)"
+        echo "2.     ${WINDOWS}"
+        echo "3.     ${CENTOS}"
+        echo ""
+        read -p "Are you ready to proceed with the deployment? [Y/N]: " yn
         case $yn in
-            [Ee]* ) vagrant up elastic $CENTOS $WINDOWS; break;;
-            [Dd]* ) vagrant box update elastic $CENTOS $WINDOWS; break;;
-            [Cc]* ) break;;
-            * ) echo "Please answer yes or no or cancel.";;
+            [Yy]* ) vagrant up elastomic ${CENTOS} ${WINDOWS}; sleep 20; snapshot; break;;
+            [Nn]* ) deploy; break;;
+            [Bb]* ) clear; main; break;; # back to main menubreak;;
+            * ) echo "Selection invalid, try again.";;
         esac
     done
 }
 
-
-# function to perform management tasks
-run_manage() {
-    #show status of services
-    #restart services
-    #clear indexes and clean house
+# Display the status of current environment
+check() {
+    while true; do
+        clear
+        banner_check
+        echo ""
+        echo "Range Node Status:"
+        # how are things here
+        echo "-------------------------------------------------"
+        vagrant status elastomic ${WINDOWS} ${CENTOS}
+        echo ""
+        sleep 2
+        echo "-------------------------------------------------"
+        echo "Elasticsearch Service Status:"
+        echo "(yellow) is expected with only 1 node:"
+        echo ""
+        check_indexes
+        echo ""
+        sleep 2
+        echo ""
+        echo "-------------------------------------------------"
+        echo "Kibana Service Status: '200' ==  everything is OK"
+        echo "Status: "; curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://127.0.0.1:5601/api/status
+        echo ""
+        sleep 2
+        echo ""
+        echo ""
+        read -p "Return to (M)ain Menu or (E)xit Program? " yn
+        case $yn in
+            [Mm]* ) main; break;;
+            [Ee]* ) clear; break;;
+            * ) echo "Selection invalid, try again.";;
+        esac
+    done
 }
 
+# Checks the elasticsearch index health that lives on the elastomic box
+check_indexes() {
+    curl -X GET "localhost:9200/_cluster/health?pretty"
+}
+
+# curls elasticsearches api to dump the index, not the index pattern, because resetting that would be a pain to do over and over and over...
+delete_indexes() {
+    curl -X GET "localhost:9200/_cat/indices"
+    curl -X DELETE "localhost:9200/logs*"
+    curl -X DELETE "localhost:9200/winlogbeat-*"
+}
+
+# Function to perform management tasks
+manage() {
+    while true; do
+        clear
+        banner_manage
+        echo ""
+        read -p "Select an available management task: " yn
+        case $yn in
+            [1]* ) echo "Updating boxes to the latest version, pulling from vagrant cloud"; vagrant box update; break;; # may need -f
+            [2]* ) echo "Rebooting Boxes..."; vagrant reload; sleep 15; break;;
+            [3]* ) echo "Clearing All Indexes..."; delete_indexes; sleep 15; break;; # run check_indexes
+            [4]* ) echo "Performing Soft Reset -- reverting to initial snapshot..."; snapshot_restore; break;;
+            [5]* ) echo "Performing Hard Reset -- deleting VMs but keeping local boxes"; vagrant destroy -f; break;;
+            [6]* ) echo "Nuke and Pave, it's as bad as it sounds...your starting from nothing."; nuke_pave; break;; # TODO add confirmation for this.
+            [Bb]* ) clear; main;break;;
+            * ) echo " Choose your option [ 1 - 6 ]";;
+        esac
+    done
+}
+
+# Checks to see if vagrant exists
+requirements() {
+if ! command -v vagrant &> /dev/null
+then
+    echo ""
+    echo "Error: Vagrant is not installed or cannot be found!"
+    echo "Please reference docs.thremulation.io for"
+    echo "setup instructions."
+    exit
+fi
+}
+# Creates a snapshot just in case things go pear-shaped
+snapshot() {
+    echo " Creating Snapshot...just in case"
+    for machine in elastomic centos windows10
+    do
+        vagrant snapshot save ts."$machine" ts."$machine"_initial
+    done
+    echo "This may take some time... waiting 30 secs"
+}
+
+# restores initial snapshot if things have indeed gone pear-shaped
+snapshot_restore() {
+    echo "Restoring Snapshot..."
+    for machine in elastomic centos windows10
+    do
+        vagrant snapshot restore ts."$machine" ts."$machine"_initial
+    done
+    echo "This may take some time... waiting 30 secs"
+}
+
+# This is as bad as it sounds, EVERYTHING dies...EVERYTHING!
+nuke_pave() {
+    echo "Burn Baby Burn..."
+    for machine in elastomic centos windows10
+    do
+        vagrant destroy -f ts."$machine"
+        vagrant box remove mocyber/ts."$machine"
+    done
+    echo "This may take some time... waiting 30 secs"
+}
+
+##################
+# Start Program
+##################
+
+main

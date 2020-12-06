@@ -62,9 +62,9 @@ $policyId = $ApiKeyActual.item[0].policy_id
 # Configure Fleet output URLs for Kibana and Elasticsearch
 Write-Output "Set Kibana Url"
 $fleetYMLconfig = @"
-  {
+{
   "kibana_urls": ["$kibana_url"]
-  }
+}
 "@ | ConvertFrom-Json
 $fleetYMLconfigJson = ConvertTo-Json($fleetYMLconfig)
 Invoke-WebRequest -UseBasicParsing -Uri "$kibana_url/api/fleet/settings" -ContentType application/json -Headers $headers -Method Put -body $fleetYMLconfigJson -ErrorAction SilentlyContinue -ErrorVariable SearchError -TransferEncoding compress
