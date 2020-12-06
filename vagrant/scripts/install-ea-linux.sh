@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -eux
 
 set -o pipefail
 
@@ -8,6 +8,11 @@ KIBANA_AUTH="${KIBANA_AUTH:-}"
 
 AGENT_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-${STACK_VER}-linux-x86_64.tar.gz"
 
+function install_jq() {
+    if ! command -v jq; then
+        sudo yum install -y jq
+    fi
+}
 function download_and_install_agent() {
     ENROLLMENT_TOKEN=$(get_enrollment_token)
 
@@ -38,3 +43,6 @@ function get_enrollment_token() {
 
     echo -n "${enrollment_key}"
 }
+
+install_jq
+download_and_install_agent
