@@ -17,6 +17,7 @@ WINDOWS=""
 # define functions
 ###############################################################################
 
+
 ### Main Menu
 main() {
     while true; do
@@ -71,7 +72,7 @@ deploy() {
 deploy_quick() {
     while true; do
         clear
-        echo "##########################################################################"
+        echo "###########################################"
         echo "###  DEPLOY QUICK                       ###"
         echo "###########################################"
         echo ""
@@ -80,11 +81,11 @@ deploy_quick() {
         echo "------------------------------------------------------------------------"
         echo "You have chosen to Quick Deploy all nodes, which includes the following:"
         echo ""
-        echo "    * elastomic -- control node used to EMULATE and DETECT activity"
+        echo "    * Elastomic -- control node used to EMULATE and DETECT activity"
         echo ""
-        echo "    * windows10 -- primary windows client target"
+        echo "    * Windows 10 -- Windows target node"
         echo ""
-        echo "    * centos7   -- target linux server"
+        echo "    * CentOS 7   -- Linux target node"
         echo ""
         read- rp "Would you like to proceed with this configuration? [Y/N]: " yn
         case $yn in
@@ -116,12 +117,12 @@ deploy_custom() {
         echo ""
         echo "(B)ack to Deploy Menu"
         echo ""
-        echo 'The "elastomic" box is the first and pivotal node.'
+        echo 'The "Elastomic" box is the first and pivotal node.'
         echo "What TARGET nodes would you like to deploy?"
         echo ""
         read -rp "Do you want deploy the Windows10 target node? [Y/N]: " yn
         case $yn in
-            [Yy]* ) WINDOWS="windows10"; break;;
+            [Yy]* ) WINDOWS="ts.windows10"; break;;
             [Nn]* ) WINDOWS=""; break;;
         esac
     done
@@ -130,7 +131,7 @@ deploy_custom() {
         banner_deploycustom
         read- rp "Do you deploy the Centos7 target node? [Y/N]: " yn
         case $yn in
-            [Yy]* ) CENTOS="centos"; break;;
+            [Yy]* ) CENTOS="ts.centos7"; break;;
             [Nn]* ) CENTOS=""; break;;
             [Bb]* ) clear; deploy;break;;
             * ) echo "Please answer yes or no.";;
@@ -143,8 +144,8 @@ deploy_custom() {
         echo "You have chosen the following nodes configuration:"
         echo ""
         echo "1. Control Node - elastomic (attack & detect)"
-        echo "2.     ${WINDOWS}"
-        echo "3.     ${CENTOS}"
+        echo "2. ${"WINDOWS"}"
+        echo "3. ${"CENTOS"}"
         echo ""
         read- rp "Are you ready to proceed with the deployment? [Y/N]: " yn
         case $yn in
@@ -182,7 +183,7 @@ check() {
         echo ""
         echo "-------------------------------------------------"
         echo "Kibana Service Status: '200' ==  everything is OK"
-        echo "Status: "; curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://127.0.0.1:5601/api/status
+        echo "Status: "; curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://192.168.33.10:5601/api/status
         echo ""
         sleep 2
         echo ""
@@ -199,16 +200,16 @@ check() {
 
 # Checks the elasticsearch index health that lives on the elastomic box
 check_indexes() {
-    curl -X GET "localhost:9200/_cluster/health?pretty"
+    curl -X GET "192.168.33.10:9200/_cluster/health?pretty"
 }
 
 
 # Curl the Elasticsearch API to dump the index, not the index pattern
 # Resetting that would be a pain to do over and over and over...
 delete_indexes() {
-    curl -X GET "localhost:9200/_cat/indices"
-    curl -X DELETE "localhost:9200/logs*"
-    curl -X DELETE "localhost:9200/winlogbeat-*"
+    curl -X GET "192.168.33.10:9200/_cat/indices"
+    curl -X DELETE "192.168.33.10:9200/logs-*"
+    curl -X DELETE "192.168.33.10:9200/winlogbeat-*"
 }
 
 
