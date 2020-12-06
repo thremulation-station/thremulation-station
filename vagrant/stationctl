@@ -15,6 +15,7 @@ WINDOWS=""
 ​
 banner_main() {
     echo "###########################################"
+    echo "##                                       ##"
     echo "##        THREMULATION STATION           ##"
     echo "##                                       ##"
     echo "###########################################"
@@ -27,7 +28,9 @@ banner_main() {
 ​
 banner_deploy() {
     echo "###########################################"
-    echo "###  DEPLOY                             ###"
+    echo "##                                       ##"
+    echo "##                DEPLOY                 ##"
+    echo "##                                       ##"
     echo "###########################################"
     echo ""
     echo "1. Quick Deployment -  Deploy everything"
@@ -37,7 +40,9 @@ banner_deploy() {
 ​
 banner_deployquick() {
     echo "###########################################"
-    echo "###  DEPLOY QUICK                       ###"
+    echo "##                                       ##"
+    echo "##             QUICK DEPLOY              ##"
+    echo "##                                       ##"
     echo "###########################################"
     echo ""
     echo "(B)ack to Deploy Menu"
@@ -45,7 +50,9 @@ banner_deployquick() {
 ​
 banner_deploycustom() {
     echo "###########################################"
-    echo "###  DEPLOY CUSTOM                      ###"
+    echo "##                                       ##"
+    echo "##            CUSTOM DEPLOY              ##"
+    echo "##                                       ##"
     echo "###########################################"
     echo ""
     echo "(B)ack to Deploy Menu"
@@ -116,11 +123,11 @@ deploy_quick() {
         echo "------------------------------------------------------------------------"
         echo "You have chosen to Quick Deploy all nodes, which includes the following:"
         echo ""
-        echo "    * elastomic -- control node used to EMULATE and DETECT activity"
+        echo "    * Elastomic -- control node used to EMULATE and DETECT activity"
         echo ""
-        echo "    * windows10 -- primary windows client target"
+        echo "    * Windows 10 -- Windows target node"
         echo ""
-        echo "    * centos7   -- target linux server"
+        echo "    * CentOS 7   -- Linux target node"
         echo ""
         read -p "Would you like to proceed with this configuration? [Y/N]: " yn
         case $yn in
@@ -148,21 +155,21 @@ deploy_custom() {
         clear
         banner_deploycustom
         echo ""
-        echo 'The "elastomic" box is the first and pivotal node.'
+        echo 'The "Elastomic" box is the first and pivotal node.'
         echo "What TARGET nodes would you like to deploy?"
         echo ""
-        read -p "Do you want deploy the Windows10 target node? [Y/N]: " yn
+        read -p "Do you want deploy the Windows 10 target node? [Y/N]: " yn
         case $yn in
-            [Yy]* ) WINDOWS="windows10"; break;;
+            [Yy]* ) WINDOWS="ts.windows10"; break;;
             [Nn]* ) WINDOWS=""; break;;
         esac
     done
     while true; do
         clear
         banner_deploycustom
-        read -p "Do you deploy the Centos7 target node? [Y/N]: " yn
+        read -p "Do you deploy the CentOS 7 target node? [Y/N]: " yn
         case $yn in
-            [Yy]* ) CENTOS="centos"; break;;
+            [Yy]* ) CENTOS="ts.centos7"; break;;
             [Nn]* ) CENTOS=""; break;;
             [Bb]* ) clear; deploy;break;;
             * ) echo "Please answer yes or no.";;
@@ -175,12 +182,12 @@ deploy_custom() {
         echo "You have chosen the following nodes configuration:"
         echo ""
         echo "1. Control Node - elastomic (attack & detect)"
-        echo "2.     ${WINDOWS}"
-        echo "3.     ${CENTOS}"
+        echo "2. ${WINDOWS}"
+        echo "3. ${CENTOS}"
         echo ""
         read -p "Are you ready to proceed with the deployment? [Y/N]: " yn
         case $yn in
-            [Yy]* ) vagrant up elastomic ${CENTOS} ${WINDOWS}; sleep 20; snapshot; break;;
+            [Yy]* ) vagrant up ts.elastomic ${CENTOS} ${WINDOWS}; sleep 20; snapshot; break;;
             [Nn]* ) deploy; break;;
             [Bb]* ) clear; main; break;; # back to main menubreak;;
             * ) echo "Selection invalid, try again.";;
