@@ -31,6 +31,9 @@ Vagrant.configure("2") do |config|
       vb.memory = 2048
       vb.cpus = 2
     cfg.vm.provision "disabledefender", type: "shell", path: "./scripts/disable-windef.ps1"
+# Holding onto this for a few iterations to make sure it works properly
+# This line will be removed as well as ./scripts/setup-winlogbeat.ps1
+#    cfg.vm.provision "winlogbeatsetup", type: "shell", path: "./scripts/setup-winlogbeat.ps1"
     cfg.vm.provision "installea", type: "shell", path: "./scripts/install-ea.ps1"
     end
   end
@@ -39,7 +42,6 @@ Vagrant.configure("2") do |config|
     cfg.vm.box = "mocyber/centos"
     cfg.vm.box_version = "0.1"
     cfg.vm.hostname = "centos"
-    #cfg.vbguest.auto_update = false
     cfg.vm.synced_folder '.', '/vagrant', disabled: true
     cfg.vm.network "private_network", ip: "192.168.33.12", auto_config: true
     cfg.vm.network "forwarded_port", guest: 80, host: 8080
