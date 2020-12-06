@@ -8,7 +8,7 @@
 
 <br>
 <p align="center">
-<img src="../img/placeholder-logo.png">
+<img src="img/placeholder-logo.png">
 </p>
 <br>
 
