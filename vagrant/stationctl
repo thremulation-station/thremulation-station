@@ -83,7 +83,7 @@ main() {
             [1]* ) deploy; break;;
             [2]* ) check; break;;
             [3]* ) manage; break;;
-            [E/n]* ) echo "Exiting..."; sleep 1; clear; break;;
+            [Ee]* ) echo "Exiting..."; sleep 1; clear; break;;
             * ) echo "Selection invalid, try again.";;
         esac
     done
@@ -111,7 +111,7 @@ deploy() {
 deploy_quick() {
     while true; do
         clear
-        banner_deployquick   
+        banner_deployquick
         echo ""
         echo "------------------------------------------------------------------------"
         echo "You have chosen to Quick Deploy all nodes, which includes the following:"
@@ -122,7 +122,7 @@ deploy_quick() {
         echo ""
         echo "    * centos7   -- target linux server"
         echo ""
-        read -p "Would you like to proceed with this configuration? [Y/N]: " yn 
+        read -p "Would you like to proceed with this configuration? [Y/N]: " yn
         case $yn in
             [Yy]* )
                 clear
@@ -133,7 +133,7 @@ deploy_quick() {
                 sleep 5;
                 echo "Capturing snapshot of clean environment...";
                 snapshot;
-                break;; 
+                break;;
             [Nn]* ) deploy; break;;
             [Bb]* ) clear; deploy;break;;
             * ) echo "Selection invalid, try again.";;
@@ -178,9 +178,9 @@ deploy_custom() {
         echo "2.     ${WINDOWS}"
         echo "3.     ${CENTOS}"
         echo ""
-        read -p "Are you ready to proceed with the deployment? [Y/N]: " yn 
+        read -p "Are you ready to proceed with the deployment? [Y/N]: " yn
         case $yn in
-            [Yy]* ) vagrant up elastomic ${CENTOS} ${WINDOWS}; sleep 20; snapshot; break;; 
+            [Yy]* ) vagrant up elastomic ${CENTOS} ${WINDOWS}; sleep 20; snapshot; break;;
             [Nn]* ) deploy; break;;
             [Bb]* ) clear; main; break;; # back to main menubreak;;
             * ) echo "Selection invalid, try again.";;
@@ -197,7 +197,7 @@ check() {
         echo "Range Node Status:"
         # how are things here
         echo "-------------------------------------------------"
-        vagrant status elastomic ${WINDOWS} ${CENTOS} 
+        vagrant status elastomic ${WINDOWS} ${CENTOS}
         echo ""
         sleep 2
         echo "-------------------------------------------------"
@@ -224,13 +224,13 @@ check() {
     done
 }
 
-# Checks the elasticsearch index health that lives on the elastomic box 
+# Checks the elasticsearch index health that lives on the elastomic box
 check_indexes() {
     curl -X GET "localhost:9200/_cluster/health?pretty"
 }
 
-# curls elasticsearches api to dump the index, not the index pattern, because resetting that would be a pain to do over and over and over...    
-delete_indexes() {  
+# curls elasticsearches api to dump the index, not the index pattern, because resetting that would be a pain to do over and over and over...
+delete_indexes() {
     curl -X GET "localhost:9200/_cat/indices"
     curl -X DELETE "localhost:9200/logs*"
     curl -X DELETE "localhost:9200/winlogbeat-*"
@@ -247,7 +247,7 @@ manage() {
             [1]* ) echo "Updating boxes to the latest version, pulling from vagrant cloud"; vagrant box update; break;; # may need -f
             [2]* ) echo "Rebooting Boxes..."; vagrant reload; sleep 15; break;;
             [3]* ) echo "Clearing All Indexes..."; delete_indexes; sleep 15; break;; # run check_indexes
-            [4]* ) echo "Performing Soft Reset -- reverting to initial snapshot..."; snapshot_restore; break;; 
+            [4]* ) echo "Performing Soft Reset -- reverting to initial snapshot..."; snapshot_restore; break;;
             [5]* ) echo "Performing Hard Reset -- deleting VMs but keeping local boxes"; vagrant destroy -f; break;;
             [6]* ) echo "Nuke and Pave, it's as bad as it sounds...your starting from nothing."; nuke_pave; break;; # TODO add confirmation for this.
             [Bb]* ) clear; main;break;;
