@@ -53,19 +53,41 @@ until (($isReady -gt 0) -or ($fleetCounter -eq 5) )
 Write-Output "Get Enrollment API Key"
 $ApiKeyList = (ConvertFrom-Json(Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/enrollment-api-keys" -ContentType "application/json" -Headers $headers -Method GET))
 
-# Get Fleet TOken from json message
+# Get Fleet Token and default policy ID from json message
 $ApiKeyId = $ApiKeyList.list[0].id
-
 $ApiKeyActual = (ConvertFrom-Json(Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/enrollment-api-keys/$ApiKeyId" -ContentType "application/json" -Headers $headers -Method GET))
 $fleetToken = $ApiKeyActual.item[0].api_key
 $policyId = $ApiKeyActual.item[0].policy_id
 
-# Get list of current packages for an up to date Endpoint Version
-$packageList = (convertfrom-json(Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/epm/packages?experimental=true" -ContentType "application/json" -Headers $headers -Method GET))
-$endpointPackageVersion = ($packageList.response | Where-Object { $_.name -eq "endpoint" }).version
+# Configure Fleet output URLs for Kibana and Elasticsearch
+Write-Output "Set Kibana Url"
+$fleetYMLconfig = @"
+  {
+  "kibana_urls": ["$kibana_url"]
+  }
+"@ | ConvertFrom-Json
+$fleetYMLconfigJson = ConvertTo-Json($fleetYMLconfig)
+Invoke-WebRequest -UseBasicParsing -Uri "$kibana_url/api/fleet/settings" -ContentType application/json -Headers $headers -Method Put -body $fleetYMLconfigJson -ErrorAction SilentlyContinue -ErrorVariable SearchError -TransferEncoding compress
 
-# Create a json request format suitable for the configuration id
-$securityConfigDict = @"
+Write-Output "Set Elasticsearch Url"
+$fleetYMLconfig = @"
+{
+  "hosts": ["$elasticsearch_url"]
+}
+"@ | ConvertFrom-Json
+$fleetYMLconfigJson = ConvertTo-Json($fleetYMLconfig)
+$response = Invoke-RestMethod -UseBasicParsing -Uri "$kibana_url/api/fleet/outputs" -ContentType application/json -Headers $headers -Method Get -ErrorAction SilentlyContinue -ErrorVariable SearchError
+$id = $response.items.id
+Invoke-WebRequest -UseBasicParsing -Uri "$kibana_url/api/fleet/outputs/$id" -ContentType application/json -Headers $headers -Method Put -body $fleetYMLconfigJson -ErrorAction SilentlyContinue -ErrorVariable SearchError -TransferEncoding compress
+
+### Configure Fleet packages ###################################
+
+# Get list of all current packages for package version
+$packageList = (convertfrom-json(Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/epm/packages?experimental=true" -ContentType "application/json" -Headers $headers -Method GET))
+
+### Enable Endpoint integration
+$pkgVer = ($packageList.response | Where-Object { $_.name -eq "endpoint" }).version
+$pkgCfg = @"
 {
   "name": "security",
   "description": "",
@@ -77,20 +99,18 @@ $securityConfigDict = @"
   "package": {
     "name": "endpoint",
     "title": "Elastic Endpoint Security",
-    "version": "$endpointPackageVersion"
+    "version": "$pkgVer"
   }
 }
 "@ | convertfrom-json
-
-$securityConfigDictJson = ConvertTo-Json($securityConfigDict)
+$pkgCfgJson = ConvertTo-Json($pkgCfg)
 
 Write-Output "Enable Security Integration into Default Config in Ingest Manager"
-Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/package_policies" -ContentType "application/json" -Headers $headers -Method POST -body $securityConfigDictJson
+Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/package_policies" -ContentType "application/json" -Headers $headers -Method POST -body $pkgCfgJson
 
-$winlogPackageVersion = ($packageList.response | Where-Object { $_.name -eq "windows" }).version
-
-# Create a json request format suitable for the configuration id
-$windowsConfigDict = @"
+### Enable Windows integration
+$pkgVer = ($packageList.response | Where-Object { $_.name -eq "windows" }).version
+$pkgCfg = @"
 {
   "name": "windows",
   "description": "",
@@ -102,42 +122,18 @@ $windowsConfigDict = @"
   "package": {
     "name": "windows",
     "title": "Windows",
-    "version": "$winlogPackageVersion"
+    "version": "$pkgVer"
   }
 }
 "@ | convertfrom-json
-
-$windowsConfigDictJson = ConvertTo-Json($windowsConfigDict)
+$pkgCfgJson = ConvertTo-Json($pkgCfg)
 
 Write-Output "Enable Windows Integration into Default Config in Ingest Manager"
-Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/package_policies" -ContentType "application/json" -Headers $headers -Method POST -body $windowsConfigDictJson
+Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/package_policies" -ContentType "application/json" -Headers $headers -Method POST -body $pkgCfgJson
 
-Write-Output "Set Kibana Url"
-$fleetYMLconfig = @"
-  {
-  "kibana_urls": ["$kibana_url"]
-  }
-"@ | ConvertFrom-Json
+### Configure Elastic Agent on host ###################################
 
-$fleetYMLconfigJson = ConvertTo-Json($fleetYMLconfig)
-
-Invoke-WebRequest -UseBasicParsing -Uri "$kibana_url/api/fleet/settings" -ContentType application/json -Headers $headers -Method Put -body $fleetYMLconfigJson -ErrorAction SilentlyContinue -ErrorVariable SearchError -TransferEncoding compress
-
-Write-Output "Set Elasticsearch Url"
-$fleetYMLconfig2 = @"
-{
-  "hosts": ["$elasticsearch_url"]
-}
-"@ | ConvertFrom-Json
-
-$fleetYMLconfig2Json = ConvertTo-Json($fleetYMLconfig2)
-
-$response = Invoke-RestMethod -UseBasicParsing -Uri "$kibana_url/api/fleet/outputs" -ContentType application/json -Headers $headers -Method Get -ErrorAction SilentlyContinue -ErrorVariable SearchError
-
-$id = $response.items.id
-
-Invoke-WebRequest -UseBasicParsing -Uri "$kibana_url/api/fleet/outputs/$id" -ContentType application/json -Headers $headers -Method Put -body $fleetYMLconfig2Json -ErrorAction SilentlyContinue -ErrorVariable SearchError -TransferEncoding compress
-
+# TODO: Clean up the temporary file artifacts
 $elasticAgentUrl = "https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-$agent_version-windows-x86_64.zip"
 $agent_install_folder = "C:\Program Files"
 $install_dir = "C:\Agent"
@@ -159,10 +155,60 @@ Write-Output "Running enroll process of Elastic Agent with token: $fleetToken at
 Set-Location 'C:\Program Files\Elastic-Agent'
 .\elastic-agent.exe install -f --insecure --kibana-url=$kibana_url --enrollment-token=$fleetToken
 
-# TODO: Force refresh of agent config
-  #Write-Output "Running Agent Install Process"
-  # & "$agent_install_folder\elastic-agent-$agent_version-windows-x86_64\install-service-elastic-agent.ps1" -Wait
+# Ensure Elastic Agent is started
+if ((Get-Service "Elastic Agent") -eq "Stopped") {
+  Write-Output "Starting Agent Service"
+  Start-Service "elastic-agent"
+}
 
-Set-Location 'C:\Program Files\Elastic\Agent\'
+# # Update endpoint policy to force a configuration update
+# Invoke-WebRequest -Uri "$kibana_url/api/fleet/package_policies/$policy_id" -ContentType "application/json" -Headers $headers -Method PUT
 
-.\elastic-agent.exe restart
+# # Checking to see if Policy was successfull in deploying.  If not, restart the Endpoint Agent
+# $agentStatusResponse = (
+#   ConvertFrom-Json(
+#     Invoke-WebRequest -UseBasicParsing -Uri  "$kibana_url/api/fleet/agents" -ContentType "application/json" -Headers $headers -Method GET
+#   )
+# )
+# $agentHostId = $agentStatusResponse.list.local_metadata.host.id
+
+# $agentHostId = "";
+# Get-Content elastic-endpoint.yaml | 
+# ForEach-Object -Begin {
+#   $in_fleet = $false;
+#   $in_host = $false;
+# } -Process {
+#   if ($in_fleet -eq $false) {
+#     if ($_ -match '^fleet:') {
+#       $in_fleet = $true;
+#     }
+#   }
+#   elseif ($in_host -eq $false) {
+#     if ($_ -match '^\s+host:') {
+#       $in_host = $true;
+#     }
+#   }
+#   elseif ($_ -match '^\s+id: (?<NodeId>[\d\w-]+)$') {
+#     $agentHostId = $Matches.NodeId;
+#     break
+#   }
+# } -End {}
+
+# Write-Output "Local Endpoint ID: $agentHostId"; 
+
+# $agentPolicyStatus = "$kibana_url/api/endpoint/policy_response?hostId=$agentHostId"
+
+# $ctr = 0
+# do {
+#   try {
+#     Write-Output "Trying $ctr times to fix policy of agent"
+#     $agentStatusResponse = Invoke-WebRequest -UseBasicParsing -Uri  $agentPolicyStatus -ContentType "application/json" -Headers $headers -Method GET -ErrorAction SilentlyContinue -ErrorVariable SearchError
+#   }
+#   catch {
+#     Write-output "Error Message Array: $searchError"
+#     Restart-Service "Elastic Endpoint" -Force
+#     Start-Sleep -Seconds 60
+#   }
+#   $ctr++
+# }
+# until (($agentStatusResponse.statuscode -eq 200) -or ($ctr -eq 5) )
