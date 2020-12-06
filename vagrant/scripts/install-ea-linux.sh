@@ -9,13 +9,13 @@ KIBANA_AUTH="${KIBANA_AUTH:-}"
 AGENT_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-${STACK_VER}-linux-x86_64.tar.gz"
 
 function download_and_install_agent() {
-    ENROLLMENT_TOKEN="$(get_enrollment_token)"
+    ENROLLMENT_TOKEN=$(get_enrollment_token)
 
     cd "$(mktemp -d)"
     curl -LJ "${AGENT_URL}" | tar xzvf -
     cd "$(basename "$(basename "${AGENT_URL}")" .tar.gz)"
     sudo ./elastic-agent install --force --insecure --kibana-url="${KIBANA_URL}" --enrollment-token="${ENROLLMENT_TOKEN}"
-    
+
     # Cleanup temporary directory
     cd ..
     rm -rf "$(pwd)"
@@ -33,10 +33,8 @@ function get_enrollment_token() {
     fi
 
     response=$(curl --silent "${AUTH[@]}" "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/enrollment-api-keys")
-    enrollment_key_id=$(echo -n "${response}" | jq -r '.list[] | select(.name | startswith("Default")) | .id' )    
+    enrollment_key_id=$(echo -n "${response}" | jq -r '.list[] | select(.name | startswith("Default")) | .id' )
     enrollment_key=$(curl --silent "${AUTH[@]}" "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/enrollment-api-keys/${enrollment_key_id}" | jq -r '.item.api_key')
-    
-    return "${enrollment_key}"
-}
 
-download_and_install_agent
+    echo -n "${enrollment_key}"
+}
