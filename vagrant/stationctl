@@ -267,13 +267,12 @@ then
     exit
 fi
 }
-
 # Creates a snapshot just in case things go pear-shaped
 snapshot() {
     echo " Creating Snapshot...just in case"
     for machine in elastomic centos windows10
     do
-        vagrant snapshot "$machine" "$machine"_initial
+        vagrant snapshot save ts."$machine" ts."$machine"_initial
     done
     echo "This may take some time... waiting 30 secs"
 }
@@ -283,7 +282,7 @@ snapshot_restore() {
     echo "Restoring Snapshot..."
     for machine in elastomic centos windows10
     do
-        vagrant restore "$machine" "$machine"_initial
+        vagrant snapshot restore ts."$machine" ts."$machine"_initial
     done
     echo "This may take some time... waiting 30 secs"
 }
@@ -293,8 +292,8 @@ nuke_pave() {
     echo "Burn Baby Burn..."
     for machine in elastomic centos windows10
     do
-        vagrant destroy -f "$machine"
-        vagrant box remove mocyber/"$machine"
+        vagrant destroy -f ts."$machine"
+        vagrant box remove mocyber/ts."$machine"
     done
     echo "This may take some time... waiting 30 secs"
 }
