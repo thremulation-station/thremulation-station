@@ -217,7 +217,7 @@ check() {
         echo ""
         echo "-------------------------------------------------"
         echo "Kibana Service Status: '200' ==  everything is OK"
-        echo "Status: "; curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://127.0.0.1:5601/api/status
+        echo "Status: "; curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://192.168.33.10:5601/api/status
         echo ""
         sleep 2
         echo ""
@@ -233,14 +233,14 @@ check() {
 
 # Checks the elasticsearch index health that lives on the elastomic box
 check_indexes() {
-    curl -X GET "localhost:9200/_cluster/health?pretty"
+    curl -X GET "192.168.33.10:9200/_cluster/health?pretty"
 }
 
 # curls elasticsearches api to dump the index, not the index pattern, because resetting that would be a pain to do over and over and over...
 delete_indexes() {
-    curl -X GET "localhost:9200/_cat/indices"
-    curl -X DELETE "localhost:9200/logs*"
-    curl -X DELETE "localhost:9200/winlogbeat-*"
+    curl -X GET "192.168.33.10:9200/_cat/indices"
+    curl -X DELETE "192.168.33.10:9200/logs-*"
+    curl -X DELETE "192.168.33.10:9200/winlogbeat-*"
 }
 
 # Function to perform management tasks
