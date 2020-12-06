@@ -260,7 +260,7 @@ fi
 # Creates a snapshot just in case things go pear-shaped
 snapshot() {
     echo " Creating Snapshot...just in case"
-    for machine in elastomic centos windows10
+    for machine in elastomic centos7 windows10
     do
         vagrant snapshot save ts."$machine" ts."$machine"_initial
     done
@@ -271,7 +271,7 @@ snapshot() {
 # restores initial snapshot if things have indeed gone pear-shaped
 snapshot_restore() {
     echo "Restoring Snapshot..."
-    for machine in elastomic centos windows10
+    for machine in elastomic centos7 windows10
     do
         vagrant snapshot restore ts."$machine" ts."$machine"_initial
     done
@@ -282,7 +282,7 @@ snapshot_restore() {
 # This is as bad as it sounds, EVERYTHING dies...EVERYTHING!
 nuke_pave() {
     echo "Burn Baby Burn..."
-    for machine in elastomic centos windows10
+    for machine in elastomic centos7 windows10
     do
         vagrant destroy -f ts."$machine"
         vagrant box remove mocyber/ts."$machine"
