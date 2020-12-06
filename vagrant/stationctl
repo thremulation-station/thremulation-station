@@ -1,5 +1,5 @@
 #! /bin/bash
-# Dont believe the git commit @koelslaw wrote ALL of this, DON'T believe his lies XD . -@koelslaw
+
 ​
 ##################
 # define variables
@@ -174,9 +174,9 @@ deploy_custom() {
         echo ""
         echo "You have chosen the following nodes configuration:"
         echo ""
-        echo "elastomic - the control node (attacker & defender)"
-        echo "  ${WINDOWS}"
-        echo "  ${CENTOS}"
+        echo "1. Control Node - elastomic (attack & detect)"
+        echo "2.     ${WINDOWS}"
+        echo "3.     ${CENTOS}"
         echo ""
         read -p "Are you ready to proceed with the deployment? [Y/N]: " yn 
         case $yn in
@@ -187,3 +187,120 @@ deploy_custom() {
         esac
     done
 }
+
+# Display the status of current environment
+check() {
+    while true; do
+        clear
+        banner_check
+        echo ""
+        echo "Range Node Status:"
+        # how are things here
+        echo "-------------------------------------------------"
+        vagrant status elastomic ${WINDOWS} ${CENTOS} 
+        echo ""
+        sleep 2
+        echo "-------------------------------------------------"
+        echo "Elasticsearch Service Status:"
+        echo "(yellow) is expected with only 1 node:"
+        echo ""
+        check_indexes
+        echo ""
+        sleep 2
+        echo ""
+        echo "-------------------------------------------------"
+        echo "Kibana Service Status: '200' ==  everything is OK"
+        echo "Status: "; curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://127.0.0.1:5601/api/status
+        echo ""
+        sleep 2
+        echo ""
+        echo ""
+        read -p "Return to (M)ain Menu or (E)xit Program? " yn
+        case $yn in
+            [Mm]* ) main; break;;
+            [Ee]* ) clear; break;;
+            * ) echo "Selection invalid, try again.";;
+        esac
+    done
+}
+
+# Checks the elasticsearch index health that lives on the elastomic box 
+check_indexes() {
+    curl -X GET "localhost:9200/_cluster/health?pretty"
+}
+
+# curls elasticsearches api to dump the index, not the index pattern, because resetting that would be a pain to do over and over and over...    
+delete_indexes() {  
+    curl -X GET "localhost:9200/_cat/indices"
+    curl -X DELETE "localhost:9200/logs*"
+    curl -X DELETE "localhost:9200/winlogbeat-*"
+}
+
+# Function to perform management tasks
+manage() {
+    while true; do
+        clear
+        banner_manage
+        echo ""
+        read -p "Select an available management task: " yn
+        case $yn in
+            [1]* ) echo "Updating boxes to the latest version, pulling from vagrant cloud"; vagrant box update; break;; # may need -f
+            [2]* ) echo "Rebooting Boxes..."; vagrant reload; sleep 15; break;;
+            [3]* ) echo "Clearing All Indexes..."; delete_indexes; sleep 15; break;; # run check_indexes
+            [4]* ) echo "Performing Soft Reset -- reverting to initial snapshot..."; snapshot_restore; break;; 
+            [5]* ) echo "Performing Hard Reset -- deleting VMs but keeping local boxes"; vagrant destroy -f; break;;
+            [6]* ) echo "Nuke and Pave, it's as bad as it sounds...your starting from nothing."; nuke_pave; break;; # TODO add confirmation for this.
+            [Bb]* ) clear; main;break;;
+            * ) echo " Choose your option [ 1 - 6 ]";;
+        esac
+    done
+}
+
+# Checks to see if vagrant exists
+requirements() {
+if ! command -v vagrant &> /dev/null
+then
+    echo ""
+    echo "Error: Vagrant is not installed or cannot be found!"
+    echo "Please reference docs.thremulation.io for"
+    echo "setup instructions."
+    exit
+fi
+}
+
+# Creates a snapshot just in case things go pear-shaped
+snapshot() {
+    echo " Creating Snapshot...just in case"
+    for machine in elastomic centos windows10
+    do
+        vagrant snapshot "$machine" "$machine"_initial
+    done
+    echo "This may take some time... waiting 30 secs"
+}
+
+# restores initial snapshot if things have indeed gone pear-shaped
+snapshot_restore() {
+    echo "Restoring Snapshot..."
+    for machine in elastomic centos windows10
+    do
+        vagrant restore "$machine" "$machine"_initial
+    done
+    echo "This may take some time... waiting 30 secs"
+}
+
+# This is as bad as it sounds, EVERYTHING dies...EVERYTHING!
+nuke_pave() {
+    echo "Burn Baby Burn..."
+    for machine in elastomic centos windows10
+    do
+        vagrant destroy -f "$machine"
+        vagrant box remove mocyber/"$machine"
+    done
+    echo "This may take some time... waiting 30 secs"
+}
+
+##################
+# Start Program
+##################
+
+main
