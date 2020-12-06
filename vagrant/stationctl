@@ -182,12 +182,12 @@ deploy_custom() {
         echo "You have chosen the following nodes configuration:"
         echo ""
         echo "1. Control Node - elastomic (attack & detect)"
-        echo "2. ${WINDOWS}"
-        echo "3. ${CENTOS}"
+        echo "2. ${"WINDOWS"}"
+        echo "3. ${"CENTOS"}"
         echo ""
         read -p "Are you ready to proceed with the deployment? [Y/N]: " yn
         case $yn in
-            [Yy]* ) vagrant up ts.elastomic ${CENTOS} ${WINDOWS}; sleep 20; snapshot; break;;
+            [Yy]* ) vagrant up ts.elastomic ${"CENTOS"} ${"WINDOWS"}; sleep 20; snapshot; break;;
             [Nn]* ) deploy; break;;
             [Bb]* ) clear; main; break;; # back to main menubreak;;
             * ) echo "Selection invalid, try again.";;
