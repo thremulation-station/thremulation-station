@@ -1,4 +1,6 @@
-#! /bin/bash
+#!/bin/bash -eu
+
+set -o pipefail
 
 ​
 ##################
@@ -240,7 +242,7 @@ delete_indexes() {
 manage() {
     while true; do
         clear
-        banner_manage
+        banner_manage # Put raw content here (from banner_manage)
         echo ""
         read -p "Select an available management task: " yn
         case $yn in
