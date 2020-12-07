@@ -2,7 +2,7 @@
 
 set -o pipefail
 
-# TODOLIST: 
+# TODOLIST:
 # [ ] os detection for banner stats
 #     [x] macos
 #     [ ] linux
@@ -141,8 +141,6 @@ deploy_quick() {
         read -rp "Would you like to proceed? [Y/N]: " yn
         case $yn in
             [Yy]* )
-                clear
-                banner_deployquick
                 echo ""
                 echo "Deploying all boxes with vagrant up!";
                 vagrant up;
