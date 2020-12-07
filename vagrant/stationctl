@@ -9,6 +9,7 @@ set -o pipefail
 #     [ ] other
 # [ ] "selection invalid" styling
 # [ ] make "status output" green bold
+# [ ] add confirmation step for nuke and pave
 
 
 ###############################################################################
@@ -52,6 +53,7 @@ LIGHTGREEN='\033[1;32m'
 LIGHTPURPLE='\033[1;35m'
 LIGHTGRAY='\033[0;37m'
 WHITE='\033[1;37m'
+YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 
@@ -75,9 +77,9 @@ main() {
         echo ""
         echo -e "${LIGHTPURPLE} ------------------------------------------------------${NC}";
         echo -e ""
-        echo " 1. Deploy New Thremulation Proving Ground"
-        echo " 2. Show Status - current deployment"
-        echo " 3. Management  - current deployment"
+        echo " 1. Deploy.......:  create new thremulation range"
+        echo " 2. Status.......:  show current deployment"
+        echo " 3. Management...:  tune and troubleshoot"
         echo ""
         read -rp " Select Above Option [or (E)xit]: " yn
         case $yn in
@@ -103,8 +105,8 @@ deploy() {
         echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
         echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
-        echo "1. Quick Deployment - deploy all target boxes"
-        echo "2. Custom Deployment - choose targets you want"
+        echo "1. Quick Deployment....: deploy all target boxes"
+        echo "2. Custom Deployment...: choose targets you want"
         echo ""
         read -rp " Select Above Option: " yn
         case $yn in
@@ -132,11 +134,11 @@ deploy_quick() {
         echo "You have chosen to Quick-Deploy all boxes."
         echo "This includes the following configuration:"
         echo ""
-        echo "     Elastomic   -- EMULATE and DETECT"
+        echo "   Elastomic...:  EMULATE and DETECT"
         echo ""
-        echo "     Windows 10  -- Windows target box"
+        echo "   Windows 10..:  Windows target box"
         echo ""
-        echo "     CentOS 7    -- Linux target box"
+        echo "   CentOS 7....:  Linux target box"
         echo ""
         read -rp "Would you like to proceed? [Y/N]: " yn
         case $yn in
@@ -234,34 +236,32 @@ status() {
         echo -e "${LIGHTPURPLE}     /_  __/ __/    / __/ /____ _/ /___ _____ ${NC}";
         echo -e "${LIGHTPURPLE}      / / _\ \     _\ \/ __/ _ \/ __/ // (_-< ${NC}";
         echo -e "${LIGHTPURPLE}     /_/ /___/    /___/\__/\_,_/\__/\_,_/___/ ${NC}";
+        echo -e "${LIGHTPURPLE}                                              ${NC}";
         echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
         echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
-        echo "Range Box Status:"
-        # how are things here
-        echo -e "${LIGHTPURPLE}------------------${NC}";
         echo ""
-        vagrant status ts.elastomic "${WINDOWS}" "${CENTOS}"
+        echo " Vagrant Box Status:"
+        echo -e " ${LIGHTPURPLE}------------------${NC}";
         echo ""
-        sleep 2
-        echo -e "${LIGHTPURPLE}------------------${NC}";
-        echo ""
-        echo "Elasticsearch Service Status:"
-        echo "(yellow) is expected with only 1 node:"
-        echo ""
-        status_indexes
-        echo ""
-        sleep 2
-        echo ""
-        echo -e "${LIGHTPURPLE}------------------${NC}";
-        echo ""
-        echo "Kibana Service Status: '200' ==  everything is OK"
-        echo "Status: "; curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://192.168.33.10:5601/api/status
-        echo ""
-        sleep 2
+        vagrant status ts.elastomic "${WINDOWS}" "${CENTOS}"; sleep 2;
         echo ""
         echo ""
-        read- rp "Return to (M)ain Menu or (E)xit Program? " yn
+        echo " Elasticsearch Service Status:"
+        echo -e " note: ${YELLOW}yellow${NC} is expected"
+        echo -e " ${LIGHTPURPLE}------------------${NC}";
+        echo ""
+        status_indexes; sleep 2;
+        echo ""
+        echo ""
+        echo " Kibana Service Status: "
+        echo ' 200 == "OK": '
+        echo -e " ${LIGHTPURPLE}------------------${NC}";
+        echo ""
+        curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://192.168.33.10:5601/api/status; sleep 2;
+        echo ""
+        echo ""
+        read- rp "Return to (M)ain Menu or (E)xit Program: " yn
         case $yn in
             [Mm]* ) main; break;;
             [Ee]* ) clear; break;;
@@ -298,22 +298,46 @@ manage() {
         echo -e "${LIGHTPURPLE}   (B)ack to Main                                ${NC}";
         echo -e "${LIGHTPURPLE} ----------------------------------------------    ${NC}";
         echo ""
-        echo "1. Update - update boxes to latest version"
-        echo "2. Reboot - restart boxes (troubleshooting)"
-        echo "3. Clear Data - delete data in all indexes"
-        echo "4. Soft Reset - revert to original snapshots"
-        echo "5. Hard Reset - destroy and redeploy all boxes"
-        echo "6. Nuke and Pave - Burn it down and start over"
+        echo "1. Update..........:  update boxes to latest version"
+        echo "2. Reboot..........:  restart boxes (troubleshooting)"
+        echo "3. Clear Data......:  Delete data in all indexes"
+        echo "4. Soft Reset......:  revert to original snapshots"
+        echo "5. Hard Reset......:  destroy and redeploy all boxes"
+        echo -e "6. ${LIGHTRED}Nuke and Pave${NC}...:  burn it down and start over!"
         echo ""
-        read -rp " Select Above Option: " yn
+        read -rp "  Select Above Option: " yn
         case $yn in
-            [1]* ) echo "Updating boxes to the latest version, pulling from vagrant cloud"; vagrant box update; break;; # may need -f
-            [2]* ) echo "Rebooting Boxes..."; vagrant reload; sleep 15; break;;
-            [3]* ) echo "Clearing All Indexes..."; delete_indexes; sleep 15; break;; # run status_indexes
-            [4]* ) echo "Performing Soft Reset -- reverting to initial snapshot..."; snapshot_restore; break;;
-            [5]* ) echo "Performing Hard Reset -- deleting VMs but keeping local boxes"; vagrant destroy -f; break;;
-            [6]* ) echo "Nuke and Pave, it's as bad as it sounds...your starting from nothing."; nuke_pave; break;; # TODO add confirmation for this.
-            [Bb]* ) clear; main;break;;
+            [1]* ) 
+                echo "Updating boxes to the latest version";
+                echo "Pulling from Vagrant Cloud...";
+                vagrant box update; # may need -f
+                break;;
+            [2]* ) 
+                echo "Rebooting All Nodes...";
+                vagrant reload; 
+                sleep 15; 
+                break;;
+            [3]* ) 
+                echo "Clearing All Indexes..."; 
+                delete_indexes; 
+                sleep 15; 
+                break;;
+            [4]* ) 
+                echo "Performing Soft Reset";
+                echo "Reverting to initial snapshot..."; 
+                snapshot_restore; 
+                break;;
+            [5]* ) 
+                echo "Performing Hard Reset";
+                echo "Deleting VMs but keeping local boxes";
+                vagrant destroy -f; 
+                break;;
+            [6]* ) 
+                echo "NUKE and PAVE"
+                echo "As bad as it sounds, rebuilding everything..."; 
+                nuke_pave; 
+                break;; 
+            [Bb]* ) clear; main; break;;
             * ) echo "Selection invalid, try again: "; sleep 1;;
         esac
     done
