@@ -1,6 +1,4 @@
-#!/bin/bash -eux
-
-set -o pipefail
+#!/bin/bash
 
 STACK_VER="${ELASTIC_STACK_VERSION:-7.10.0}"
 KIBANA_URL="${KIBANA_URL:-http://127.0.0.1:5601}"
