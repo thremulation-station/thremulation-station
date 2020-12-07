@@ -15,7 +15,7 @@ function download_and_install_agent() {
     ENROLLMENT_TOKEN=$(get_enrollment_token)
 
     cd "$(mktemp -d)"
-    curl -LJ "${AGENT_URL}" | tar xzvf -
+    curl --silent -LJ "${AGENT_URL}" | tar xzvf -
     cd "$(basename "$(basename "${AGENT_URL}")" .tar.gz)"
     sudo ./elastic-agent install --force --insecure --kibana-url="${KIBANA_URL}" --enrollment-token="${ENROLLMENT_TOKEN}"
 
