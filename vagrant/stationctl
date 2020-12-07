@@ -2,15 +2,57 @@
 
 set -o pipefail
 
+# TODOLIST: 
+# [ ] os detection for banner stats
+#     [x] macos
+#     [ ] linux
+#     [ ] other
+# [ ] "selection invalid" styling
+# [ ] make "status output" green bold
+
+
+###############################################################################
+# os detection
+###############################################################################
+
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
 
 ###############################################################################
 # define variables
 ###############################################################################
 
-CENTOS=""
-WINDOWS=""
+# boxes
+ELASTOMIC="ts.elastomic"
+WINDOWS="ts.windows10"
+CENTOS="ts.centos7"
 
 
+# host stats
+MACCPU=`top -l 1 | grep -E "^CPU" | grep -Eo '[^[:space:]]+%' | head -1`
+MACMEM=`top -l 1 | grep -E "^Phys" | awk '{print $2}'`
+MACDISK=`df -Ph | grep "/dev/disk1s1s1" | awk '{print $5}'`
+#MACCPU=`top -l 1 | grep -E "^CPU" | awk '{print $3}'`
+
+NOTMACCPU="TODO"
+NOTMACMEM="TODO"
+NOTMACDISK="TODO"
+
+# colors
+RED='\033[0;31m'
+LIGHTRED='\033[1;31m'
+GREEN='\033[0;32m'
+LIGHTGREEN='\033[1;32m'
+LIGHTPURPLE='\033[1;35m'
+LIGHTGRAY='\033[0;37m'
+WHITE='\033[1;37m'
+NC='\033[0m' # No Color
 
 
 ###############################################################################
@@ -22,23 +64,28 @@ WINDOWS=""
 main() {
     while true; do
         clear
-        echo "###########################################"
-        echo "##        THREMULATION STATION           ##"
-        echo "##                                       ##"
-        echo "###########################################"
+        echo -e "${LIGHTPURPLE}    ________                      __     __  _${NC}            ";
+        echo -e "${LIGHTPURPLE}   /_  __/ /  _______ __ _  __ __/ /__ _/ /_(_)__  ___  ${NC}  ";
+        echo -e "${LIGHTPURPLE}    / / / _ \/ __/ -_)  ' \/ // / / _ \/ __/ / _ \/ _ \ ${NC}  ";
+        echo -e "${LIGHTPURPLE}   /_/ /_//_/_/  \__/_/_/_/\_,_/_/\_,_/\__/_/\___/_//_/ ${NC}  ";
+        echo -e "${LIGHTPURPLE}    ______       __  _                                  ${NC}  ";
+        echo -e "${LIGHTPURPLE}   / __/ /____ _/ /_(_)__  ___  ${NC}    CPU usage..: $CPU     ";
+        echo -e "${LIGHTPURPLE}  _\ \/ __/ _ \/ __/ / _ \/ _ \ ${NC}    Memory used: $MEM     ";
+        echo -e "${LIGHTPURPLE} /___/\__/\_,_/\__/_/\___/_//_/ ${NC}    Disk usage.: $DISK    ";
         echo ""
-        echo "1. Deploy New Thremulation Range"
-        echo "2. Show Status of Current Range"
-        echo "3. Management of Current Range"
-        echo "(E)xit Program"
+        echo -e "${LIGHTPURPLE} ------------------------------------------------------${NC}";
+        echo -e ""
+        echo " 1. Deploy New Thremulation Proving Ground"
+        echo " 2. Show Status - current deployment"
+        echo " 3. Management  - current deployment"
         echo ""
-        read- rp "Enter an action from the above options: " yn
+        read -rp " Select Above Option [or (E)xit]: " yn
         case $yn in
             [1]* ) deploy; break;;
-            [2]* ) check; break;;
+            [2]* ) status; break;;
             [3]* ) manage; break;;
             [Ee]* ) echo "Exiting..."; sleep 1; clear; break;;
-            * ) echo "Selection invalid, try again.";;
+            * ) echo "Selection invalid, try again: "; sleep 1;;
         esac
     done
 }
@@ -46,23 +93,25 @@ main() {
 
 # Main deployment screen, ask for quick or custom
 deploy() {
-    requirements
     while true; do
         clear
-        echo "###########################################"
-        echo "###  DEPLOY                             ###"
-        echo "###########################################"
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
-        echo "1. Quick Deployment -  Deploy everything"
-        echo "2. Custom Deployment - Deploy with choice."
-        echo "(B)ack to Main Menu"
+        echo "1. Quick Deployment - deploy all target boxes"
+        echo "2. Custom Deployment - choose targets you want"
         echo ""
-        read- rp "Select what kind of deployment would you like: " yn
+        read -rp " Select Above Option: " yn
         case $yn in
             [1]* ) deploy_quick; break;;
             [2]* ) deploy_custom; break;;
             [Bb]* ) clear; main;break;;
-            * ) echo "Selection invalid, try again.";;
+            * ) echo "Selection invalid, try again: ";;
         esac
     done
 }
@@ -72,28 +121,30 @@ deploy() {
 deploy_quick() {
     while true; do
         clear
-        echo "###########################################"
-        echo "###  DEPLOY QUICK                       ###"
-        echo "###########################################"
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
-        echo "(B)ack to Deploy Menu"
+        echo "You have chosen to Quick-Deploy all boxes."
+        echo "This includes the following configuration:"
         echo ""
-        echo "------------------------------------------------------------------------"
-        echo "You have chosen to Quick Deploy all nodes, which includes the following:"
+        echo "     Elastomic   -- EMULATE and DETECT"
         echo ""
-        echo "    * Elastomic -- control node used to EMULATE and DETECT activity"
+        echo "     Windows 10  -- Windows target box"
         echo ""
-        echo "    * Windows 10 -- Windows target node"
+        echo "     CentOS 7    -- Linux target box"
         echo ""
-        echo "    * CentOS 7   -- Linux target node"
-        echo ""
-        read- rp "Would you like to proceed with this configuration? [Y/N]: " yn
+        read -rp "Would you like to proceed? [Y/N]: " yn
         case $yn in
             [Yy]* )
                 clear
                 banner_deployquick
                 echo ""
-                echo "Deploying all nodes with vagrant up!";
+                echo "Deploying all boxes with vagrant up!";
                 vagrant up;
                 sleep 5;
                 echo "Capturing snapshot of clean environment...";
@@ -101,7 +152,7 @@ deploy_quick() {
                 break;;
             [Nn]* ) deploy; break;;
             [Bb]* ) clear; deploy;break;;
-            * ) echo "Selection invalid, try again.";;
+            * ) echo "Selection invalid, try again: "; sleep 1;;
         esac
     done
 }
@@ -111,77 +162,99 @@ deploy_quick() {
 deploy_custom() {
     while true; do
         clear
-        echo "###########################################"
-        echo "###  DEPLOY CUSTOM                      ###"
-        echo "###########################################"
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
-        echo "(B)ack to Deploy Menu"
+        echo "The Elastomic (control) box is required."
+        echo "What TARGET boxes would you like to deploy?"
         echo ""
-        echo 'The "Elastomic" box is the first and pivotal node.'
-        echo "What TARGET nodes would you like to deploy?"
-        echo ""
-        read -rp "Do you want deploy the Windows10 target node? [Y/N]: " yn
+        read -rp "Deploy the Windows10 target? [Y/N]: " yn
         case $yn in
             [Yy]* ) WINDOWS="ts.windows10"; break;;
             [Nn]* ) WINDOWS=""; break;;
+            * ) echo "Selection invalid, try again: "; sleep 1;;
         esac
     done
     while true; do
         clear
-        banner_deploycustom
-        read- rp "Do you deploy the Centos7 target node? [Y/N]: " yn
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
+        read -rp "Deploy the Centos7 target? [Y/N]: " yn
         case $yn in
             [Yy]* ) CENTOS="ts.centos7"; break;;
             [Nn]* ) CENTOS=""; break;;
-            [Bb]* ) clear; deploy;break;;
-            * ) echo "Please answer yes or no.";;
+            [Bb]* ) clear; deploy; break;;
+            * ) echo "Selection invalid, try again.";;
         esac
     done
     while true; do
         clear
-        banner_deploycustom
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
-        echo "You have chosen the following nodes configuration:"
         echo ""
-        echo "1. Control Node - elastomic (attack & detect)"
-        echo "2. ${"WINDOWS"}"
-        echo "3. ${"CENTOS"}"
+        echo "You have chosen the following Custom Deployment:"
         echo ""
-        read- rp "Are you ready to proceed with the deployment? [Y/N]: " yn
+        echo "- CONTROL..: ts.elastomic (required)"
+        echo "- target...: ${WINDOWS}"
+        echo "- target...: ${CENTOS}"
+        echo ""
+        read -rp "Confirm to proceed with deployment [Y/N]: " yn
         case $yn in
-            [Yy]* ) vagrant up elastomic "${CENTOS}" "${WINDOWS}"; sleep 20; snapshot; break;;
+            [Yy]* ) vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}"; sleep 20; snapshot; break;;
             [Nn]* ) deploy; break;;
-            [Bb]* ) clear; main; break;; # back to main menubreak;;
-            * ) echo "Selection invalid, try again.";;
+            [Bb]* ) clear; main; break;;
+            * ) echo "Selection invalid, try again: "; sleep 1;;
         esac
     done
 }
 
 
 # Display the status of current environment
-check() {
+status() {
     while true; do
         clear
-        echo "###########################################"
-        echo "###  RANGE STATUS                       ###"
-        echo "###########################################"
+        echo -e "${LIGHTPURPLE}      __________     ______       __          ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/    / __/ /____ _/ /___ _____ ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \     _\ \/ __/ _ \/ __/ // (_-< ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/    /___/\__/\_,_/\__/\_,_/___/ ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
-        echo ""
-        echo "Range Node Status:"
+        echo "Range Box Status:"
         # how are things here
-        echo "-------------------------------------------------"
-        vagrant status elastomic "${WINDOWS}" "${CENTOS}"
+        echo -e "${LIGHTPURPLE}------------------${NC}";
+        echo ""
+        vagrant status ts.elastomic "${WINDOWS}" "${CENTOS}"
         echo ""
         sleep 2
-        echo "-------------------------------------------------"
+        echo -e "${LIGHTPURPLE}------------------${NC}";
+        echo ""
         echo "Elasticsearch Service Status:"
         echo "(yellow) is expected with only 1 node:"
         echo ""
-        check_indexes
+        status_indexes
         echo ""
         sleep 2
         echo ""
-        echo "-------------------------------------------------"
+        echo -e "${LIGHTPURPLE}------------------${NC}";
+        echo ""
         echo "Kibana Service Status: '200' ==  everything is OK"
         echo "Status: "; curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://192.168.33.10:5601/api/status
         echo ""
@@ -192,14 +265,14 @@ check() {
         case $yn in
             [Mm]* ) main; break;;
             [Ee]* ) clear; break;;
-            * ) echo "Selection invalid, try again.";;
+            * ) echo "Selection invalid, try again: "; sleep 1;;
         esac
     done
 }
 
 
 # Checks the elasticsearch index health that lives on the elastomic box
-check_indexes() {
+status_indexes() {
     curl -X GET "192.168.33.10:9200/_cluster/health?pretty"
 }
 
@@ -217,28 +290,31 @@ delete_indexes() {
 manage() {
     while true; do
         clear
-        echo "###########################################"
-        echo "###  MANAGE                             ###"
-        echo "###########################################"
+        echo -e "${LIGHTPURPLE}    __________     __  ___${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__ ____  ___ ____ ____ ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_)${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/ ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/      ${NC}";
+        echo -e "${LIGHTPURPLE}   (B)ack to Main                                ${NC}";
+        echo -e "${LIGHTPURPLE} ----------------------------------------------    ${NC}";
         echo ""
-        echo "1. Update - update to latest version"
-        echo "2. Reboot - restart local boxes (troubleshooting"
-        echo "3. Clear data - delete data in all index "
-        echo "4. Soft Reset - revert to original snapshot"
-        echo "5. Hard Reset - remove and redeploy boxes, return to the build menu to redeploy"
-        echo "6. Nuke and Pave - Burn it down and start over, return to the build menu to redeploy"
-        echo "(B)ack to Main Menu"
+        echo "1. Update - update boxes to latest version"
+        echo "2. Reboot - restart boxes (troubleshooting)"
+        echo "3. Clear Data - delete data in all indexes"
+        echo "4. Soft Reset - revert to original snapshots"
+        echo "5. Hard Reset - destroy and redeploy all boxes"
+        echo "6. Nuke and Pave - Burn it down and start over"
         echo ""
-        read- rp "Select an available management task: " yn
+        read -rp " Select Above Option: " yn
         case $yn in
             [1]* ) echo "Updating boxes to the latest version, pulling from vagrant cloud"; vagrant box update; break;; # may need -f
             [2]* ) echo "Rebooting Boxes..."; vagrant reload; sleep 15; break;;
-            [3]* ) echo "Clearing All Indexes..."; delete_indexes; sleep 15; break;; # run check_indexes
+            [3]* ) echo "Clearing All Indexes..."; delete_indexes; sleep 15; break;; # run status_indexes
             [4]* ) echo "Performing Soft Reset -- reverting to initial snapshot..."; snapshot_restore; break;;
             [5]* ) echo "Performing Hard Reset -- deleting VMs but keeping local boxes"; vagrant destroy -f; break;;
             [6]* ) echo "Nuke and Pave, it's as bad as it sounds...your starting from nothing."; nuke_pave; break;; # TODO add confirmation for this.
             [Bb]* ) clear; main;break;;
-            * ) echo " Choose your option [ 1 - 6 ]";;
+            * ) echo "Selection invalid, try again: "; sleep 1;;
         esac
     done
 }
@@ -294,5 +370,15 @@ nuke_pave() {
 ###############################################################################
 # Start Program
 ###############################################################################
+
+if [[ $machine == "Mac" ]]; then
+    CPU="${MACCPU}"
+    MEM="${MACMEM}"
+    DISK="${MACDISK}"
+else
+    CPU="${NOTMACCPU}"
+    MEM="${NOTMACMEM}"
+    DISK="${NOTMACDISK}"
+fi
 
 main
