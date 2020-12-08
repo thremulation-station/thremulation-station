@@ -590,17 +590,17 @@ elif [[ $machine == "MinGw" ]]; then
 
     main # Execute CLI
 
-# elif [[ $machine == "Linux" ]]; then
-#     # host stats
-#     TUXCPU="`wmic cpu get loadpercentage` %"
-#     TUXMEM="`systeminfo | grep -e "^Virtual Memory: Available:" | awk '{ print $4, $5 }'`"
-#     TUXDISK="`df -Ph | grep -e "^C:" | awk '{ print $6 }'`"
+elif [[ $machine == "Linux" ]]; then
+    # host stats
+    TUXCPU="`cat /proc/loadavg | awk '{ print $2 }'` %"
+    TUXMEM="`free -t -m | grep "Total" | awk '{ print $3" MB";}'`"
+    TUXDISK="`df -Ph | grep -e "^C:" | awk '{ print $5 }'`"
 
-#     CPU="${TUXCPU}"
-#     MEM="${TUXMEM}"
-#     DISK="${TUXDISK}" 
+    CPU="${TUXCPU}"
+    MEM="${TUXMEM}"
+    DISK="${TUXDISK}" 
 
-#     main
+    main
 
 else
 
