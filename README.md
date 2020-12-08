@@ -25,7 +25,7 @@ This is just a down and dirty to make things alive, if you actually want to oper
       brew install ansible git
       vagrant plugin install vagrant-disksize
       vagrant plugin install vagrant-vbguest
-      git clone https://github.com/mocyber/thremulation-station.git
+      git clone https://github.com/thremulation-station/thremulation-station.git
       cd thremulation-station/vagrant
       sh stationctl
 
@@ -38,6 +38,9 @@ This is just a down and dirty to make things alive, if you actually want to oper
       choco install ansible git
       vagrant plugin install vagrant-disksize
       vagrant plugin install vagrant-vbguest
+      git clone https://github.com/thremulation-station/thremulation-station.git
+      cd thremulation-station/vagrant
+      sh stationctl
 
 </details>
 <details>
@@ -45,13 +48,16 @@ This is just a down and dirty to make things alive, if you actually want to oper
 
       yum groupinstall -y "Development Tools"
       yum install -y kernel-devel kernel-devel-3.10.0-1127.el7.x86_64 epel-release
-      yum install -y ansible
+      yum install -y ansible git
       curl -o /etc/yum.repos.d/virtualbox.repo http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
       rpm --import https://www.virtualbox.org/download/oracle_vbox.asc
       yum install -y VirtualBox-6.0
       yum install -y https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.rpm
       vagrant plugin install vagrant-disksize
-      vagrant plugin install vagrant-vbguest  
+      vagrant plugin install vagrant-vbguest
+      git clone https://github.com/thremulation-station/thremulation-station.git
+      cd thremulation-station/vagrant
+      sh stationctl
 
 </details>
 
