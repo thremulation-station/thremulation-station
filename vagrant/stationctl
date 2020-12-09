@@ -133,7 +133,7 @@ deploy_quick() {
         echo ""
         read -rp " Proceed to deploy this configuration? [Y/N]: " yn
         case $yn in
-            [Yy]* ) 
+            [Yy]* )
                 echo ""
                 echo ""
                 echo " Deploying all boxes with vagrant up!";
@@ -156,7 +156,7 @@ deploy_quick() {
                 echo "";
                 echo " Deployment Complete! Returning to the Main Menu...";
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
-                sleep 5; 
+                sleep 5;
                 main; break;;
             [Nn]* ) deploy; break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
@@ -230,7 +230,7 @@ deploy_custom() {
                 snapshot;
                 break;;
             [Nn]* ) deploy; break;;
-            [Bb]* ) 
+            [Bb]* )
                 clear;
                 main;
                 break;;
@@ -305,7 +305,7 @@ deploy_staged() {
                 done
                 break;;
             [Nn]* ) deploy; break;;
-            [Bb]* ) 
+            [Bb]* )
                 clear;
                 main;
                 break;;
@@ -397,23 +397,27 @@ manage() {
         echo -e "${LIGHTPURPLE}   (B)ack to Main                                ${NC}";
         echo -e "${LIGHTPURPLE} ------------------------------------------------    ${NC}";
         echo ""
+        echo ""
+        echo "${LIGHTPURPLE}             --- Maintenance ---${NC}"
+        echo ""
         echo "1. List............:  list all current boxes"
         echo "2. Startup.........:  start all local boxes up"
         echo "3. Shutdown........:  halt running boxes shutdown range"
         echo "4. Update..........:  update boxes to latest version"
         echo "5. Reboot..........:  restart boxes (troubleshooting)"
         echo ""
-        echo -e "${LIGHTPURPLE}    --- Data Reset and Troubleshooting ---${NC}"
+        echo ""
+        echo "${LIGHTPURPLE}    --- Data Reset and Troubleshooting ---${NC}"
         echo ""
         echo "6. Clear Data......:  delete data in all indexes"
         echo "7. Soft Reset......:  revert to original snapshots"
         echo "8. Hard Reset......:  destroy all vms"
-        echo -e "9. ${LIGHTRED}Nuke and Pave${NC}...:  destroy all vms and boxes"
+        echo "9. ${LIGHTRED}Nuke and Pave${NC}...:  destroy all vms and boxes"
         echo ""
-        echo ""        
+        echo ""
         read -rp "  Select Above Option: " yn
         case $yn in
-            [1]* ) 
+            [1]* )
                 echo ""
                 echo ""
                 echo "  Current box listing:";
@@ -430,7 +434,7 @@ manage() {
                     * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
-            [2]* ) 
+            [2]* )
                 echo ""
                 echo ""
                 echo "  Starting up all local boxes";
@@ -447,7 +451,7 @@ manage() {
                     * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
-            [3]* ) 
+            [3]* )
                 echo ""
                 echo ""
                 echo "  Shutting down all running boxes";
@@ -464,7 +468,7 @@ manage() {
                     * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
-            [4]* ) 
+            [4]* )
                 echo ""
                 echo ""
                 echo "  Updating boxes to the latest version";
@@ -482,14 +486,14 @@ manage() {
                     * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
-            [5]* ) 
+            [5]* )
                 echo ""
                 echo ""
                 echo "  Rebooting All VMs...";
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant reload; 
+                vagrant reload;
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -499,7 +503,7 @@ manage() {
                     * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
-            [6]* ) 
+            [6]* )
                 echo ""
                 echo ""
                 echo "  Starting Data Rest...";
@@ -507,7 +511,7 @@ manage() {
                 echo ""
                 echo ""
                 sleep 3;
-                delete_indexes; 
+                delete_indexes;
                 sleep 1;
                 echo ""
                 echo ""
@@ -523,17 +527,17 @@ manage() {
                     * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
-            [7]* ) 
+            [7]* )
                 echo ""
                 echo ""
                 echo "  Soft Reset: Rolling back all VMs";
-                echo "  Reverting to initial snapshot..."; 
+                echo "  Reverting to initial snapshot...";
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
                 read -rp "  Proceed with this destructive change? [Y/N]: " yn
                 case $yn in
-                    [Yy]* ) snapshot_restore; break;;
+                    [Yy]* ) snapshot_restore;;
                     [Nn]* ) manage; break;;
                     * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
@@ -546,7 +550,7 @@ manage() {
                     * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
-            [8]* ) 
+            [8]* )
                 echo "";
                 echo "";
                 echo -e "  ${LIGHTRED}Hard Reset: Deleting VMS!${NC}";
@@ -557,17 +561,17 @@ manage() {
                 sleep 10;
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
-                vagrant destroy -f; 
+                vagrant destroy -f;
                 echo "";
                 echo "";
                 echo "  All VMs deleted! Returning to Menu";
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                sleep 5; 
+                sleep 5;
                 main;
                 break;;
-            [9]* ) 
+            [9]* )
                 echo ""
                 echo ""
                 echo -e "  ${LIGHTRED}OPERATION ROLLING THUNDER Underway...${NC}";
@@ -576,8 +580,8 @@ manage() {
                 echo ""
                 echo ""
                 sleep 5;
-                nuke_pave; 
-                break;; 
+                nuke_pave;
+                break;;
             [Bb]* ) clear; main; break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
@@ -628,7 +632,7 @@ nuke_pave() {
     echo ""
     echo -e "${LIGHTRED}  !!!BURN IN WITH FIRE!!!${NC}"
     vagrant destroy -f
-    
+
     for machine in elastomic windows10 centos
     do
         vagrant box remove "mocyber/${machine}";
@@ -649,7 +653,7 @@ if [[ $machine == "Mac" ]]; then
     CPU="${MACCPU}"
     MEM="${MACMEM}"
     DISK="${MACDISK}"
-    
+
     main # Execute CLI
 
 elif [[ $machine == "MinGw" ]]; then
@@ -672,7 +676,7 @@ elif [[ $machine == "Linux" ]]; then
 
     CPU="${TUXCPU}"
     MEM="${TUXMEM}"
-    DISK="${TUXDISK}" 
+    DISK="${TUXDISK}"
 
     main
 
