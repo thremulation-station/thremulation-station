@@ -2,9 +2,9 @@
 
 #Clone, Download and Install AtomicRedTeam
 
-IEX (IWR 'https://raw.githubusercontent.com/redcanaryco/invoke-atomicredteam/master/install-atomicredteam.ps1' -UseBasicParsing);
+IEX (IWR -UseBasicParsing -Uri 'https://raw.githubusercontent.com/redcanaryco/invoke-atomicredteam/master/install-atomicredteam.ps1');
 
-Install-AtomicRedTeam -InstallPath /home/vagrant/AtomicRedTeam -getAtomics -Force
+Install-AtomicRedTeam -RepoOwner dmr4of8 -Branch atomic-gui -InstallPath /home/vagrant/AtomicRedTeam -getAtomics -Force
 
 sudo pwsh -ex Unrestricted -c {Set-Content -Path $PROFILE.AllUsersAllHosts -Value '$PSDefaultParameterValues = @{"Invoke-AtomicTest:PathToAtomicsFolder"="/home/vagrant/AtomicRedTeam/atomics"}'}
     
