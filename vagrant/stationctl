@@ -147,7 +147,7 @@ deploy_quick() {
         echo ""
         read -rp " Proceed to deploy this configuration? [Y/N]: " yn
         case $yn in
-            [Yy]* )
+            [Yy]* ) 
                 echo ""
                 echo ""
                 echo " Deploying all boxes with vagrant up!";
@@ -159,7 +159,7 @@ deploy_quick() {
                 echo "";
                 echo "";
                 echo " Vagrant Up Complete! Snapshotting each box...";
-                echo " This can be used as a clean-slate restore point."
+                echo " This can be used as a clean-slate restore point.";
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
                 echo "";
                 echo "";
@@ -168,16 +168,12 @@ deploy_quick() {
                 echo "";
                 echo "";
                 echo "";
-                echo " Deployment Process Complete! [ctrl+c] to exit: ";
+                echo " Deployment Complete! Returning to the Main Menu...";
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
-                echo ""
-                echo ""
-                read -rp "Return to (M)ain Menu or (E)xit Program: " yn
-                case $yn in
-                    [Mm]* ) main; break;;
-                    [Ee]* ) clear; break;;
-                    * ) echo "Selection invalid, try again: "; sleep 1;;
-                esac
+                sleep 5; 
+                main; break;;
+            [Nn]* ) deploy; break;;
+            * ) echo "Selection invalid, try again: "; sleep 1;;
         esac
     done
 }
@@ -289,6 +285,7 @@ status() {
         case $yn in
             [Mm]* ) main; break;;
             [Ee]* ) clear; break;;
+            [Bb]* ) main; break;;
             * ) echo "Selection invalid, try again: "; sleep 1;;
         esac
     done
@@ -315,19 +312,18 @@ manage() {
     while true; do
         clear
         echo -e "${LIGHTPURPLE}    __________     __  ___${NC}";
-        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__ ____  ___ ____ ____ ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___ ${NC}";
         echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_)${NC}";
         echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/ ${NC}";
         echo -e "${LIGHTPURPLE}                                      /___/      ${NC}";
         echo -e "${LIGHTPURPLE}   (B)ack to Main                                ${NC}";
-        echo -e "${LIGHTPURPLE} ----------------------------------------------    ${NC}";
+        echo -e "${LIGHTPURPLE} ------------------------------------------------    ${NC}";
         echo ""
         echo "1. List............:  list all current boxes"
         echo "2. Startup.........:  start all local boxes up"
         echo "3. Shutdown........:  halt running boxes shutdown range"
         echo "4. Update..........:  update boxes to latest version"
         echo "5. Reboot..........:  restart boxes (troubleshooting)"
-        echo ""
         echo ""
         echo -e "${LIGHTPURPLE}    --- Data Reset and Troubleshooting ---${NC}"
         echo ""
@@ -336,6 +332,7 @@ manage() {
         echo "8. Hard Reset......:  destroy all vms"
         echo -e "9. ${LIGHTRED}Nuke and Pave${NC}...:  destroy all vms and boxes"
         echo ""
+        echo ""        
         read -rp "  Select Above Option: " yn
         case $yn in
             [1]* ) 
@@ -476,7 +473,7 @@ manage() {
                 echo "";
                 echo -e "  ${LIGHTRED}Hard Reset: Deleting VMS!${NC}";
                 echo "  Deleting VMs but keeping local boxes";
-                echo "  You have 10 seconds to cancel [ctrl+c]...";
+                echo "  You have 5 seconds to cancel [ctrl+c]...";
                 echo ""
                 echo ""
                 sleep 10;
@@ -489,7 +486,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                sleep 10; 
+                sleep 5; 
                 main;
                 break;;
             [9]* ) 
@@ -497,10 +494,10 @@ manage() {
                 echo ""
                 echo -e "  ${LIGHTRED}OPERATION ROLLING THUNDER Underway...${NC}";
                 echo "  Deleting ALL VMs local boxes!";
-                echo "  You have 10 seconds to cancel [ctrl+c] !";
+                echo "  You have 5 seconds to cancel [ctrl+c] !";
                 echo ""
                 echo ""
-                sleep 15;
+                sleep 5;
                 nuke_pave; 
                 break;; 
             [Bb]* ) clear; main; break;;
@@ -529,7 +526,7 @@ snapshot() {
     echo ""
     for machine in elastomic centos7 windows10
     do
-        vagrant snapshot save ts."$machine" ts."$machine"_initial
+        vagrant snapshot save ts."$machine" ts."$machine"_initial;
     done
     echo "";
     echo "";
@@ -551,12 +548,12 @@ snapshot_restore() {
 # This is as bad as it sounds, EVERYTHING dies...EVERYTHING!
 nuke_pave() {
     echo ""
-    echo -e "${RED}Burn Baby Burn!${NC}"
-    echo ""
-    for machine in elastomic centos7 windows10
+    echo -e "${LIGHTRED}  !!!BURN IN WITH FIRE!!!${NC}"
+    vagrant destroy -f
+    
+    for machine in elastomic windows10 centos
     do
-        vagrant destroy -f ts."$machine"
-        vagrant box remove mocyber/ts."$machine"
+        vagrant box remove "mocyber/${machine}";
     done
 }
 
@@ -567,11 +564,10 @@ nuke_pave() {
 
 if [[ $machine == "Mac" ]]; then
     # host stats
-    MACCPU=`top -l 1 | grep -E "^CPU" | grep -Eo '[^[:space:]]+%' | head -1`
-    MACMEM=`top -l 1 | grep -E "^Phys" | awk '{ print $2 }'`
-    MACDISK=`df -Ph | grep "/dev/disk1s1s1" | awk '{ print $5 }'`
-    #MACCPU=`top -l 1 | grep -E "^CPU" | awk '{print $3}'`
-    
+    MACCPU="$(top -l 1 | grep -E "^CPU" | grep -Eo '[^[:space:]]+%' | head -1)"
+    MACMEM="$(top -l 1 | grep -E "^Phys" | awk '{ print $2 }')"
+    MACDISK="$(df -Ph | grep "/dev/disk1s1s1" | awk '{ print $5 }')"
+
     CPU="${MACCPU}"
     MEM="${MACMEM}"
     DISK="${MACDISK}"
@@ -580,9 +576,9 @@ if [[ $machine == "Mac" ]]; then
 
 elif [[ $machine == "MinGw" ]]; then
     # host stats
-    WINCPU="`wmic cpu get loadpercentage | awk '{ print $1 }' | grep -v "LoadPercentage"` %"
-    WINMEM="`systeminfo | grep -e "^Virtual Memory: In Use:" | awk '{ print $5 }'`"
-    WINDISK=`df -Ph | grep -e "^C:" | awk '{ print $6 }'`
+    WINCPU="$(wmic cpu get loadpercentage | awk '{ print $1 }' | grep -v "LoadPercentage") %"
+    WINMEM="$(systeminfo | grep -e "^Virtual Memory: In Use:" | awk '{ print $5 }')"
+    WINDISK=$(df -Ph | grep -e "^C:" | awk '{ print $6 }')
 
     CPU="${WINCPU}"
     MEM="${WINMEM}"
@@ -592,9 +588,9 @@ elif [[ $machine == "MinGw" ]]; then
 
 elif [[ $machine == "Linux" ]]; then
     # host stats
-    TUXCPU="`cat /proc/loadavg | awk '{ print $2 }'` %"
-    TUXMEM="`free -t -m | grep "Total" | awk '{ print $3" MB";}'`"
-    TUXDISK="`df -Ph | grep -e "^C:" | awk '{ print $5 }'`"
+    TUXCPU="$(cat /proc/loadavg | awk '{ print $2 }') %"
+    TUXMEM="$(free -t -m | grep "Total" | awk '{ print $3" MB";}')"
+    TUXDISK="$(df -Ph | grep -e "^C:" | awk '{ print $5 }')"
 
     CPU="${TUXCPU}"
     MEM="${TUXMEM}"
