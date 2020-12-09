@@ -2,16 +2,6 @@
 
 set -o pipefail
 
-# TODOLIST:
-# [ ] os detection for banner stats
-#     [x] macos
-#     [ ] linux
-#     [x] win10
-#     [ ] other
-# [ ] "selection invalid" styling
-# [ ] make "status output" green bold
-# [x] add confirmation for destructive changes
-
 
 ###############################################################################
 # os detection
@@ -52,13 +42,7 @@ RED='\033[0;31m'
 LIGHTGREEN='\033[1;32m'
 GREEN='\033[0;32m'
 LIGHTPURPLE='\033[1;35m'
-LIGHTGRAY='\033[0;37m'
 NC='\033[0m' # No Color
-
-BOLD='\e[1m'
-ITALIC='\e[3m'
-BOLDITALIC='\e[3m\e[1m'
-NF='\e[0m'
 
 
 ###############################################################################
@@ -91,7 +75,7 @@ main() {
             [2]* ) status; break;;
             [3]* ) manage; break;;
             [Ee]* ) echo "Exiting..."; sleep 1; clear; break;;
-            * ) echo "Selection invalid, try again: "; sleep 1;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
 }
@@ -111,13 +95,15 @@ deploy() {
         echo ""
         echo "1. Quick Deployment....: deploy all target boxes"
         echo "2. Custom Deployment...: choose targets you want"
+        echo "3. Staged Deployment...: download boxes you want"
         echo ""
         read -rp " Select Above Option: " yn
         case $yn in
             [1]* ) deploy_quick; break;;
             [2]* ) deploy_custom; break;;
+            [3]* ) deploy_staged; break;;
             [Bb]* ) clear; main; break;;
-            * ) echo "Selection invalid, try again: ";;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
 }
@@ -173,7 +159,7 @@ deploy_quick() {
                 sleep 5; 
                 main; break;;
             [Nn]* ) deploy; break;;
-            * ) echo "Selection invalid, try again: "; sleep 1;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
 }
@@ -198,7 +184,7 @@ deploy_custom() {
         case $yn in
             [Yy]* ) WINDOWS="ts.windows10"; break;;
             [Nn]* ) WINDOWS=""; break;;
-            * ) echo "Selection invalid, try again: "; sleep 1;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
     while true; do
@@ -216,7 +202,7 @@ deploy_custom() {
             [Yy]* ) CENTOS="ts.centos7"; break;;
             [Nn]* ) CENTOS=""; break;;
             [Bb]* ) clear; deploy; break;;
-            * ) echo "Selection invalid, try again.";;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
     while true; do
@@ -238,14 +224,106 @@ deploy_custom() {
         echo ""
         read -rp "Confirm to proceed with deployment [Y/N]: " yn
         case $yn in
-            [Yy]* ) vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}"; sleep 20; snapshot; break;;
+            [Yy]* )
+                vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}";
+                sleep 10;
+                snapshot;
+                break;;
             [Nn]* ) deploy; break;;
-            [Bb]* ) clear; main; break;;
-            * ) echo "Selection invalid, try again: "; sleep 1;;
+            [Bb]* ) 
+                clear;
+                main;
+                break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
 }
 
+# Staged deployment pulls all selected boxes for later startup
+deploy_staged() {
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
+        echo "  The Elastomic box is required and will be pulled."
+        echo "  Select the TARGET boxes to include with it:"
+        echo ""
+        read -rp "  Pre-stage the Windows10 target? [Y/N]: " yn
+        case $yn in
+            [Yy]* ) WINDOWS="ts.windows10"; break;;
+            [Nn]* ) WINDOWS=""; break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+        esac
+    done
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
+        read -rp "  Pre-stage the Centos7 target? [Y/N]: " yn
+        case $yn in
+            [Yy]* ) CENTOS="ts.centos7"; break;;
+            [Nn]* ) CENTOS=""; break;;
+            [Bb]* ) clear; deploy; break;;
+            * ) echo "Selection invalid, try again.";;
+        esac
+    done
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
+        echo ""
+        echo "  You have chosen to Pre-stage the following boxes:"
+        echo ""
+        echo "  - CONTROL..: ts.elastomic"
+        echo "  - target...: ${WINDOWS}"
+        echo "  - target...: ${CENTOS}"
+        echo ""
+        read -rp "  Confirm to proceed with pulling the above [Y/N]: " yn
+        case $yn in
+            [Yy]* )
+                for machine in elastomic windows10 centos
+                do
+                    vagrant box add "mocyber/${machine}";
+                done
+                break;;
+            [Nn]* ) deploy; break;;
+            [Bb]* ) 
+                clear;
+                main;
+                break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+        esac
+    done
+}
+
+
+# Checks the elasticsearch index health that lives on the elastomic box
+status_indexes() {
+    curl -X GET "192.168.33.10:9200/_cluster/health?pretty"
+}
+
+# Checks that Kibana is reachable
+status_kibana() {
+    curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://192.168.33.10:5601/api/status
+}
 
 # Display the status of current environment
 status() {
@@ -270,31 +348,31 @@ status() {
         echo -e "   NOTE: '\033[3myellow\033[0m' indicates singlenode"
         echo -e "   ${LIGHTPURPLE}------------------${NC}";
         echo ""
-        status_indexes; sleep 2;
+        echo -n -e "${LIGHTGREEN}"
+        status_indexes;
+        sleep 1;
+        echo -n -e "${NC}"
         echo ""
         echo ""
         echo "   Kibana Service Status: "
         echo '   200 == "OK": '
         echo -e "   ${LIGHTPURPLE}------------------${NC}";
         echo ""
-        curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://192.168.33.10:5601/api/status; 
-        sleep 2;
+        echo -n -e "${LIGHTGREEN}"
+        status_kibana;
+        sleep 1;
+        echo -n -e "${NC}"
         echo ""
         echo ""
-        read -rp "Return to (M)ain Menu or (E)xit Program: " yn
+        echo ""
+        read -rp "   Return to (M)ain Menu or (E)xit Program: " yn
         case $yn in
             [Mm]* ) main; break;;
             [Ee]* ) clear; break;;
             [Bb]* ) main; break;;
-            * ) echo "Selection invalid, try again: "; sleep 1;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
-}
-
-
-# Checks the elasticsearch index health that lives on the elastomic box
-status_indexes() {
-    curl -X GET "192.168.33.10:9200/_cluster/health?pretty"
 }
 
 
@@ -349,7 +427,7 @@ manage() {
                 case $yn in
                     [Bb]* ) manage; break;;
                     [Mm]* ) main; break;;
-                    * ) echo "Selection invalid, try again: "; sleep 1;;
+                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
             [2]* ) 
@@ -366,7 +444,7 @@ manage() {
                 case $yn in
                     [Bb]* ) manage; break;;
                     [Mm]* ) main; break;;
-                    * ) echo "Selection invalid, try again: "; sleep 1;;
+                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
             [3]* ) 
@@ -383,7 +461,7 @@ manage() {
                 case $yn in
                     [Bb]* ) manage; break;;
                     [Mm]* ) main; break;;
-                    * ) echo "Selection invalid, try again: "; sleep 1;;
+                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
             [4]* ) 
@@ -401,7 +479,7 @@ manage() {
                 case $yn in
                     [Bb]* ) manage; break;;
                     [Mm]* ) main; break;;
-                    * ) echo "Selection invalid, try again: "; sleep 1;;
+                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
             [5]* ) 
@@ -418,7 +496,7 @@ manage() {
                 case $yn in
                     [Bb]* ) manage; break;;
                     [Mm]* ) main; break;;
-                    * ) echo "Selection invalid, try again: "; sleep 1;;
+                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
             [6]* ) 
@@ -442,7 +520,7 @@ manage() {
                 case $yn in
                     [Bb]* ) manage; break;;
                     [Mm]* ) main; break;;
-                    * ) echo "Selection invalid, try again: "; sleep 1;;
+                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
             [7]* ) 
@@ -457,7 +535,7 @@ manage() {
                 case $yn in
                     [Yy]* ) snapshot_restore; break;;
                     [Nn]* ) manage; break;;
-                    * ) echo "Selection invalid, try again: "; sleep 1;;
+                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 echo ""
                 echo ""
@@ -465,7 +543,7 @@ manage() {
                 case $yn in
                     [Bb]* ) manage; break;;
                     [Mm]* ) main; break;;
-                    * ) echo "Selection invalid, try again: "; sleep 1;;
+                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
             [8]* ) 
@@ -501,7 +579,7 @@ manage() {
                 nuke_pave; 
                 break;; 
             [Bb]* ) clear; main; break;;
-            * ) echo "Selection invalid, try again: "; sleep 1;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
 }
