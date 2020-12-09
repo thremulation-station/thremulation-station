@@ -11,8 +11,3 @@ move "C:\Users\vagrant\sysmon-config\sysmonconfig-export.xml" "C:\Users\vagrant\
 cd "C:\Users\vagrant\Sysmon"
 
 .\Sysmon64.exe -accepteula -i sysmonconfig-export.xml
-
-Stop-Service winlogbeat
-
-Start-Service winlogbeat
-
