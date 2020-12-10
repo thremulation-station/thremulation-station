@@ -5,7 +5,6 @@ $shutUp10RepoPath = "C:\Users\vagrant\OOSU10.exe"
 if (-not (Test-Path $shutUp10RepoPath)) {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing ShutUp10 and disabling Windows Defender"
   Invoke-WebRequest -Uri "$shutUp10DownloadUrl" -OutFile $shutUp10RepoPath
-  . $shutUp10RepoPath c:\vagrant\resources\shutup10.cfg /quiet
 } else {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) ShutUp10 was already installed. Moving On."
 }
