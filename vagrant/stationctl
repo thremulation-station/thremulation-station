@@ -541,16 +541,6 @@ deploy_staged() {
 }
 
 
-# Checks the elasticsearch index health that lives on the elastomic box
-status_indexes() {
-    curl -X GET "192.168.33.10:9200/_cluster/health?pretty"
-}
-
-# Checks that Kibana is reachable
-status_kibana() {
-    curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://192.168.33.10:5601/api/status
-}
-
 # Display the status of current environment
 status() {
     while true; do
@@ -599,6 +589,18 @@ status() {
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
+}
+
+
+# Checks the elasticsearch index health that lives on the elastomic box
+status_indexes() {
+    curl -X GET "192.168.33.10:9200/_cluster/health?pretty"
+}
+
+
+# Checks that Kibana is reachable
+status_kibana() {
+    curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://192.168.33.10:5601/api/status
 }
 
 
@@ -800,13 +802,21 @@ manage() {
             [9]* )
                 echo ""
                 echo ""
-                echo -e "  ${LIGHTRED}OPERATION ROLLING THUNDER Underway...${NC}";
-                echo "  Deleting ALL VMs local boxes!";
-                echo "  You have 5 seconds to cancel [ctrl+c] !";
+                echo -e "      ${LIGHTRED}--- OPERATION ROLLING THUNDER ---${NC}";
+                echo -e "         ${LIGHTRED}DELETING ALL VMs and BOXES!${NC}";
+                echo -e "         ${LIGHTRED}5 seconds to cancel [ctrl+c]${NC}";
                 echo ""
                 echo ""
                 sleep 5;
                 nuke_pave;
+                echo "";
+                echo "";
+                echo "  All VMs and BOXES deleted! Returning to Menu";
+                echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
+                echo ""
+                echo ""
+                sleep 5;
+                main;
                 break;;
             [Bb]* ) clear; main; break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
@@ -856,7 +866,8 @@ snapshot_restore() {
 # This is as bad as it sounds, EVERYTHING dies...EVERYTHING!
 nuke_pave() {
     echo ""
-    echo -e "${LIGHTRED}  !!!BURN IN WITH FIRE!!!${NC}"
+    echo -e "         ${LIGHTRED}Destruction Commencing...${NC}"
+    echo ""
     vagrant destroy -f
 
     for machine in elastomic windows10 centos
