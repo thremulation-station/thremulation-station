@@ -40,7 +40,6 @@ Vagrant.configure("2") do |config|
       vb.name = "ts.windows10"
       vb.memory = 2048
       vb.cpus = 2
-    cfg.vm.provision "disabledefender", type: "shell", path: "./scripts/disable-windef.ps1"
     cfg.vm.provision "installea", type: "shell", path: "./scripts/install-ea.ps1"
     end
   end
@@ -67,7 +66,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell" do |s|
       s.path = "./scripts/install-ea-linux.sh"
       s.env = {
-        "ELASTIC_STACK_VERSION" => "7.10.0",
+        "ELASTIC_STACK_VERSION" => "7.10.1",
         "KIBANA_URL" => "http://192.168.33.10:5601",
         "KIBANA_AUTH" => "vagrant:vagrant"
       }
