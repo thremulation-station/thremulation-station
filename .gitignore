@@ -17,3 +17,8 @@ packer/output/*.box
 **.DS_Store
 
 **.log
+
+# Packer Build Artifacts
+**.hwm
+**.pwd
+**.pwi

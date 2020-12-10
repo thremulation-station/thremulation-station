@@ -8,7 +8,7 @@ $HTTP_Response = $HTTP_Request.GetResponse()
 $HTTP_Status = [int]$HTTP_Response.StatusCode
 
 If ( $HTTP_Status -eq 200 ) {
-  Write-Host "Elastic box is reachable -- proceeding:"
+  Write-Host "elastomic box is reachable -- proceeding:"
   Start-Sleep -s 2
   Write-Host "Running Winlogbeat Setup Command"
   winlogbeat --path.config C:\ProgramData\chocolatey\lib\winlogbeat\tools setup

@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.box_version = "0.2"
     cfg.vm.hostname = "elastomic"
     cfg.disksize.size = "256GB"
-    #cfg.vbguest.auto_update = false
+    cfg.vbguest.auto_update = false
     cfg.vm.synced_folder '.', '/vagrant', disabled: true
     cfg.vm.network "private_network", ip: "192.168.33.10", auto_config: true
     cfg.vm.network "forwarded_port", guest: 5601, host: 5601
@@ -18,6 +18,7 @@ Vagrant.configure("2") do |config|
       vb.cpus = 2
       vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
     end
+<<<<<<< HEAD
     cfg.vm.provision "loadprebuiltrules", type: "shell", path: "./scripts/siem-prebuilt-rules.sh"
 
     # Setup Fleet
@@ -27,6 +28,18 @@ Vagrant.configure("2") do |config|
         "ELASTIC_STACK_VERSION" => "7.10.1",
         "KIBANA_URL" => "http://192.168.33.10:5601",
         "KIBANA_AUTH" => "vagrant:vagrant"
+=======
+
+    cfg.vm.provision "loadprebuiltrules", type: "shell", path: "./scripts/siem-prebuilt-rules.sh"
+
+    cfg.vm.provision "shell" do |s|
+      s.path = "./scripts/setup-fleet.sh"
+      s.env = {
+        "ELASTIC_STACK_VERSION" => "7.10.0",
+        "KIBANA_URL" => "http://192.168.33.10:5601",
+        "KIBANA_AUTH" => "vagrant:vagrant",
+        "ELASTICSEARCH_URL" => "http://192.168.33.10:9200"
+>>>>>>> devel
       }
     end
   end
@@ -48,6 +61,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.box = "mocyber/centos"
     cfg.vm.box_version = "0.1"
     cfg.vm.hostname = "centos7"
+    cfg.vbguest.auto_update = false
     cfg.vm.synced_folder '.', '/vagrant', disabled: true
     cfg.vm.network "private_network", ip: "192.168.33.12", auto_config: true
     cfg.vm.network "forwarded_port", guest: 80, host: 8080
@@ -61,8 +75,13 @@ Vagrant.configure("2") do |config|
 
     # Setup auditbeat
     cfg.vm.provision "auditbeatsetup", type: "shell", path: "./scripts/setup-linux-beats.sh"
+<<<<<<< HEAD
     
     # Install and Enroll Elastic Agent
+=======
+
+    # Setup Elastic Agent
+>>>>>>> devel
     cfg.vm.provision "shell" do |s|
       s.path = "./scripts/install-ea-linux.sh"
       s.env = {
