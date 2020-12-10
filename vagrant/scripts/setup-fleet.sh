@@ -1,8 +1,8 @@
-#!/bin/bash -eux
+#!/bin/bash -eu
 
 set -o pipefail
 
-STACK_VER="${ELASTIC_STACK_VERSION:-7.10.0}"
+STACK_VER="${ELASTIC_STACK_VERSION:-7.10.1}"
 KIBANA_URL="${KIBANA_URL:-http://127.0.0.1:5601}"
 KIBANA_URL_REMOTE="${KIBANA_URL_REMOTE:-http://192.168.33.10:5601}"
 ELASTICSEARCH_URL="${ELASTICSEARCH_URL:-http://127.0.0.1:9200}"
@@ -46,7 +46,7 @@ function enable_agent_package() {
         echo "Agent package ${PKG_NAME}-1 already enabled. Skipping"
         return
     fi
-    
+
     if [ "${ENABLE_LOGS}" = true ]; then
         types+=("logs")
     fi
@@ -64,7 +64,7 @@ function enable_agent_package() {
     for inputtype in ${PKG_INPUTS[@]}; do
         streams_json="$(
             echo -n "${PKG_INFO}" | \
-                jq --raw-output \
+                jq \
                     --arg input "${inputtype}" \
                     '.data_streams[] | select(.streams[] | select(.input==$input))' | \
                 jq --arg enable_logs ${ENABLE_LOGS} --arg enable_metrics ${ENABLE_METRICS} '
@@ -77,24 +77,25 @@ function enable_agent_package() {
                             $enable_metrics | test("true")
                         end),
                     "data_stream": {
-                        "type": .streams[0].input,
+                        "type": .type,
                         "dataset": .dataset
                     }
                 } + if (.streams[0].vars != null) then
                     {
                         "vars": .streams[0].vars |
-                            map({(.name): {"type": .type, "value": .default}}) | add
+                            map({(.name): {"value": .default, "type": .type}}) | add
                     } else
                     {}
                     end
             ' | jq -s .
             )"
 
+        input_enabled=$([ "$(echo "${streams_json}" |  jq '.[] | select(.enabled==true) | .id' | wc -l)" -gt 0 ] && echo true || echo false)
         inputs_json="$(
             echo -n "${inputs_json}" | jq \
                 --arg input "${inputtype}" \
                 --argjson streams "${streams_json}" \
-                --arg enabled true \
+                --arg enabled "${input_enabled}" \
                 '. + [{"type": $input, "enabled": $enabled | test("true"), "streams": $streams}]'
         )"
     done
@@ -116,6 +117,10 @@ function enable_agent_package() {
     }
 EOS
 )"
+    # echo "==== XXXXXXXX ======="
+    # echo "${package_config}" | jq
+    # echo "==== XXXXXXXX ======="
+
     result=$(echo -n "${package_config}" | curl --silent -XPOST "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/package_policies" -d @-)
     echo -n "${result}" | jq
 
@@ -157,7 +162,7 @@ function create_fleet_user() {
         printf '.'
         attempt_counter=$(($attempt_counter+1))
         sleep 5
-    done 
+    done
 }
 
 function configure_fleet_outputurls() {
