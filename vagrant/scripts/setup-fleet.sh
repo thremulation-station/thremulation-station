@@ -2,9 +2,15 @@
 
 set -o pipefail
 
-STACK_VER="${ELASTIC_STACK_VERSION:-7.10.0}"
+STACK_VER="${ELASTIC_STACK_VERSION:-7.10.1}"
 KIBANA_URL="${KIBANA_URL:-http://127.0.0.1:5601}"
+<<<<<<< HEAD
+KIBANA_URL_REMOTE="${KIBANA_URL_REMOTE:-http://192.168.33.10:5601}"
 ELASTICSEARCH_URL="${ELASTICSEARCH_URL:-http://127.0.0.1:9200}"
+ELASTICSEARCH_URL_REMOTE="${ELASTICSEARCH_URL_REMOTE:-http://192.168.33.10:9200}"
+=======
+ELASTICSEARCH_URL="${ELASTICSEARCH_URL:-http://127.0.0.1:9200}"
+>>>>>>> devel
 KIBANA_AUTH="${KIBANA_AUTH:-}"
 ENABLE_PACKAGES=("endpoint" "windows")
 
@@ -163,18 +169,31 @@ function create_fleet_user() {
     done
 }
 
+<<<<<<< HEAD
+function configure_fleet_outputurls() {
+    printf '{"kibana_urls": ["%s"]}' "${KIBANA_URL_REMOTE}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/settings" -d @- | jq
+
+    OUTPUT_ID="$(curl -XGET "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/outputs" | jq --raw-output '.items[] | select(.name == "default") | .id')"
+
+    printf '{"hosts": ["%s"]}' "${ELASTICSEARCH_URL_REMOTE}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/outputs/${OUTPUT_ID}" -d @- | jq 
+=======
 function configure_fleet_outputs() {
     printf '{"kibana_urls": ["%s"]}' "${KIBANA_URL}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/settings" -d @- | jq
 
     OUTPUT_ID="$(curl -XGET "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/outputs" | jq --raw-output '.items[] | select(.name == "default") | .id')"
     printf '{"hosts": ["%s"]}' "${ELASTICSEARCH_URL}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/outputs/${OUTPUT_ID}" -d @- | jq
+>>>>>>> devel
 }
 
 function main() {
     install_jq
     setup_fleet
     create_fleet_user
+<<<<<<< HEAD
+    configure_fleet_outputurls
+=======
     configure_fleet_outputs
+>>>>>>> devel
     policy_id=$(get_default_policy)
 
     # shellcheck disable=SC2068
@@ -185,9 +204,16 @@ function main() {
     done
 }
 
+<<<<<<< HEAD
+main "$@"
+
+# delete_package_policy "$(get_package_policy "endpoint-1" | jq -r '.id')"
+# delete_package_policy "$(get_package_policy "windows-1" | jq -r '.id')"
+=======
 # delete_package_policy "$(get_package_policy "endpoint-1" | jq -r '.id')"
 # delete_package_policy "$(get_package_policy "windows-1" | jq -r '.id')"
 
 main "$@"
 
 
+>>>>>>> devel
