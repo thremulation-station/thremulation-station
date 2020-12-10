@@ -3,7 +3,7 @@
 This directory covers the engineering side of the project, and covers building 
 the following custom images:
 
-- Elastic (centos7)
+- Elastomic (centos7)
 - Windows10 (Windows 10)
 - Centos (centos7)
 
