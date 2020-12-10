@@ -185,8 +185,8 @@ function main() {
     done
 }
 
-delete_package_policy "$(get_package_policy "endpoint-1" | jq -r '.id')"
-delete_package_policy "$(get_package_policy "windows-1" | jq -r '.id')"
+# delete_package_policy "$(get_package_policy "endpoint-1" | jq -r '.id')"
+# delete_package_policy "$(get_package_policy "windows-1" | jq -r '.id')"
 
 main "$@"
 
