@@ -45,15 +45,15 @@
   "provisioners": [
     {
       "type": "ansible",
-      "playbook_file": "packer/ansible/centos-playbook.yml"
+      "playbook_file": "./ansible/centos-playbook.yml"
     },
     {
       "type": "shell",
-      "scripts": "packer/scripts/guest-additions.sh"
+      "scripts": "./scripts/guest-additions.sh"
     },
     {
       "type": "shell",
-      "scripts": "packer/scripts/cleanup.sh"
+      "scripts": "./scripts/cleanup.sh"
     }
   ],
   "post-processors": [{
