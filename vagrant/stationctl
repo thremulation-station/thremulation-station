@@ -230,8 +230,8 @@ setup_windows() {
 
 # Windows install actions
 setup_windows_install() {
-    choco install virtualbox vagrant;
-    choco install ansible git;
+    choco install -y virtualbox vagrant;
+    choco install -y git;
     vagrant plugin install vagrant-disksize;
     vagrant plugin install vagrant-vbguest;
 }
@@ -615,16 +615,16 @@ delete_indexes() {
 manage() {
     while true; do
         clear
-        echo -e "${LIGHTPURPLE}    __________     __  ___${NC}";
-        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___ ${NC}";
-        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_)${NC}";
-        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/ ${NC}";
-        echo -e "${LIGHTPURPLE}                                      /___/      ${NC}";
-        echo -e "${LIGHTPURPLE}   (B)ack to Main                                ${NC}";
-        echo -e "${LIGHTPURPLE} ------------------------------------------------    ${NC}";
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}   (B)ack to Main                                 ${NC}";
+        echo -e "${LIGHTPURPLE} ------------------------------------------------ ${NC}";
         echo ""
         echo ""
-        echo "${LIGHTPURPLE}             --- Maintenance ---${NC}"
+        echo -e "${LIGHTPURPLE}             --- Maintenance ---${NC}"
         echo ""
         echo "1. List............:  list all current boxes"
         echo "2. Startup.........:  start all local boxes up"
@@ -633,12 +633,12 @@ manage() {
         echo "5. Reboot..........:  restart boxes (troubleshooting)"
         echo ""
         echo ""
-        echo "${LIGHTPURPLE}    --- Data Reset and Troubleshooting ---${NC}"
+        echo -e "${LIGHTPURPLE}    --- Data Reset and Troubleshooting ---${NC}"
         echo ""
         echo "6. Clear Data......:  delete data in all indexes"
         echo "7. Soft Reset......:  revert to original snapshots"
         echo "8. Hard Reset......:  destroy all vms"
-        echo "9. ${LIGHTRED}Nuke and Pave${NC}...:  destroy all vms and boxes"
+        echo -e "9. ${LIGHTRED}Nuke and Pave${NC}...:  destroy all vms and boxes"
         echo ""
         echo ""
         read -rp "  Select Above Option: " yn
