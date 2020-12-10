@@ -4,6 +4,7 @@ set -o pipefail
 
 STACK_VER="${ELASTIC_STACK_VERSION:-7.10.0}"
 KIBANA_URL="${KIBANA_URL:-http://127.0.0.1:5601}"
+ELASTICSEARCH_URL="${ELASTICSEARCH_URL:-http://127.0.0.1:9200}"
 KIBANA_AUTH="${KIBANA_AUTH:-}"
 ENABLE_PACKAGES=("endpoint" "windows")
 
@@ -37,6 +38,13 @@ function enable_agent_package() {
     declare package_config
     declare -a types
 
+    result=$(get_package_policy "${PKG_NAME}-1" | wc -l)
+
+    if [ "${result}" -gt 0 ]; then
+        echo "Agent package ${PKG_NAME}-1 already enabled. Skipping"
+        return
+    fi
+
     if [ "${ENABLE_LOGS}" = true ]; then
         types+=("logs")
     fi
@@ -54,37 +62,38 @@ function enable_agent_package() {
     for inputtype in ${PKG_INPUTS[@]}; do
         streams_json="$(
             echo -n "${PKG_INFO}" | \
-                jq --raw-output \
+                jq \
                     --arg input "${inputtype}" \
                     '.data_streams[] | select(.streams[] | select(.input==$input))' | \
                 jq --arg enable_logs ${ENABLE_LOGS} --arg enable_metrics ${ENABLE_METRICS} '
                 {
                     "id": (.streams[0].input + "-" + .dataset),
                     "enabled": (
-                        if (.streams[0].input == "logs") then
+                        if (.type == "logs") then
                             $enable_logs | test("true")
                         else
                             $enable_metrics | test("true")
                         end),
                     "data_stream": {
-                        "type": .streams[0].input,
+                        "type": .type,
                         "dataset": .dataset
                     }
                 } + if (.streams[0].vars != null) then
                     {
                         "vars": .streams[0].vars |
-                            map({(.name): {"type": .type, "value": .default}}) | add
+                            map({(.name): {"value": .default, "type": .type}}) | add
                     } else
                     {}
                     end
             ' | jq -s .
             )"
 
+        input_enabled=$([ "$(echo "${streams_json}" |  jq '.[] | select(.enabled==true) | .id' | wc -l)" -gt 0 ] && echo true || echo false)
         inputs_json="$(
             echo -n "${inputs_json}" | jq \
                 --arg input "${inputtype}" \
                 --argjson streams "${streams_json}" \
-                --arg enabled true \
+                --arg enabled "${input_enabled}" \
                 '. + [{"type": $input, "enabled": $enabled | test("true"), "streams": $streams}]'
         )"
     done
@@ -106,6 +115,10 @@ function enable_agent_package() {
     }
 EOS
 )"
+    # echo "==== XXXXXXXX ======="
+    # echo "${package_config}" | jq
+    # echo "==== XXXXXXXX ======="
+
     result=$(echo -n "${package_config}" | curl --silent -XPOST "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/package_policies" -d @-)
     echo -n "${result}" | jq
 
@@ -131,8 +144,37 @@ function get_package_policy() {
         | jq --raw-output --arg name "${PKG_POLICY_NAME}" '.items[] | select(.name == $name)'
 }
 
+function setup_fleet() {
+    curl --silent -XPOST "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/setup" | jq
+}
+
+function create_fleet_user() {
+    printf '{"forceRecreate": "true"}' | curl --silent -XPOST "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/agents/setup" -d @- | jq
+    attempt_counter=0
+    max_attempts=5
+    until [ "$(curl --silent --fail "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/agents/setup" | jq -c 'select(.isReady==true)' | wc -l)" -gt 0 ]; do
+        if [ ${attempt_counter} -eq ${max_attempts} ];then
+            echo "Max attempts reached"
+            exit 1
+        fi
+        printf '.'
+        attempt_counter=$(($attempt_counter+1))
+        sleep 5
+    done
+}
+
+function configure_fleet_outputs() {
+    printf '{"kibana_urls": ["%s"]}' "${KIBANA_URL}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/settings" -d @- | jq
+
+    OUTPUT_ID="$(curl -XGET "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/outputs" | jq --raw-output '.items[] | select(.name == "default") | .id')"
+    printf '{"hosts": ["%s"]}' "${ELASTICSEARCH_URL}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/outputs/${OUTPUT_ID}" -d @- | jq
+}
+
 function main() {
     install_jq
+    setup_fleet
+    create_fleet_user
+    configure_fleet_outputs
     policy_id=$(get_default_policy)
 
     # shellcheck disable=SC2068
@@ -141,12 +183,11 @@ function main() {
         pkg_ver=$(list_packages | jq --raw-output --arg name "${item}" 'select(.name == $name) | .version')
         enable_agent_package "${policy_id}" "${item}" "${pkg_ver}" "default"
     done
-
-
 }
-
-
-# main "$@"
 
 delete_package_policy "$(get_package_policy "endpoint-1" | jq -r '.id')"
 delete_package_policy "$(get_package_policy "windows-1" | jq -r '.id')"
+
+main "$@"
+
+

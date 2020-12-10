@@ -17,7 +17,18 @@ Vagrant.configure("2") do |config|
       vb.memory = 4096
       vb.cpus = 2
       vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+    end
+
     cfg.vm.provision "loadprebuiltrules", type: "shell", path: "./scripts/siem-prebuilt-rules.sh"
+
+    cfg.vm.provision "shell" do |s|
+      s.path = "./scripts/setup-fleet.sh"
+      s.env = {
+        "ELASTIC_STACK_VERSION" => "7.10.0",
+        "KIBANA_URL" => "http://192.168.33.10:5601",
+        "KIBANA_AUTH" => "vagrant:vagrant",
+        "ELASTICSEARCH_URL" => "http://192.168.33.10:9200"
+      }
     end
   end
 
@@ -55,7 +66,7 @@ Vagrant.configure("2") do |config|
 
     # Setup auditbeat
     cfg.vm.provision "auditbeatsetup", type: "shell", path: "./scripts/setup-linux-beats.sh"
-    
+
     # Setup Elastic Agent
     cfg.vm.provision "shell" do |s|
       s.path = "./scripts/install-ea-linux.sh"
