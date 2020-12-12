@@ -59,7 +59,7 @@
           - nano
           - tmux
           - git
-          - cargo #mitreassistant
+          - golang
           - openssl-devel
           - wget
 
