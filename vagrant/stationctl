@@ -587,10 +587,42 @@ deploy_staged() {
         read -rp "  Confirm to proceed with pulling the above [Y/N]: " yn
         case $yn in
             [Yy]* )
+                clear
+                echo ""
+                echo "  Staging your selected machines with"
+                echo "  the 'vagrant pull' command..."
+                echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
+                echo ""
+                sleep 3
                 for machine in elastomic windows10 centos7
                 do
                     vagrant box add "thremulation-station/${machine}";
                 done
+                echo ""
+                echo ""
+                echo ""
+                echo "  The boxes you selected are staged for"
+                echo "  later deployment. Current configuration:"
+                echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
+                echo ""
+                echo ""
+                echo -n -e "${LIGHTGREEN}"
+                vagrant box list;
+                echo -n -e "${NC}"
+                echo ""
+                echo ""
+                echo ""
+                echo "  Run 'vagrant up' when ready to deploy."
+                echo "  Reference: [vagrantup.com/docs/cli/up]"
+                echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
+                echo ""
+                read -rp "  Return to (M)ain Menu or (E)xit Program: " yn
+                case $yn in
+                    [Mm]* ) main; break;;
+                    [Ee]* ) clear; break;;
+                    [Bb]* ) main; break;;
+                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+                esac
                 break;;
             [Nn]* ) deploy; break;;
             [Bb]* )
