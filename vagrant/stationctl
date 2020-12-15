@@ -320,13 +320,13 @@ centos_install() {
     epel-release;
 
     #Install VirtualBox
-    curl -o /etc/yum.repos.d/virtualbox.repo http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
-    rpm --import https://www.virtualbox.org/download/oracle_vbox.asc
+    sudo curl -o /etc/yum.repos.d/virtualbox.repo http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
+    sudo rpm --import https://www.virtualbox.org/download/oracle_vbox.asc
     sudo yum install -y VirtualBox-6.0
     sudo usermod -aG vboxusers "$(whoami)"
 
     #Install Vagrant
-    sudo yum install -y https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.rpm;
+    sudo yum install -y https://releases.hashicorp.com/vagrant/2.2.14/vagrant_2.2.14_x86_64.rpm;
     vagrant plugin install vagrant-disksize;
     vagrant plugin install vagrant-vbguest;
 }
@@ -605,9 +605,9 @@ deploy_staged() {
                 echo "  later deployment. Current configuration:"
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
-                echo ""
                 echo -n -e "${LIGHTGREEN}"
                 vagrant box list;
+                sleep 1;
                 echo -n -e "${NC}"
                 echo ""
                 echo ""
