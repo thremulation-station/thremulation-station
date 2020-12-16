@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-set -o pipefail
+# set -o pipefail
 
 
 ###############################################################################
@@ -22,9 +22,10 @@ esac
 ###############################################################################
 
 # boxes
-ELASTOMIC="ts.elastomic"
 WINDOWS="ts.windows10"
 CENTOS="ts.centos7"
+
+RHELFAM=""
 
 
 # host stats
@@ -34,13 +35,10 @@ DISK=""
 
 
 # colors
-WHITE='\033[1;37m'
-YELLOW='\033[1;33m'
 ORANGE='\033[0;33m'
 LIGHTRED='\033[1;31m'
 RED='\033[0;31m'
 LIGHTGREEN='\033[1;32m'
-GREEN='\033[0;32m'
 LIGHTPURPLE='\033[1;35m'
 NC='\033[0m' # No Color
 
@@ -63,6 +61,7 @@ main() {
         echo -e "${LIGHTPURPLE}  _\ \/ __/ _ \/ __/ / _ \/ _ \ ${NC}    Memory used: $MEM     ";
         echo -e "${LIGHTPURPLE} /___/\__/\_,_/\__/_/\___/_//_/ ${NC}    Disk usage.: $DISK    ";
         echo ""
+        echo -e "${LIGHTPURPLE}  ATTACK with Atomic <-----------> DETECT with Elastic${NC}"
         echo -e "${LIGHTPURPLE} ------------------------------------------------------${NC}";
         echo -e ""
         echo " 1. Setup........:  install host system requriements"
@@ -76,7 +75,7 @@ main() {
             [2]* ) deploy; break;;
             [3]* ) status; break;;
             [4]* ) manage; break;;
-            [Ee]* ) echo "Exiting..."; sleep 1; clear; break;;
+            [Ee]* ) echo -e "\n Exiting..."; sleep 1; clear; break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
@@ -138,7 +137,7 @@ setup_mac() {
         echo ""
         read -rp " Proceed to install these packages? [Y/N]: " yn
         case $yn in
-            [Yy]* ) 
+            [Yy]* )
                 echo ""
                 echo ""
                 echo " Installing requirements...";
@@ -151,9 +150,9 @@ setup_mac() {
                 echo "";
                 echo " Install Complete! Returning to the Main Menu...";
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
-                sleep 5; 
+                sleep 5;
                 main; break;;
-            [Nn]* ) 
+            [Nn]* )
                 main;
                 break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
@@ -204,7 +203,7 @@ setup_windows() {
         echo ""
         read -rp " Proceed to install these packages? [Y/N]: " yn
         case $yn in
-            [Yy]* ) 
+            [Yy]* )
                 echo ""
                 echo ""
                 echo " Installing requirements...";
@@ -217,9 +216,9 @@ setup_windows() {
                 echo "";
                 echo " Install Complete! Returning to the Main Menu...";
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
-                sleep 5; 
+                sleep 5;
                 main; break;;
-            [Nn]* ) 
+            [Nn]* )
                 main;
                 break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
@@ -256,13 +255,13 @@ setup_rhel() {
         echo "  vagrant........:  automation"
         echo "  vagrant-plugin :  disksize"
         echo "  vagrant-plugin :  vbguest"
-        echo "  ansible........:  provisioning"
-        echo "  git............:  git the bits"
+        # echo "  ansible........:  provisioning"
+        # echo "  git............:  git the bits"
         echo ""
         echo ""
         read -rp " Proceed to install these packages? [Y/N]: " yn
         case $yn in
-            [Yy]* ) 
+            [Yy]* )
                 echo ""
                 echo ""
                 echo " Installing requirements...";
@@ -275,9 +274,9 @@ setup_rhel() {
                 echo "";
                 echo " Install Complete! Returning to the Main Menu...";
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
-                sleep 5; 
+                sleep 5;
                 main; break;;
-            [Nn]* ) 
+            [Nn]* )
                 main;
                 break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
@@ -288,24 +287,87 @@ setup_rhel() {
 
 # Rhel install actions
 setup_rhel_install() {
-    yum groupinstall -y "Development Tools"
-    
-    yum install -y \
-        kernel-devel \
-        kernel-devel-3.10.0-1127.el7.x86_64 \
-        epel-release \
-        ansible;
+
+# If Linux, try to determine specific distribution
+if [[ "${machine}" == "Linux" ]]; then
+
+    # determine centos or fedora
+    RHELFAM="$(sed s/\"//g /etc/os-release | grep -e "^ID=")"
+
+    if [ "${RHELFAM}" == "ID=centos" ]; then
+        centos_install
+
+    elif [ "${RHELFAM}" == "ID=fedora" ]; then
+        fedora_install
+
+    else
+        echo "Detected an unsupported Linux Distro:"
+        echo "See the full documentation for setup"
+        echo "details: [https://docs.thremulation.io]"
+    fi
+fi
+}
+
+centos_install() {
+    # install requirements
+    sudo yum install -y \
+    kernel-devel \
+    kernel-devel-"$(uname -r)" \
+    kernel-headers kernel-headers-"$(uname -r)" \
+    make \
+    patch \
+    gcc \
+    epel-release;
 
     #Install VirtualBox
-    curl -o /etc/yum.repos.d/virtualbox.repo http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
-    rpm --import https://www.virtualbox.org/download/oracle_vbox.asc
-    yum install -y VirtualBox-6.0
+    sudo curl -o /etc/yum.repos.d/virtualbox.repo http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
+    sudo rpm --import https://www.virtualbox.org/download/oracle_vbox.asc
+    sudo yum install -y VirtualBox-6.0
+    sudo usermod -aG vboxusers "$(whoami)"
 
     #Install Vagrant
-    yum install -y https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.rpm;
+    sudo yum install -y https://releases.hashicorp.com/vagrant/2.2.14/vagrant_2.2.14_x86_64.rpm;
     vagrant plugin install vagrant-disksize;
     vagrant plugin install vagrant-vbguest;
 }
+
+
+fedora_install() {
+    # install requirements
+    sudo dnf install -y rpmrebuild
+
+    "$(curl -o ~/VirtualBox-6.1-6.1.16_140961_fedora32-1.x86_64.rpm http://download.virtualbox.org/virtualbox/rpm/fedora/32/x86_64/VirtualBox-6.1-6.1.16_140961_fedora32-1.x86_64.rpm)"
+
+    # rebuild vbox
+    "$(rpmrebuild --change-spec-preamble='sed -e "s/6.1.16_140961_fedora32/6.1.16_140961_fedora33/"' --change-spec-requires='sed -e "s/python(abi) = 3.8/python(abi) >= 3.8/"' --package VirtualBox-6.1-6.1.16_140961_fedora32-1.x86_64.rpm)"
+
+    # more deps
+    sudo dnf install -y \
+    binutils \
+    gcc \
+    make \
+    patch \
+    libgomp \
+    glibc-headers \
+    glibc-devel \
+    kernel-headers \
+    kernel-devel \
+    dkms \
+    qt5-qtx11extras \
+    libxkbcommon
+
+    #Install VirtualBox
+    sudo dnf install -y ~/rpmbuild/RPMS/x86_64/VirtualBox-6.1-6.1.16_140961_fedora33-1.x86_64.rpm
+
+    # vboxusers groupadd
+    sudo usermod -aG vboxusers "$(whoami)"
+
+    #Install Vagrant
+    sudo dnf install -y https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.rpm;
+    vagrant plugin install vagrant-disksize;
+    vagrant plugin install vagrant-vbguest;
+}
+
 
 # Main deployment screen, ask for quick or custom
 deploy() {
@@ -366,7 +428,7 @@ deploy_quick() {
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
                 echo "";
                 echo "";
-                vagrant up; sleep 5;
+                vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}"; sleep 5;
                 echo "";
                 echo "";
                 echo "";
@@ -525,10 +587,42 @@ deploy_staged() {
         read -rp "  Confirm to proceed with pulling the above [Y/N]: " yn
         case $yn in
             [Yy]* )
-                for machine in elastomic windows10 centos
+                clear
+                echo ""
+                echo "  Staging your selected machines with"
+                echo "  the 'vagrant pull' command..."
+                echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
+                echo ""
+                sleep 3
+                for machine in elastomic windows10 centos7
                 do
-                    vagrant box add "mocyber/${machine}";
+                    vagrant box add "thremulation-station/${machine}";
                 done
+                echo ""
+                echo ""
+                echo ""
+                echo "  The boxes you selected are staged for"
+                echo "  later deployment. Current configuration:"
+                echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
+                echo ""
+                echo -n -e "${LIGHTGREEN}"
+                vagrant box list;
+                sleep 1;
+                echo -n -e "${NC}"
+                echo ""
+                echo ""
+                echo ""
+                echo "  Run 'vagrant up' when ready to deploy."
+                echo "  Reference: [vagrantup.com/docs/cli/up]"
+                echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
+                echo ""
+                read -rp "  Return to (M)ain Menu or (E)xit Program: " yn
+                case $yn in
+                    [Mm]* ) main; break;;
+                    [Ee]* ) clear; break;;
+                    [Bb]* ) main; break;;
+                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+                esac
                 break;;
             [Nn]* ) deploy; break;;
             [Bb]* )
@@ -561,7 +655,6 @@ status() {
         echo ""
         echo ""
         echo "   Elasticsearch Cluster Status:"
-        echo -e "   NOTE: '\033[3myellow\033[0m' indicates singlenode"
         echo -e "   ${LIGHTPURPLE}------------------${NC}";
         echo ""
         echo -n -e "${LIGHTGREEN}"
@@ -652,7 +745,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant box list;
+                vagrant box list ts.elastomic "${CENTOS}" "${WINDOWS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -669,7 +762,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant up;
+                vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -686,7 +779,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant halt;
+                vagrant halt ts.elastomic "${CENTOS}" "${WINDOWS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -789,7 +882,7 @@ manage() {
                 sleep 10;
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
-                vagrant destroy -f;
+                vagrant destroy -f ts.elastomic "${CENTOS}" "${WINDOWS}";
                 echo "";
                 echo "";
                 echo "  All VMs deleted! Returning to Menu";
@@ -868,11 +961,11 @@ nuke_pave() {
     echo ""
     echo -e "         ${LIGHTRED}Destruction Commencing...${NC}"
     echo ""
-    vagrant destroy -f
+    vagrant destroy -f ts.elastomic "${CENTOS}" "${WINDOWS}";
 
-    for machine in elastomic windows10 centos
+    for machine in elastomic windows10 centos7
     do
-        vagrant box remove "mocyber/${machine}";
+        vagrant box remove "thremulation-station/${machine}";
     done
 }
 

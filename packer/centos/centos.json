@@ -1,6 +1,7 @@
 {
   "variables": {
-    "version": ""
+    "cloud_token": "{{ env `VAGRANT_CLOUD_TOKEN` }}",
+    "version": "0.9.{{timestamp}}"
   },
   "builders": [
     {
@@ -53,12 +54,23 @@
     },
     {
       "type": "shell",
-      "scripts": "./scripts/cleanup.sh"
+      "scripts": "./scripts/cleanup.sh",
+      "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     }
   ],
-  "post-processors": [{
-    "type": "vagrant",
-    "compression_level": "8",
-    "output": "../output/{{.Provider}}-centos-{{timestamp}}.box"
-  }]
+  "post-processors": [
+    [
+      {
+        "type": "vagrant",
+        "compression_level": "8",
+        "output": "../_output/{{.Provider}}-dev-centos7-{{timestamp}}.box"
+      },
+      {
+        "type": "vagrant-cloud",
+        "box_tag": "thremulation-station/dev-centos7",
+        "access_token": "{{user `cloud_token`}}",
+        "version": "{{user `version`}}"
+      }
+    ]
+  ]
 }

@@ -52,6 +52,7 @@
           - cockpit
           - git
           - wget
+          - golang
 
     - name: Start Firewalld Service
       systemd:
