@@ -428,7 +428,7 @@ deploy_quick() {
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
                 echo "";
                 echo "";
-                vagrant up; sleep 5;
+                vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}"; sleep 5;
                 echo "";
                 echo "";
                 echo "";
@@ -746,7 +746,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant box list;
+                vagrant box list ts.elastomic "${CENTOS}" "${WINDOWS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -763,7 +763,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant up;
+                vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -780,7 +780,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant halt;
+                vagrant halt ts.elastomic "${CENTOS}" "${WINDOWS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -883,7 +883,7 @@ manage() {
                 sleep 10;
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
-                vagrant destroy -f;
+                vagrant destroy -f ts.elastomic "${CENTOS}" "${WINDOWS}";
                 echo "";
                 echo "";
                 echo "  All VMs deleted! Returning to Menu";
@@ -962,7 +962,7 @@ nuke_pave() {
     echo ""
     echo -e "         ${LIGHTRED}Destruction Commencing...${NC}"
     echo ""
-    vagrant destroy -f
+    vagrant destroy -f ts.elastomic "${CENTOS}" "${WINDOWS}";
 
     for machine in elastomic windows10 centos7
     do
