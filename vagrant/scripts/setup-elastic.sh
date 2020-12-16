@@ -2,31 +2,35 @@
 
 set -o pipefail
 
+# Define variables
 STACK_VER="${ELASTIC_STACK_VERSION:-7.10.1}"
 KIBANA_URL="${KIBANA_URL:-http://127.0.0.1:5601}"
 ELASTICSEARCH_URL="${ELASTICSEARCH_URL:-http://127.0.0.1:9200}"
 KIBANA_AUTH="${KIBANA_AUTH:-}"
 ENABLE_PACKAGES=("endpoint" "windows")
-
 HEADERS=(
     -H "kbn-version: ${STACK_VER}"
     -H 'Content-Type: application/json'
 )
 
+# Prep for authorization to Elasticsearch/Kibana
 if [ -n "${KIBANA_AUTH}" ]; then
     HEADERS+=(-u "${KIBANA_AUTH}")
 fi
 
+# Install jq
 function install_jq() {
     if ! command -v jq >/dev/null; then
         sudo yum install -y jq
     fi
 }
 
+# Collect integrations available deployment
 function list_packages() {
     curl --silent -XGET "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/epm/packages?experimental=true" | jq '.response[]'
 }
 
+# Enable the Elastic Agent
 function enable_agent_package() {
     POLICY_ID="$1"
     PKG_NAME="$2"
@@ -139,10 +143,12 @@ function get_package_policy() {
         | jq --raw-output --arg name "${PKG_POLICY_NAME}" '.items[] | select(.name == $name)'
 }
 
+# Setup Fleet
 function setup_fleet() {
     curl --silent -XPOST "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/setup" | jq
 }
 
+# Create Fleet User
 function create_fleet_user() {
     printf '{"forceRecreate": "true"}' | curl --silent -XPOST "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/agents/setup" -d @- | jq
     attempt_counter=0
@@ -158,6 +164,7 @@ function create_fleet_user() {
     done
 }
 
+# Configure Fleet Output
 function configure_fleet_outputs() {
     printf '{"kibana_urls": ["%s"]}' "${KIBANA_URL}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/settings" -d @- | jq
 
@@ -165,12 +172,31 @@ function configure_fleet_outputs() {
     printf '{"hosts": ["%s"]}' "${ELASTICSEARCH_URL}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/outputs/${OUTPUT_ID}" -d @- | jq
 }
 
+# Configure Elasticsearch Index Replicas
+function configure_index_replicas() {
+    curl --silent "${HEADERS[@]}" -XPUT "${ELASTICSEARCH_URL}"/*/_settings -d '{ "index" : { "number_of_replicas" : 0 } }' | jq
+}
+
+# Add Detection Engine Index"
+function add_detection_engine_index() {
+    curl --silent "${HEADERS[@]}" -XPOST "${KIBANA_URL}"/api/detection_engine/index
+}
+
+# Load Detection Engine Prebuilt Rules
+function add_detection_engine_rules() {
+    curl --silent "${HEADERS[@]}" -XPUT "${KIBANA_URL}"/api/detection_engine/rules/prepackaged
+}
+
+# Execute Fleet Funcionts
 function main() {
     install_jq
     setup_fleet
     create_fleet_user
     configure_fleet_outputs
     policy_id=$(get_default_policy)
+    configure_index_replicas
+    add_detection_engine_index
+    add_detection_engine_rules
 
     # shellcheck disable=SC2068
     for item in ${ENABLE_PACKAGES[@]}; do
@@ -185,4 +211,3 @@ main "$@"
 # Example to delete policies
 # delete_package_policy "$(get_package_policy "endpoint-1" | jq -r '.id')"
 # delete_package_policy "$(get_package_policy "windows-1" | jq -r '.id')"
-
