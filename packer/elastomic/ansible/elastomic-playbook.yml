@@ -1,0 +1,343 @@
+---
+  - hosts: all
+    become: yes
+    gather_facts: no
+    vars:
+      bootstrap_password: "vagrant"
+      vagrant:
+        user: "vagrant"
+        password: "{{ bootstrap_password }}"
+        role: "superuser"
+      header:
+        content: "{{ 'Content-Type: application/json' }}"
+        kbn: "{{ 'kbn-xsrf: true' }}"
+
+    tasks:
+  
+    - name: Import RPM Keys
+      rpm_key:
+        state: present
+        key: "{{ item }}"
+      loop:
+        - https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+        - https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+    - name: Add EPEL Repository
+      yum:
+        name: epel-release
+
+    - name: Add Elastic Repository
+      yum_repository:
+        name: elastic
+        description: Elasticsearch repository for 7.x packages
+        enabled: yes
+        gpgcheck: yes
+        baseurl: https://artifacts.elastic.co/packages/7.x/yum
+        gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        file: elastic
+
+    - name: Add Microsoft Repository
+      yum_repository:
+        name: packages-microsoft-com-prod
+        description: Microsoft Repo for RHEL-based
+        enabled: yes
+        gpgcheck: yes
+        baseurl: https://packages.microsoft.com/rhel/7/prod/
+        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+        file: prod
+
+    - name: Clean Yum Cache
+      command: yum clean all
+
+    - name: Install System Tools
+      yum:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - vim
+          - nano
+          - tmux
+          - git
+          - golang
+          - openssl-devel
+          - wget
+
+###################################
+# Firewall
+###################################
+
+    - name: Start Firewalld Service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Add Elasticsearch Firewall Rule
+      firewalld:
+        zone: public
+        port: 9200/tcp
+        permanent: yes
+        immediate: yes
+        state: enabled
+        
+    - name: Add Kibana Firewall Rule
+      firewalld:
+        zone: public
+        port: 5601/tcp
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+    - name: Add AtomicGUI Firewall Rule
+      firewalld:
+        zone: public
+        port: 8487/tcp
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+    - name: Add Caldera Firewall Rule
+      firewalld:
+        zone: public
+        port: 8888/tcp
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+
+###################################
+# Elasticstack
+###################################
+
+    - name: Install Elasticsearch
+      yum:
+        name: elasticsearch
+        state: present
+
+    - name: Elasticsearch Vagrant User tasks
+      block:
+
+        - name: Create the Elasticsearch Keystore
+          command: "/usr/share/elasticsearch/bin/elasticsearch-keystore create"
+          args:
+            creates: "/etc/elasticsearch/elasticsearch.keystore"
+
+        - name: Check if Bootstrap Password is Set
+          command: /usr/share/elasticsearch/bin/elasticsearch-keystore list
+          register: list_es_keystore
+          changed_when: False
+          check_mode: no
+
+        - name: Set Bootstrap Password
+          command: /usr/share/elasticsearch/bin/elasticsearch-keystore add -x bootstrap.password
+          when: "'bootstrap.password' not in list_es_keystore.stdout_lines"
+          no_log: true
+          register: es_keystore
+          args:
+            stdin: "{{ bootstrap_password | quote }}"
+
+        - name: Create Vagrant Superuser
+          command: "/usr/share/elasticsearch/bin/elasticsearch-users useradd {{ vagrant.user }} -p {{ vagrant.password }} -r {{ vagrant.role }}"
+
+    - name: Create Default Directory
+      file:
+        path: /etc/default
+        state: directory
+
+    - name: Add Elasticsearch Default File
+      copy:
+        src: ./files/elasticsearch
+        dest: /etc/default/elasticsearch
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create Elasticsearch Service Folder
+      file:
+        path: /etc/systemd/system/elasticsearch.service.d
+        state: directory
+        # owner: vagrant
+        # mode: '0755'
+
+    - name: Add Override Config
+      copy:
+        src: ./files/override.conf
+        dest: /etc/systemd/system/elasticsearch.service.d/override.conf
+        # owner: root
+        # group: root
+        # mode: '0644'
+    
+    - name: Add Limits Config
+      copy:
+        src: ./files/limits.conf
+        dest: /etc/security/limits.conf
+        # owner: root
+        # group: root
+        # mode: '0644'
+
+    - name: Confirm Directory Permissions
+      file:
+        path: /etc/elasticsearch
+        state: directory
+        recurse: yes
+        owner: elasticsearch
+        group: elasticsearch
+
+    - name: Update Elasticsearch Config
+      copy:
+        src: ./files/elasticsearch.yml
+        dest: /etc/elasticsearch/elasticsearch.yml
+        owner: elasticsearch
+        group: elasticsearch
+        mode: '0660'
+
+    - name: Start and Enable Elasticsearch
+      systemd: 
+        name: elasticsearch
+        state: started
+        enabled: yes
+
+    - name: Install Kibana
+      yum:
+        name: kibana
+        state: present
+
+    - name: Update Kibana Config
+      copy:
+        src: ./files/kibana.yml
+        dest: /etc/kibana/kibana.yml
+        owner: kibana
+        group: kibana
+
+    - name: Confirm Directory Permissions
+      file:
+        path: /etc/kibana
+        state: directory
+        recurse: yes
+        owner: kibana
+        group: kibana
+  
+
+    - name: Start and Enable Kibana
+      systemd: 
+        name: kibana
+        state: started
+        enabled: yes
+
+
+###################################
+# SIEM Rules
+# This section needs love / currently working 
+# as a small bash script called in Vagrantfile
+###################################
+
+    # - name: Create Detection Engine Index
+    #   uri:
+    #     url: http://192.168.33.10:5601/api/detection_engine/index
+    #     method: POST
+    #     status_code: 200
+    #     user: "{{ vagrant.user }}"
+    #     password: "{{ bootstrap_password }}"
+    #     validate_certs: false
+    #     force_basic_auth: yes
+
+    # - name: Put Prepackaged Rules
+    #   uri:
+    #     url: http://192.168.33.10:5601/api/detection_engine/rules/prepackaged
+    #     method: PUT
+    #     body_format: json
+    #     body: >
+    #       {
+    #         "password": "{{ bootstrap_password }}"
+    #       }
+    #     status_code: 200
+    #     user: "{{ vagrant.user }}"
+    #     password: "{{ bootstrap_password }}"
+    #     validate_certs: false
+    #     force_basic_auth: yes
+
+
+###################################
+# Powershell
+###################################
+
+    - name: Install Powershell
+      yum:
+        name: powershell
+        state: present
+
+    - name: Enable Powershell Remoting
+      command: pwsh -Command {Enable-PSRemoting -Force}
+
+
+###################################
+# SSH Configuration
+###################################
+
+    - name: Uncomment Pass Auth Yes
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#PasswordAuthentication\s+yes'
+        line: PasswordAuthentication yes
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Comment out Passauth No
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication\s+no'
+        line: '# PasswordAuthentication no'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Allow SSH Pubkey Auth
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#PubkeyAuthentication\s+yes'
+        line: 'PubkeyAuthentication yes'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Add PS Subsystem to PS remote over SSH
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: 'Subsystem powershell /usr/bin/pwsh -sshs -NoLogo'
+        create: yes
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Create Vagrant User SSH Directory
+      file:
+        path: /home/vagrant/.ssh
+        state: directory
+        owner: vagrant
+        mode: '0700'
+
+    - name: Retrieve Default Vagrant Pub Key
+      command: wget --no-check-certificate https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub -O /home/vagrant/.ssh/authorized_keys
+
+    - name: Update Permissions of SSH Key
+      file:
+        path: /home/vagrant/.ssh/authorized_keys
+        state: file
+        owner: vagrant
+        mode: '0600'
+        
+    - name: Add AuthorizedKeysFile to Config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AuthorizedKeysFile\s+\.ssh/authorized_keys'
+        line: 'AuthorizedKeysFile %h/.ssh/authorized_keys'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Restart sshd service
+      systemd:
+        name: sshd
+        state: restarted

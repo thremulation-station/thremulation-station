@@ -1,0 +1,25 @@
+# ignore .vagrant build folder
+**.vagrant/
+
+# ignore packer cache
+**packer_cache/
+
+# ignore iso files
+**_iso/
+
+# ignore packer output .box files
+packer/output/*.box
+
+**.vbox-extpack
+
+**output-virtualbox-iso/
+
+**.DS_Store
+
+**.log
+
+# Packer Build Artifacts
+**.hwm
+**.pwd
+**.pwi
+**.box

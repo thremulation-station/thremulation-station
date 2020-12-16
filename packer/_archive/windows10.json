@@ -1,0 +1,87 @@
+{
+  "variables": {
+    "iso_path": "/Users/colsonwilhoit/Documents/iso/10240.16384.150709-1700.TH1_CLIENTENTERPRISEEVAL_OEMRET_X64FRE_EN-US.ISO",
+    "iso_md5": "6cd2f47f2c32faa7be85f1dc81af3220",
+    "switch_name": "Default Switch"
+  },
+
+  "builders": [
+  {    
+    "type": "virtualbox-iso",
+    "communicator": "winrm",
+    "disk_size": 61440,
+    "floppy_files": [
+      "Autounattend.xml",
+      "update-windows.ps1",
+      "configure-winrm.ps1"
+    ],
+    "guest_os_type": "Windows10_64",
+    "headless": true,
+    "iso_url": "{{user `iso_path`}}",
+    "iso_checksum_type": "md5",
+    "iso_checksum": "{{user `iso_md5`}}",    
+    "winrm_username": "vagrant",
+    "winrm_password": "vagrant",
+    "winrm_timeout": "6h",
+    "winrm_insecure": true,
+    "hard_drive_interface": "sata",
+    "iso_interface": "sata",
+    "shutdown_command": "shutdown /s /t 0 /f /d p:4:1 /c \"Packer Shutdown\"",
+    "guest_additions_mode": "upload",
+    "guest_additions_path": "c:/Windows/Temp/windows.iso",
+    "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "4096"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "2"
+        ],
+	[
+	  "modifyvm",
+	  "{{.Name}}",
+	  "--vram", 
+	  "32"
+	]	
+      ]
+    } 
+  ],
+  "provisioners": [
+  {
+    "type": "powershell",
+    "scripts": [
+      "./scripts/install-guest-tools.ps1",
+      "./scripts/enable-rdp.ps1",
+      "./scripts/disable-hibernate.ps1",
+      "./scripts/disable-autologin.ps1",
+      "./scripts/enable-uac.ps1",
+      "./scripts/no-expiration.ps1",
+      "./scripts/install-winlogbeat.ps1",
+      "./scripts/install-sysmon.ps1",
+      "./scripts/install-pwshssh.ps1",
+      "./scripts/install-advaudit.ps1",
+      "./scripts/disable-windef.ps1",
+      "./scripts/cleanup.ps1"
+    ]},
+  {
+    "type": "windows-restart",
+    "restart_command": "powershell \"& {(Get-WmiObject win32_operatingsystem).LastBootUpTime > C:\\ProgramData\\lastboot.txt; Restart-Computer -force}\"",
+    "restart_check_command": "powershell -command \"& {if ((get-content C:\\ProgramData\\lastboot.txt) -eq (Get-WmiObject win32_operatingsystem).LastBootUpTime) {Write-Output 'Sleeping for 600 seconds to wait for reboot'; start-sleep 600} else {Write-Output 'Reboot complete'}}\""
+  }
+
+],  
+
+ "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": false,
+      "output": "../output/{{.Provider}}_windows-10-{{timestamp}}.box",
+      "vagrantfile_template": "vagrantfile.template"
+    }
+  ]
+}
