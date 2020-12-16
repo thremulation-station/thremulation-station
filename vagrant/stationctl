@@ -137,7 +137,7 @@ setup_mac() {
         echo ""
         read -rp " Proceed to install these packages? [Y/N]: " yn
         case $yn in
-            [Yy]* ) 
+            [Yy]* )
                 echo ""
                 echo ""
                 echo " Installing requirements...";
@@ -150,9 +150,9 @@ setup_mac() {
                 echo "";
                 echo " Install Complete! Returning to the Main Menu...";
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
-                sleep 5; 
+                sleep 5;
                 main; break;;
-            [Nn]* ) 
+            [Nn]* )
                 main;
                 break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
@@ -203,7 +203,7 @@ setup_windows() {
         echo ""
         read -rp " Proceed to install these packages? [Y/N]: " yn
         case $yn in
-            [Yy]* ) 
+            [Yy]* )
                 echo ""
                 echo ""
                 echo " Installing requirements...";
@@ -216,9 +216,9 @@ setup_windows() {
                 echo "";
                 echo " Install Complete! Returning to the Main Menu...";
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
-                sleep 5; 
+                sleep 5;
                 main; break;;
-            [Nn]* ) 
+            [Nn]* )
                 main;
                 break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
@@ -261,7 +261,7 @@ setup_rhel() {
         echo ""
         read -rp " Proceed to install these packages? [Y/N]: " yn
         case $yn in
-            [Yy]* ) 
+            [Yy]* )
                 echo ""
                 echo ""
                 echo " Installing requirements...";
@@ -274,9 +274,9 @@ setup_rhel() {
                 echo "";
                 echo " Install Complete! Returning to the Main Menu...";
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
-                sleep 5; 
+                sleep 5;
                 main; break;;
-            [Nn]* ) 
+            [Nn]* )
                 main;
                 break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
@@ -296,10 +296,10 @@ if [[ "${machine}" == "Linux" ]]; then
 
     if [ "${RHELFAM}" == "ID=centos" ]; then
         centos_install
-    
+
     elif [ "${RHELFAM}" == "ID=fedora" ]; then
         fedora_install
-    
+
     else
         echo "Detected an unsupported Linux Distro:"
         echo "See the full documentation for setup"
@@ -309,7 +309,7 @@ fi
 }
 
 centos_install() {
-    # install requirements 
+    # install requirements
     sudo yum install -y \
     kernel-devel \
     kernel-devel-"$(uname -r)" \
@@ -333,7 +333,7 @@ centos_install() {
 
 
 fedora_install() {
-    # install requirements 
+    # install requirements
     sudo dnf install -y rpmrebuild
 
     "$(curl -o ~/VirtualBox-6.1-6.1.16_140961_fedora32-1.x86_64.rpm http://download.virtualbox.org/virtualbox/rpm/fedora/32/x86_64/VirtualBox-6.1-6.1.16_140961_fedora32-1.x86_64.rpm)"
@@ -358,7 +358,7 @@ fedora_install() {
 
     #Install VirtualBox
     sudo dnf install -y ~/rpmbuild/RPMS/x86_64/VirtualBox-6.1-6.1.16_140961_fedora33-1.x86_64.rpm
-    
+
     # vboxusers groupadd
     sudo usermod -aG vboxusers "$(whoami)"
 
@@ -655,7 +655,6 @@ status() {
         echo ""
         echo ""
         echo "   Elasticsearch Cluster Status:"
-        echo -e "   NOTE: '\033[3myellow\033[0m' indicates singlenode"
         echo -e "   ${LIGHTPURPLE}------------------${NC}";
         echo ""
         echo -n -e "${LIGHTGREEN}"
