@@ -596,7 +596,7 @@ deploy_staged() {
                 sleep 3
                 for machine in elastomic windows10 centos7
                 do
-                    vagrant box add "thremulation-station/${machine}";
+                    vagrant box add "thremulation-station/dev-${machine}";
                 done
                 echo ""
                 echo ""
@@ -762,7 +762,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}";
+                vagrant up --no-provision ts.elastomic "${CENTOS}" "${WINDOWS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -814,7 +814,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant reload;
+                vagrant reload --no-provision ts.elastomic "${CENTOS}" "${WINDOWS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -965,7 +965,7 @@ nuke_pave() {
 
     for machine in elastomic windows10 centos7
     do
-        vagrant box remove "thremulation-station/${machine}";
+        vagrant box remove "thremulation-station/dev-${machine}";
     done
 }
 
