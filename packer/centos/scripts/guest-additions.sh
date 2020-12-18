@@ -1,5 +1,3 @@
-# https://github.com/lavabit/robox/blob/master/scripts/centos7/virtualbox.sh
-
 retry() {
   local COUNT=1
   local RESULT=0
@@ -64,7 +62,7 @@ fi
 printf "Installing the Virtual Box Tools.\n"
 
 # Read in the version number.
-VBOXVERSION=`cat /root/VBoxVersion.txt`
+# VBOXVERSION=`cat /root/VBoxVersion.txt`
 
 retry yum --quiet --assumeyes install bzip2; error
 
@@ -73,13 +71,67 @@ getent group vboxsf >/dev/null || groupadd --system vboxsf; error
 getent passwd vboxadd >/dev/null || useradd --system --gid bin --home-dir /var/run/vboxadd --shell /sbin/nologin vboxadd; error
 
 mkdir -p /mnt/virtualbox; error
-mount -o loop /root/VBoxGuestAdditions.iso /mnt/virtualbox; error
+
+curl --url http://download.virtualbox.org/virtualbox/4.3.8/VBoxGuestAdditions_4.3.8.iso --output /home/vagrant/VBoxGuestAdditions.iso
+
+mount -o loop /home/vagrant/VBoxGuestAdditions.iso /mnt/virtualbox; error
 
 # For some reason the vboxsf module fails the first time, but installs
 # successfully if we run the installer a second time.
 sh /mnt/virtualbox/VBoxLinuxAdditions.run --nox11 || sh /mnt/virtualbox/VBoxLinuxAdditions.run --nox11; error
-ln -s /opt/VBoxGuestAdditions-$VBOXVERSION/lib/VBoxGuestAdditions /usr/lib/VBoxGuestAdditions; error
+# ln -s /opt/VBoxGuestAdditions-$VBOXVERSION/lib/VBoxGuestAdditions /usr/lib/VBoxGuestAdditions; error
 
 umount /mnt/virtualbox; error
 rm -rf /root/VBoxVersion.txt; error
 rm -rf /root/VBoxGuestAdditions.iso; error
+
+
+# https://github.com/lavabit/robox/blob/master/scripts/centos7/virtualbox.sh
+
+
+# #!/bin/bash
+
+# curl --url http://download.virtualbox.org/virtualbox/4.3.8/VBoxGuestAdditions_4.3.8.iso --output ./VBoxGuestAdditions_4.3.8.iso
+
+# mkdir /media/VBoxGuestAdditions
+
+# mount -o loop,ro /home/vagrant/VBoxGuestAdditions_4.3.8.iso /media/VBoxGuestAdditions
+
+# sh /media/VBoxGuestAdditions/VBoxLinuxAdditions.run
+
+# umount /media/VBoxGuestAdditions
+
+# rm /home/vagrant/VBoxGuestAdditions_4.3.8.iso
+
+# rmdir /media/VBoxGuestAdditions
+
+# echo "----- Guest Additions Successfully Installed -----"
+
+
+
+
+# # Mount the disk image
+# cd /tmp
+# mkdir /tmp/isomount
+# mount -t iso9660 -o loop /root/VBoxGuestAdditions.iso /tmp/isomount
+
+# # Install the drivers
+# /tmp/isomount/VBoxLinuxAdditions.run
+
+# # Cleanup
+# umount isomount
+# rm -rf isomount /root/VBoxGuestAdditions.iso
+
+
+#   # Guest additions are located as per guest_additions_path in 
+#   # Packer's configuration file
+#   - name: Mount guest additions ISO read-only
+#     mount:
+#       path: /mnt/
+#       src: /home/vagrant/VBoxGuestAdditions.iso
+#       fstype: iso9660
+#       opts: ro
+#       state: mounted
+
+#   - name: execute guest additions
+#     shell: /mnt/VBoxLinuxAdditions.run 
