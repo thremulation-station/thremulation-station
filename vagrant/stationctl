@@ -597,7 +597,7 @@ deploy_staged() {
                 sleep 3
                 for machine in elastomic windows10 centos7
                 do
-                    vagrant box add "thremulation-station/${machine}";
+                    vagrant box add "thremulation-station/dev-${machine}";
                 done
                 echo ""
                 echo ""
@@ -966,7 +966,7 @@ nuke_pave() {
 
     for machine in elastomic windows10 centos7
     do
-        vagrant box remove "thremulation-station/${machine}";
+        vagrant box remove "thremulation-station/dev-${machine}";
     done
 }
 
