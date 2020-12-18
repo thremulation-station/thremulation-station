@@ -2,8 +2,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "ts.elastomic", primary: true do |cfg|
     cfg.vm.box = "thremulation-station/elastomic"
-# cfg.vm.box_version commented out for devel, set to latest for release
-#    cfg.vm.box_version = "0.9.1608144367"
+    # cfg.vm.box_version commented out for devel, set to latest for release
+    #    cfg.vm.box_version = "0.9.1608144367"
     cfg.vm.hostname = "elastomic"
     cfg.disksize.size = "256GB"
     cfg.vbguest.auto_update = true
