@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -eux
 
 # set -o pipefail
 
@@ -472,7 +472,7 @@ deploy_custom() {
         read -rp "Deploy the Windows10 target? [Y/N]: " yn
         case $yn in
             [Yy]* ) WINDOWS="ts.windows10"; break;;
-            [Nn]* ) unset WINDOWS; break;;
+            [Nn]* ) WINDOWS=""; break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
@@ -489,7 +489,7 @@ deploy_custom() {
         read -rp "Deploy the Centos7 target? [Y/N]: " yn
         case $yn in
             [Yy]* ) CENTOS="ts.centos7"; break;;
-            [Nn]* ) unset CENTOS; break;;
+            [Nn]* ) CENTOS=""; break;;
             [Bb]* ) clear; deploy; break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
@@ -597,7 +597,7 @@ deploy_staged() {
                 sleep 3
                 for machine in elastomic windows10 centos7
                 do
-                    vagrant box add "thremulation-station/dev-${machine}";
+                    vagrant box add "thremulation-station/${machine}";
                 done
                 echo ""
                 echo ""
@@ -966,7 +966,7 @@ nuke_pave() {
 
     for machine in elastomic windows10 centos7
     do
-        vagrant box remove "thremulation-station/dev-${machine}";
+        vagrant box remove "thremulation-station/${machine}";
     done
 }
 
