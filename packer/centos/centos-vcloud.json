@@ -59,18 +59,11 @@
     }
   ],
   "post-processors": [
-    [
-      {
-        "type": "vagrant",
-        "compression_level": "8",
-        "output": "../_output/{{.Provider}}-dev-centos7-{{timestamp}}.box"
-      },
-      {
-        "type": "vagrant-cloud",
-        "box_tag": "thremulation-station/dev-centos7",
-        "access_token": "{{user `cloud_token`}}",
-        "version": "{{user `version`}}"
-      }
-    ]
+    {
+      "type": "vagrant-cloud",
+      "box_tag": "thremulation-station/dev-centos7",
+      "access_token": "{{user `cloud_token`}}",
+      "version": "{{user `version`}}"
+    }
   ]
 }
