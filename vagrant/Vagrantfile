@@ -51,8 +51,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "ts.centos7" do |cfg|
     cfg.vm.box = "thremulation-station/centos7"
-# cfg.vm.box_version commented out for devel, set to latest for release
-#    cfg.vm.box_version = "0.9.1608142592"
+    # cfg.vm.box_version commented out for devel, set to latest for release
+    # cfg.vm.box_version = "0.9.1608142592"
     cfg.vm.hostname = "centos7"
     cfg.vbguest.auto_update = true
     cfg.vm.synced_folder '.', '/vagrant', disabled: true
