@@ -50,7 +50,8 @@
     },
     {
       "type": "shell",
-      "scripts": "./scripts/guest-additions.sh"
+      "scripts": "scripts/guest-additions.sh",
+      "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     },
     {
       "type": "shell",
