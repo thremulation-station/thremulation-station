@@ -22,6 +22,7 @@ esac
 ###############################################################################
 
 # boxes
+ELASTOMIC="ts.elastomic"
 WINDOWS="ts.windows10"
 CENTOS="ts.centos7"
 
@@ -428,7 +429,7 @@ deploy_quick() {
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
                 echo "";
                 echo "";
-                vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}"; sleep 5;
+                vagrant up "${ELASTOMIC}" "${CENTOS}" "${WINDOWS}"; sleep 5;
                 echo "";
                 echo "";
                 echo "";
@@ -506,14 +507,14 @@ deploy_custom() {
         echo ""
         echo "You have chosen the following Custom Deployment:"
         echo ""
-        echo "- CONTROL..: ts.elastomic (required)"
-        echo "- target...: ${WINDOWS}"
-        echo "- target...: ${CENTOS}"
+        echo "- CONTROL..: "${ELASTOMIC}" (required)"
+        echo "- target...: "${WINDOWS}""
+        echo "- target...: "${CENTOS}""
         echo ""
         read -rp "Confirm to proceed with deployment [Y/N]: " yn
         case $yn in
             [Yy]* )
-                vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}";
+                vagrant up "${ELASTOMIC}" ${CENTOS} ${WINDOWS};
                 sleep 10;
                 snapshot;
                 break;;
@@ -580,7 +581,7 @@ deploy_staged() {
         echo ""
         echo "  You have chosen to Pre-stage the following boxes:"
         echo ""
-        echo "  - CONTROL..: ts.elastomic"
+        echo "  - CONTROL..: ${ELASTOMIC}"
         echo "  - target...: ${WINDOWS}"
         echo "  - target...: ${CENTOS}"
         echo ""
@@ -590,7 +591,7 @@ deploy_staged() {
                 clear
                 echo ""
                 echo "  Staging your selected machines with"
-                echo "  the 'vagrant pull' command..."
+                echo "  the 'vagrant box add' command..."
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 sleep 3
@@ -651,7 +652,7 @@ status() {
         echo "   Vagrant Box Status:"
         echo -e "   ${LIGHTPURPLE}------------------${NC}";
         echo ""
-        vagrant status ts.elastomic "${WINDOWS}" "${CENTOS}"; sleep 2;
+        vagrant status "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; sleep 2;
         echo ""
         echo ""
         echo "   Elasticsearch Cluster Status:"
@@ -745,7 +746,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant box list ts.elastomic "${CENTOS}" "${WINDOWS}";
+                vagrant box list;
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -762,7 +763,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}";
+                vagrant up --no-provision "${ELASTOMIC}" "${CENTOS}" "${WINDOWS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -779,7 +780,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant halt ts.elastomic "${CENTOS}" "${WINDOWS}";
+                vagrant halt "${ELASTOMIC}" "${CENTOS}" "${WINDOWS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -814,7 +815,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant reload;
+                vagrant reload --no-provision "${ELASTOMIC}" "${CENTOS}" "${WINDOWS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -882,7 +883,7 @@ manage() {
                 sleep 10;
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
-                vagrant destroy -f ts.elastomic "${CENTOS}" "${WINDOWS}";
+                vagrant destroy -f "${ELASTOMIC}" "${CENTOS}" "${WINDOWS}";
                 echo "";
                 echo "";
                 echo "  All VMs deleted! Returning to Menu";
@@ -937,7 +938,7 @@ snapshot() {
     echo ""
     for machine in elastomic centos7 windows10
     do
-        vagrant snapshot save ts."$machine" ts."$machine"_initial;
+        vagrant snapshot save ts."${machine}" ts."${machine}"_initial;
     done
     echo "";
     echo "";
@@ -951,7 +952,7 @@ snapshot_restore() {
     echo "Restoring Snapshot..."
     for machine in elastomic centos7 windows10
     do
-        vagrant snapshot restore ts."$machine" ts."$machine"_initial
+        vagrant snapshot restore ts."${machine}" ts."${machine}"_initial
     done
 }
 
@@ -961,7 +962,7 @@ nuke_pave() {
     echo ""
     echo -e "         ${LIGHTRED}Destruction Commencing...${NC}"
     echo ""
-    vagrant destroy -f ts.elastomic "${CENTOS}" "${WINDOWS}";
+    vagrant destroy -f "${ELASTOMIC}" "${CENTOS}" "${WINDOWS}";
 
     for machine in elastomic windows10 centos7
     do
