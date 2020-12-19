@@ -53,6 +53,8 @@
           - git
           - wget
           - golang
+          - bzip2
+          - kernel-devel-3.10.0-1160.6.1.el7.x86_64
 
     - name: Start Firewalld Service
       systemd:

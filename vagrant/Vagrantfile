@@ -2,9 +2,9 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "ts.elastomic", primary: true do |cfg|
     # below box path points to dev-<box> for testing!
-    cfg.vm.box = "thremulation-station/dev-elastomic"
+    cfg.vm.box = "dev-elastomic"
     # below version commented out to test latest, version pinned for release
-    # cfg.vm.box_version = "0.9.1608144367"
+    # cfg.vm.box_version = "0.9.1608330775"
     cfg.vm.hostname = "elastomic"
     cfg.disksize.size = "256GB"
     cfg.vbguest.auto_update = false
