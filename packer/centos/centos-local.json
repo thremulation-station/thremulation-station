@@ -49,6 +49,11 @@
     },
     {
       "type": "shell",
+      "scripts": "scripts/guest-additions.sh",
+      "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
+    },
+    {
+      "type": "shell",
       "scripts": "scripts/cleanup.sh",
       "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     }
