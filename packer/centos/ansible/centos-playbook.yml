@@ -53,6 +53,7 @@
           - git
           - wget
           - golang
+          - bzip2
 
     - name: Start Firewalld Service
       systemd:

@@ -2,11 +2,11 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "ts.elastomic", primary: true do |cfg|
     cfg.vm.box = "thremulation-station/elastomic"
-    # cfg.vm.box_version commented out for devel, set to latest for release
-    # cfg.vm.box_version = "0.9.1608144367"
+    # below version points to latest dev-testboxes commit hash
+    cfg.vm.box_version = "0.9.XXXXXXX"
     cfg.vm.hostname = "elastomic"
     cfg.disksize.size = "256GB"
-    cfg.vbguest.auto_update = true
+    cfg.vbguest.auto_update = false
     cfg.vm.synced_folder '.', '/vagrant', disabled: true
     cfg.vm.network "private_network", ip: "192.168.33.10", auto_config: true
     cfg.vm.network "forwarded_port", guest: 5601, host: 5601
@@ -34,10 +34,10 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "ts.windows10" do |cfg|
     cfg.vm.box = "thremulation-station/windows10"
-    # cfg.vm.box_version commented out for devel, set to latest for release
-    # cfg.vm.box_version = "0.9.1608145966"
+    # below version points to latest dev-testboxes commit hash
+    cfg.vm.box_version = "0.9.XXXXXXX"
     cfg.vm.hostname = "windows10"
-    cfg.vbguest.auto_update = true
+    cfg.vbguest.auto_update = false
     cfg.vm.network "private_network", ip: "192.168.33.11", auto_config: true
     cfg.vm.provider :virtualbox do |vb|
       vb.name = "ts.windows10"
@@ -51,10 +51,10 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "ts.centos7" do |cfg|
     cfg.vm.box = "thremulation-station/centos7"
-    # cfg.vm.box_version commented out for devel, set to latest for release
-    # cfg.vm.box_version = "0.9.1608142592"
+    # below version points to latest dev-testboxes commit hash
+    cfg.vm.box_version = "0.9.XXXXXXX"
     cfg.vm.hostname = "centos7"
-    cfg.vbguest.auto_update = true
+    cfg.vbguest.auto_update = false
     cfg.vm.synced_folder '.', '/vagrant', disabled: true
     cfg.vm.network "private_network", ip: "192.168.33.12", auto_config: true
     cfg.vm.network "forwarded_port", guest: 80, host: 8080

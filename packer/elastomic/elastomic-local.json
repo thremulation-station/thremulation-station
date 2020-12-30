@@ -1,7 +1,6 @@
 {
   "variables": {
-    "cloud_token": "{{ env `VAGRANT_CLOUD_TOKEN` }}",
-    "version": "0.9.{{timestamp}}"
+    "version": "0.9.01"
   },
   "builders": [
     {
@@ -50,11 +49,6 @@
     },
     {
       "type": "shell",
-      "scripts": "scripts/guest-additions.sh",
-      "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
-    },
-    {
-      "type": "shell",
       "scripts": "./scripts/install-atomicredteam.ps1"
     },
     {
@@ -68,18 +62,10 @@
     }
   ],
   "post-processors": [
-    [
-      {
-        "type": "vagrant",
-        "compression_level": "8",
-        "output": "../_output/{{.Provider}}-dev-elastomic-{{timestamp}}.box"
-      },
-      {
-        "type": "vagrant-cloud",
-        "box_tag": "thremulation-station/dev-elastomic",
-        "access_token": "{{user `cloud_token`}}",
-        "version": "{{user `version`}}"
-      }
-    ]
+    {
+      "type": "vagrant",
+      "compression_level": "8",
+      "output": "../_output/{{.Provider}}-dev-elastomic-{{timestamp}}.box"
+    }
   ]
 }
