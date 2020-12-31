@@ -3,7 +3,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "ts.elastomic", primary: true do |cfg|
     cfg.vm.box = "thremulation-station/elastomic"
     # below version points to latest dev-testboxes commit hash
-    cfg.vm.box_version = "0.9.XXXXXXX"
+    cfg.vm.box_version = "0.9.9520c3b"
     cfg.vm.hostname = "elastomic"
     cfg.disksize.size = "256GB"
     cfg.vbguest.auto_update = false
@@ -52,7 +52,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "ts.centos7" do |cfg|
     cfg.vm.box = "thremulation-station/centos7"
     # below version points to latest dev-testboxes commit hash
-    cfg.vm.box_version = "0.9.XXXXXXX"
+    cfg.vm.box_version = "0.9.9520c3b"
     cfg.vm.hostname = "centos7"
     cfg.vbguest.auto_update = false
     cfg.vm.synced_folder '.', '/vagrant', disabled: true
