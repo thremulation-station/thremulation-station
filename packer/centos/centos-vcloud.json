@@ -41,37 +41,26 @@
             "1"
           ]
         ]
-      }
-    ],
-    "provisioners": [
-      {
-        "type": "ansible",
-        "playbook_file": "ansible/centos-playbook.yml"
-      },
-      {
-        "type": "shell",
-        "scripts": "scripts/guest-additions.sh",
-        "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
-      },
-      {
-        "type": "shell",
-        "scripts": "scripts/cleanup.sh",
-        "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
-      }
-    ],
-    "post-processors": [
-      [
-        {
-          "type": "vagrant",
-          "compression_level": "8",
-          "output": "../_output/{{.Provider}}-dev-centos7-{{timestamp}}.box"
-        },
-        {
-          "type": "vagrant-cloud",
-          "box_tag": "thremulation-station/dev-centos7",
-          "access_token": "{{user `cloud_token`}}",
-          "version": "{{user `version`}}"
-        }
       ]
-    ]
-  }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "ansible/centos-playbook.yml"
+    },
+    {
+      "type": "shell",
+      "scripts": "scripts/cleanup.sh",
+      "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant-cloud",
+      "box_tag": "thremulation-station/dev-centos7",
+      "access_token": "{{user `cloud_token`}}",
+      "version": "{{user `version`}}"
+    }
+  ]
+}

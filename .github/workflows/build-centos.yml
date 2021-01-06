@@ -32,13 +32,13 @@ jobs:
           ref: actions-centos
 
       - name: Validate packer file syntax
-        run: ./packer/packer-validate.sh
+        run: ./packer/packer-validate-centos.sh
         # working-directory: ./packer
 
       - name: Build local and cloud boxes
         env:
           VAGRANT_CLOUD_TOKEN: ${{ secrets.VAGRANT_CLOUD_TOKEN }} 
-        run: ./packer/packer-build.sh
+        run: ./packer/packer-build-centos.sh
         # working-directory: ./packer
 
 #       - name: Upload local box to webshare (or bucket)
