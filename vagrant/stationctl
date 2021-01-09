@@ -429,7 +429,7 @@ deploy_quick() {
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
                 echo "";
                 echo "";
-                vagrant up "${ELASTOMIC}" "${CENTOS}" "${WINDOWS}"; sleep 5;
+                vagrant up "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; sleep 5;
                 echo "";
                 echo "";
                 echo "";
@@ -514,7 +514,7 @@ deploy_custom() {
         read -rp "Confirm to proceed with deployment [Y/N]: " yn
         case $yn in
             [Yy]* )
-                vagrant up "${ELASTOMIC}" ${CENTOS} ${WINDOWS};
+                vagrant up "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
                 sleep 10;
                 snapshot;
                 break;;
@@ -763,7 +763,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant up --no-provision "${ELASTOMIC}" "${CENTOS}" "${WINDOWS}";
+                vagrant up --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -780,7 +780,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant halt "${ELASTOMIC}" "${CENTOS}" "${WINDOWS}";
+                vagrant halt "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -815,7 +815,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant reload --no-provision "${ELASTOMIC}" "${CENTOS}" "${WINDOWS}";
+                vagrant reload --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -880,10 +880,10 @@ manage() {
                 echo "  You have 5 seconds to cancel [ctrl+c]...";
                 echo ""
                 echo ""
-                sleep 10;
+                sleep 5;
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
-                vagrant destroy -f "${ELASTOMIC}" "${CENTOS}" "${WINDOWS}";
+                vagrant destroy -f "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
                 echo "";
                 echo "";
                 echo "  All VMs deleted! Returning to Menu";
@@ -962,7 +962,7 @@ nuke_pave() {
     echo ""
     echo -e "         ${LIGHTRED}Destruction Commencing...${NC}"
     echo ""
-    vagrant destroy -f "${ELASTOMIC}" "${CENTOS}" "${WINDOWS}";
+    vagrant destroy -f "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
 
     for machine in elastomic windows10 centos7
     do
