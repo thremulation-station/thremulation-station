@@ -1,21 +1,19 @@
 # Thremulation Station
 
-**UPDATE: ALL PREVIOUS README CONTENT HAS BEEN MIGRATED TO [THREMULATION.IO](https://github.com/mocyber/thremulation.io)!!**
-
----
-
 > Cyber Security Operations. For your laptop.
 
-<br>
+<!-- <br>
 <p align="center">
 <img src="img/placeholder-logo.png">
 </p>
-<br>
+<br> -->
+
+Thremulation Station is an approachable ***small-scale threat emulation and detection range*** to emulate and detect. Leveraging tools such as Virtualbox and Vagrant Multi-Machine, you can to deploy a _reasonably sized_ local testing environment to _both_ emulate and detect bad things on various guest operating systems. Simple and abstracted... in a good way!
 
 
-## Quick Start - TL;DR
+## Quick Start
 
-This is just a down and dirty to make things alive, if you actually want to operate the stack, please visit the documentation at the [project website](https://thremulation.io).
+This is just a down and dirty to make things alive, if you actually want to operate the stack, please visit the documentation at the [project website](https://docs.thremulation.io).
 
 <details>
   <summary>macOS Quickstart (with Homebrew and Vagrant)</summary>  
@@ -61,27 +59,18 @@ This is just a down and dirty to make things alive, if you actually want to oper
 
 </details>
 
-## What is it?
 
-Thremulation Station is an approachable and ***small-scale threat emulation and detection range*** to emulate and detect. Leveraging tools such as Virtualbox and Vagrant Multi-Machine, you can to deploy a _reasonably sized_ local testing environment to _both_ emulate and detect bad things on various guest operating systems.
+## What are the requirements?
 
-simplicity, abstraction in a good way TODO
-
-
-## How is Thremulation-Station different?
-
-Not everone has a blade server heating their home from a closet.   
-Minimal requirements.  
-On a laptop.  
-TODO.  
+Our goal from the beginning has been to provide a small and useful range that can operate on a laptop with a minimum of ***4 threads available*** and ***8G of RAM***. Obviously the more the better, but the minimum specs with get the job done.  
 
 
-## Who is it for?
+## Who was it built for?
 
-This project has many practical use cases, and we're excited to see how it's used. A few examples:
+This project has many practical use cases, and we're excited to see how the community uses TS. Here are a few examples that we had in mind while creating the project.
 
-- Cyber Defense education
-- Generating raining data
+- Cyber defense education
+- Generating training data
 - Threat intelligence training
 - Writing and validating [detection rules](https://github.com/elastic/detection-rules)
 - Writing and testing threat [tactics and techniques](https://attack.mitre.org/tactics/enterprise/)
