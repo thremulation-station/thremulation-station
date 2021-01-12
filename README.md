@@ -87,7 +87,7 @@ A simple user experience is the priority. A brief usage overview looks like this
 1. Use the CLI to perform cleanup / reset tasks
 1. Use the CLI to perform setup
 
-> Full details on usage begin in the documentation [Getting Started Guide](getting-started/index.md).
+> Full details on usage begin in the documentation [Getting Started Guide](https://docs.thremulation.io/getting-started/installation/).
 
 
 ## How can I help?
