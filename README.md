@@ -13,7 +13,7 @@ Thremulation Station is an approachable ***small-scale threat emulation and dete
 
 ## Quick Start
 
-This is just a down and dirty to make things alive, if you actually want to operate the stack, please visit the documentation at the [project website](https://docs.thremulation.io).
+This is just a down and dirty to make things alive, if you actually want to operate the stack, please visit the [documentation website](https://docs.thremulation.io).
 
 <details>
   <summary>macOS Quickstart (with Homebrew and Vagrant)</summary>  
