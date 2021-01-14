@@ -8,7 +8,7 @@
 # - Use vagrant instead of VBoxManage
 
 # This does a quick deploy aka (vagrant up). This is the first step for testing. 
-name: TS Quick Deploy
+name: TS Quick Deploy - centos7
 
 # Controls when the action will run. 
 on:
