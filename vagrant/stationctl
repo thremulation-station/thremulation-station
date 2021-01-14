@@ -36,7 +36,8 @@ DISK=""
 
 
 # colors
-ORANGE='\033[0;33m'
+
+='\033[0;33m'
 LIGHTRED='\033[1;31m'
 RED='\033[0;31m'
 LIGHTGREEN='\033[1;32m'
@@ -65,7 +66,7 @@ main() {
         echo -e "${LIGHTPURPLE}  ATTACK with Atomic <-----------> DETECT with Elastic${NC}"
         echo -e "${LIGHTPURPLE} ------------------------------------------------------${NC}";
         echo -e ""
-        echo " 1. Setup........:  install host system requriements"
+        echo -e " 1. Setup........:  install dependencies (${ORANGE}experimental${NC})"
         echo " 2. Deploy.......:  create new thremulation range"
         echo " 3. Status.......:  show current deployment"
         echo " 4. Management...:  tune and troubleshoot"
@@ -704,6 +705,7 @@ delete_indexes() {
     curl -X GET "192.168.33.10:9200/_cat/indices"
     curl -X DELETE "192.168.33.10:9200/logs-*"
     curl -X DELETE "192.168.33.10:9200/winlogbeat-*"
+    curl -X DELETE "192.168.33.10:9200/filebeat-*"
 }
 
 
@@ -764,6 +766,12 @@ manage() {
                 echo ""
                 echo ""
                 vagrant up --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+                echo ""
+                echo ""
+                echo "   Vagrant Box Status:"
+                echo -e "   ${LIGHTPURPLE}------------------${NC}";
+                echo ""
+                vagrant status "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; sleep 2;
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
