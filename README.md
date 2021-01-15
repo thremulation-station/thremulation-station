@@ -2,7 +2,7 @@
 
 <br>
 <p align="center">
-<img src="images/ts-logo-temp.png" width="30%" alt="">
+<img src="img/ts-logo-temp.png" width="30%" alt="">
 </p>
 <br>
 
