@@ -1,63 +1,45 @@
 # Thremulation Station
 
-> Cyber Security Operations. For your laptop.
-
-<!-- <br>
+<br>
 <p align="center">
-<img src="img/placeholder-logo.png">
+<img src="images/ts-logo-temp.png" width="30%" alt="">
 </p>
-<br> -->
+<br>
 
-Thremulation Station is an approachable ***small-scale threat emulation and detection range*** to emulate and detect. Leveraging tools such as Virtualbox and Vagrant Multi-Machine, you can to deploy a _reasonably sized_ local testing environment to _both_ emulate and detect bad things on various guest operating systems. Simple and abstracted... in a good way!
+<h2 align="center"><b>Threat emulation and detection for your laptop</b></h2>
+
+<p align="center">
+   Collection of open source tools working together to enable a reasonably capable machine to serve as a local cyber range.
+</p>
+
+<p align="center"><b>
+    <a href="https://thremulation.io">Thremulation.io</a> |
+    <a href="https://github.com/thremulation-station/thremulation-station">Github</a> |
+    <a href="https://twitter.com/thremulation">Twitter</a> |
+    <a href="https://discord.gg/mtNXN4QjHh">Discord</a>
+    <br /><br />
+</b></p>
 
 
-## Quick Start
+<hr />
+<br>
+Thremulation Station is an approachable small-scale threat emulation and detection range. It leans on Atomic Red Team for ***emulating*** threats, and the Elastic Endpoint Agent for ***detection***.
 
-This is just a down and dirty to make things alive, if you actually want to operate the stack, please visit the documentation at the [project website](https://docs.thremulation.io).
+!!! info "TL;DR"
+    If you're ready to skip the reading and jump into things, head to the [Quickstart / Installation](/quickstart/installation.md) section.
 
-<details>
-  <summary>macOS Quickstart (with Homebrew and Vagrant)</summary>  
 
-      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-      brew install --cask virtualbox vagrant
-      brew install ansible git
-      vagrant plugin install vagrant-disksize
-      vagrant plugin install vagrant-vbguest
-      git clone https://github.com/thremulation-station/thremulation-station.git
-      cd thremulation-station/vagrant
-      sh stationctl
+## Project Goals
 
-</details>
-<details>
-  <summary>Windows Quickstart (with Chocolatey and Vagrant - Reboot required)</summary>  
+Our goal from the very beginning has been to provide the following:
 
-      Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-      choco install virtualbox vagrant
-      choco install ansible git
-      vagrant plugin install vagrant-disksize
-      vagrant plugin install vagrant-vbguest
-      git clone https://github.com/thremulation-station/thremulation-station.git
-      cd thremulation-station/vagrant
-      sh stationctl
+1. lightweight range that can operate on a laptop with a _minimum_ of 4 threads and 8G of RAM
+1. support the big 3 host operating systems (initial linux path is RHEL-based)
+1. present users a smooth path to execute threats and observe them with Elastic 
+1. provide a singular TUI (Station Control) that can be used to manage all aspects
 
-</details>
-<details>
-  <summary>CentOS Quickstart</summary>
-
-      yum groupinstall -y "Development Tools"
-      yum install -y kernel-devel kernel-devel-3.10.0-1127.el7.x86_64 epel-release
-      yum install -y ansible git
-      curl -o /etc/yum.repos.d/virtualbox.repo http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
-      rpm --import https://www.virtualbox.org/download/oracle_vbox.asc
-      yum install -y VirtualBox-6.0
-      yum install -y https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.rpm
-      vagrant plugin install vagrant-disksize
-      vagrant plugin install vagrant-vbguest
-      git clone https://github.com/thremulation-station/thremulation-station.git
-      cd thremulation-station/vagrant
-      sh stationctl
-
-</details>
+!!! note "Note"
+    You'll be introduced to `./stationctl` early in the [Getting Started](/getting-started/deployment/#introduction-to-station-control) section and use it to deploy boxes, get status, manage and clear data, and much more. A full reference guide is located at [support / stationctl](/support/stationctl.md).
 
 
 ## What are the requirements?
