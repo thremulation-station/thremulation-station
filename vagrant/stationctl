@@ -725,13 +725,8 @@ manage() {
         echo -e "${LIGHTPURPLE}             --- Maintenance ---${NC}"
         echo ""
         echo "1. List............:  list all current boxes"
-<<<<<<< Updated upstream
-        echo "2. Startup.........:  start all local boxes up"
-        echo "3. Shutdown........:  halt running boxes, shutdown range"
-=======
         echo "2. Resume..........:  resume the local boxes"
         echo "3. Suspend.........:  pause running boxes"
->>>>>>> Stashed changes
         echo "4. Update..........:  update boxes to latest version"
         echo "5. Reboot..........:  restart boxes (troubleshooting)"
         echo ""
