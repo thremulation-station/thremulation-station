@@ -725,8 +725,13 @@ manage() {
         echo -e "${LIGHTPURPLE}             --- Maintenance ---${NC}"
         echo ""
         echo "1. List............:  list all current boxes"
+<<<<<<< Updated upstream
         echo "2. Startup.........:  start all local boxes up"
         echo "3. Shutdown........:  halt running boxes, shutdown range"
+=======
+        echo "2. Resume..........:  resume the local boxes"
+        echo "3. Suspend.........:  pause running boxes"
+>>>>>>> Stashed changes
         echo "4. Update..........:  update boxes to latest version"
         echo "5. Reboot..........:  restart boxes (troubleshooting)"
         echo ""
@@ -765,7 +770,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant up --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+                vagrant resume --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; # Added names because on windows leaving this blank does not work
                 echo ""
                 echo ""
                 echo "   Vagrant Box Status:"
@@ -784,11 +789,11 @@ manage() {
             [3]* )
                 echo ""
                 echo ""
-                echo "  Shutting down all running boxes";
+                echo "  Suspending all of the running boxes";
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant halt "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+                vagrant suspend "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; # Added names because on windows leaving this blank does not work
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
