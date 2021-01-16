@@ -726,7 +726,7 @@ manage() {
         echo ""
         echo "1. List............:  list all current boxes"
         echo "2. Startup.........:  start all local boxes up"
-        echo "3. Shutdown........:  halt running boxes shutdown range"
+        echo "3. Shutdown........:  halt running boxes, shutdown range"
         echo "4. Update..........:  update boxes to latest version"
         echo "5. Reboot..........:  restart boxes (troubleshooting)"
         echo ""
