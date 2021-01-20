@@ -761,25 +761,8 @@ manage() {
             [2]* )
                 echo ""
                 echo ""
-                echo "  Starting up all local boxes";
-                echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
-                echo ""
-                echo ""
-                vagrant resume --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; # Added names because on windows leaving this blank does not work
-                echo ""
-                echo ""
-                echo "   Vagrant Box Status:"
-                echo -e "   ${LIGHTPURPLE}------------------${NC}";
-                echo ""
-                vagrant status "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; sleep 2;
-                echo ""
-                echo ""
-                read -rp " (B)ack or (M)ain Menu: " yn
-                case $yn in
-                    [Bb]* ) manage; break;;
-                    [Mm]* ) main; break;;
-                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
-                esac
+                echo "  Resuming up all local boxes";
+                resume;
                 break;;
             [3]* )
                 echo ""
@@ -926,6 +909,103 @@ manage() {
     done
 }
 
+resume() {
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}   (B)ack to Main                                 ${NC}";
+        echo -e "${LIGHTPURPLE} ------------------------------------------------ ${NC}";
+        echo ""
+        echo -e "${LIGHTPURPLE}             --- Resume ---${NC}"
+        echo ""
+        echo " Resume (A)ll ..............:  Resume all Thremulation Staion VMs"
+        echo " Resume (S)elected..........:  Resume selected Thremulation Station VMs"
+        echo " (B)ack or (M)ain Menu: "
+        read -rp "Resume All or Selected VMs? [Y/N]: " yn
+        case $yn in
+            [Aa]* ) vagrant resume  --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; break;;
+            [Ss]* ) resume_custom; break;;
+            [Bb]* ) main; break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+        esac
+    done
+}
+
+resume_custom() {
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                               ${NC}";
+        echo -e "${LIGHTPURPLE} -------------------------------------------------${NC}";
+        echo ""
+        echo "The Elastomic (control) box is required."
+        echo "Which boxes would you like to suspend?"
+        echo ""
+        read -rp "Resume the Windows10 VM? [Y/N]: " yn
+        case $yn in
+            [Yy]* ) WINDOWS="ts.windows10"; break;;
+            [Nn]* ) WINDOWS=""; break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+        esac
+    done
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                               ${NC}";
+        echo -e "${LIGHTPURPLE} -------------------------------------------------${NC}";
+        echo ""
+        read -rp "Resume the Centos7 VM? [Y/N]: " yn
+        case $yn in
+            [Yy]* ) CENTOS="ts.centos7"; break;;
+            [Nn]* ) CENTOS=""; break;;
+            [Bb]* ) clear; deploy; break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+        esac
+    done
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                               ${NC}";
+        echo -e "${LIGHTPURPLE} -------------------------------------------------${NC}";
+        echo ""
+        echo ""
+        echo "You have chosen the following Custom Deployment:"
+        echo ""
+        echo "- CONTROL..: "${ELASTOMIC}" (required)"
+        echo "- target...: "${WINDOWS}""
+        echo "- target...: "${CENTOS}""
+        echo ""
+        read -rp "Confirm to proceed. [Y/N]: " yn
+        case $yn in
+            [Yy]* )
+                vagrant resume --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+                sleep 10;
+                break;;
+            [Nn]* ) main; break;;
+            [Bb]* )
+                clear;
+                main;
+                break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+        esac
+    done
+}
 
 # Checks to see if vagrant exists
 requirements() {
