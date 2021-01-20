@@ -37,7 +37,7 @@ DISK=""
 
 # colors
 
-='\033[0;33m'
+ORANGE='\033[0;33m'
 LIGHTRED='\033[1;31m'
 RED='\033[0;31m'
 LIGHTGREEN='\033[1;32m'
