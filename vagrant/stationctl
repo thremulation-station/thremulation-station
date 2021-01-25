@@ -922,14 +922,32 @@ resume() {
         echo ""
         echo -e "${LIGHTPURPLE}             --- Resume ---${NC}"
         echo ""
-        echo " Resume (A)ll ..............:  Resume all Thremulation Staion VMs"
-        echo " Resume (S)elected..........:  Resume selected Thremulation Station VMs"
-        echo " (B)ack or (M)ain Menu: "
-        read -rp "Resume All or Selected VMs? [Y/N]: " yn
+        echo " Resume (A)ll ..............: resume all currently suspended VMs"
+        echo " Resume (S)elected Boxes....: choose what VMs to turn back on"
+        echo ""
+        read -rp " Select Above Option: " yn
         case $yn in
-            [Aa]* ) vagrant resume  --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; break;;
+            [Aa]* ) 
+                echo ""
+                echo ""
+                echo "  Resuming all VMs...";
+                echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
+                echo ""
+                echo ""
+                sleep 3;
+                vagrant resume  --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+                sleep 1;
+                echo ""
+                echo ""
+                read -rp "  (B)ack or (M)ain Menu: " yn
+                case $yn in
+                    [Bb]* ) manage; break;;
+                    [Mm]* ) main; break;;
+                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+                esac
+                break;;
             [Ss]* ) resume_custom; break;;
-            [Bb]* ) main; break;;
+            [Bb]* ) manage; break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
@@ -946,10 +964,10 @@ resume_custom() {
         echo -e "${LIGHTPURPLE}     (B)ack to Main                               ${NC}";
         echo -e "${LIGHTPURPLE} -------------------------------------------------${NC}";
         echo ""
-        echo "The Elastomic (control) box is required."
-        echo "Which boxes would you like to suspend?"
+        echo " The Elastomic box is required."
+        echo -e " Select the boxes you would like to turn back on along with it:"
         echo ""
-        read -rp "Resume the Windows10 VM? [Y/N]: " yn
+        read -rp " Resume the Windows10 VM? [Y/N]: " yn
         case $yn in
             [Yy]* ) WINDOWS="ts.windows10"; break;;
             [Nn]* ) WINDOWS=""; break;;
@@ -985,19 +1003,19 @@ resume_custom() {
         echo -e "${LIGHTPURPLE} -------------------------------------------------${NC}";
         echo ""
         echo ""
-        echo "You have chosen the following Custom Deployment:"
+        echo " You have chosen resume (turn back on) the following boxes:"
         echo ""
-        echo "- CONTROL..: "${ELASTOMIC}" (required)"
-        echo "- target...: "${WINDOWS}""
-        echo "- target...: "${CENTOS}""
+        echo "  - CONTROL..: "${ELASTOMIC}" (required)"
+        echo "  - target...: "${WINDOWS}""
+        echo "  - target...: "${CENTOS}""
         echo ""
-        read -rp "Confirm to proceed. [Y/N]: " yn
+        read -rp " Confirm to proceed. [Y/N]: " yn
         case $yn in
             [Yy]* )
                 vagrant resume --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
                 sleep 10;
                 break;;
-            [Nn]* ) main; break;;
+            [Nn]* ) manage; break;;
             [Bb]* )
                 clear;
                 main;
