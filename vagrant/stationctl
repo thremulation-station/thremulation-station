@@ -22,6 +22,7 @@ esac
 ###############################################################################
 
 # boxes
+ELASTOMIC="ts.elastomic"
 WINDOWS="ts.windows10"
 CENTOS="ts.centos7"
 
@@ -35,6 +36,7 @@ DISK=""
 
 
 # colors
+
 ORANGE='\033[0;33m'
 LIGHTRED='\033[1;31m'
 RED='\033[0;31m'
@@ -64,7 +66,7 @@ main() {
         echo -e "${LIGHTPURPLE}  ATTACK with Atomic <-----------> DETECT with Elastic${NC}"
         echo -e "${LIGHTPURPLE} ------------------------------------------------------${NC}";
         echo -e ""
-        echo " 1. Setup........:  install host system requriements"
+        echo -e " 1. Setup........:  install dependencies (${ORANGE}experimental${NC})"
         echo " 2. Deploy.......:  create new thremulation range"
         echo " 3. Status.......:  show current deployment"
         echo " 4. Management...:  tune and troubleshoot"
@@ -428,7 +430,7 @@ deploy_quick() {
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
                 echo "";
                 echo "";
-                vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}"; sleep 5;
+                vagrant up "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; sleep 5;
                 echo "";
                 echo "";
                 echo "";
@@ -506,14 +508,14 @@ deploy_custom() {
         echo ""
         echo "You have chosen the following Custom Deployment:"
         echo ""
-        echo "- CONTROL..: ts.elastomic (required)"
-        echo "- target...: ${WINDOWS}"
-        echo "- target...: ${CENTOS}"
+        echo "- CONTROL..: "${ELASTOMIC}" (required)"
+        echo "- target...: "${WINDOWS}""
+        echo "- target...: "${CENTOS}""
         echo ""
         read -rp "Confirm to proceed with deployment [Y/N]: " yn
         case $yn in
             [Yy]* )
-                vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}";
+                vagrant up "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
                 sleep 10;
                 snapshot;
                 break;;
@@ -580,7 +582,7 @@ deploy_staged() {
         echo ""
         echo "  You have chosen to Pre-stage the following boxes:"
         echo ""
-        echo "  - CONTROL..: ts.elastomic"
+        echo "  - CONTROL..: ${ELASTOMIC}"
         echo "  - target...: ${WINDOWS}"
         echo "  - target...: ${CENTOS}"
         echo ""
@@ -590,13 +592,13 @@ deploy_staged() {
                 clear
                 echo ""
                 echo "  Staging your selected machines with"
-                echo "  the 'vagrant pull' command..."
+                echo "  the 'vagrant box add' command..."
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 sleep 3
-                for machine in elastomic windows10 centos7
+                for machine in dev-elastomic dev-windows10 dev-centos7
                 do
-                    vagrant box add "thremulation-station/${machine}";
+                    vagrant box add -cf "thremulation-station/${machine}";
                 done
                 echo ""
                 echo ""
@@ -651,7 +653,7 @@ status() {
         echo "   Vagrant Box Status:"
         echo -e "   ${LIGHTPURPLE}------------------${NC}";
         echo ""
-        vagrant status ts.elastomic "${WINDOWS}" "${CENTOS}"; sleep 2;
+        vagrant status "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; sleep 2;
         echo ""
         echo ""
         echo "   Elasticsearch Cluster Status:"
@@ -703,6 +705,7 @@ delete_indexes() {
     curl -X GET "192.168.33.10:9200/_cat/indices"
     curl -X DELETE "192.168.33.10:9200/logs-*"
     curl -X DELETE "192.168.33.10:9200/winlogbeat-*"
+    curl -X DELETE "192.168.33.10:9200/filebeat-*"
 }
 
 
@@ -715,15 +718,15 @@ manage() {
         echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
         echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
         echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
-        echo -e "${LIGHTPURPLE}   (B)ack to Main                                 ${NC}";
+        echo -e "${LIGHTPURPLE}   (B)ack to Main or (E)xit                       ${NC}";
         echo -e "${LIGHTPURPLE} ------------------------------------------------ ${NC}";
         echo ""
         echo ""
         echo -e "${LIGHTPURPLE}             --- Maintenance ---${NC}"
         echo ""
         echo "1. List............:  list all current boxes"
-        echo "2. Startup.........:  start all local boxes up"
-        echo "3. Shutdown........:  halt running boxes shutdown range"
+        echo "2. Resume..........:  resume the local boxes"
+        echo "3. Suspend.........:  pause running boxes"
         echo "4. Update..........:  update boxes to latest version"
         echo "5. Reboot..........:  restart boxes (troubleshooting)"
         echo ""
@@ -745,7 +748,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant box list ts.elastomic "${CENTOS}" "${WINDOWS}";
+                vagrant box list;
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -758,34 +761,24 @@ manage() {
             [2]* )
                 echo ""
                 echo ""
-                echo "  Starting up all local boxes";
-                echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
-                echo ""
-                echo ""
-                vagrant up ts.elastomic "${CENTOS}" "${WINDOWS}";
-                echo ""
-                echo ""
-                read -rp " (B)ack or (M)ain Menu: " yn
-                case $yn in
-                    [Bb]* ) manage; break;;
-                    [Mm]* ) main; break;;
-                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
-                esac
+                echo "  Resuming up all local boxes";
+                resume;
                 break;;
             [3]* )
                 echo ""
                 echo ""
-                echo "  Shutting down all running boxes";
+                echo "  Suspending all of the running boxes";
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant halt ts.elastomic "${CENTOS}" "${WINDOWS}";
+                vagrant suspend "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; # Added names because on windows leaving this blank does not work
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
                 case $yn in
                     [Bb]* ) manage; break;;
                     [Mm]* ) main; break;;
+                    [Ee]* ) main; break;;
                     * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
@@ -814,7 +807,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant reload;
+                vagrant reload --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -879,10 +872,10 @@ manage() {
                 echo "  You have 5 seconds to cancel [ctrl+c]...";
                 echo ""
                 echo ""
-                sleep 10;
+                sleep 5;
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
-                vagrant destroy -f ts.elastomic "${CENTOS}" "${WINDOWS}";
+                vagrant destroy -f "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
                 echo "";
                 echo "";
                 echo "  All VMs deleted! Returning to Menu";
@@ -912,11 +905,127 @@ manage() {
                 main;
                 break;;
             [Bb]* ) clear; main; break;;
+            [Ee]* ) clear; exit; break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
 }
 
+resume() {
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}   (B)ack to Main                                 ${NC}";
+        echo -e "${LIGHTPURPLE} ------------------------------------------------ ${NC}";
+        echo ""
+        echo -e "${LIGHTPURPLE}             --- Resume ---${NC}"
+        echo ""
+        echo " Resume (A)ll ..............: resume all currently suspended VMs"
+        echo " Resume (S)elected Boxes....: choose what VMs to turn back on"
+        echo ""
+        read -rp " Select Above Option: " yn
+        case $yn in
+            [Aa]* ) 
+                echo ""
+                echo ""
+                echo "  Resuming all VMs...";
+                echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
+                echo ""
+                echo ""
+                sleep 3;
+                vagrant resume  --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+                sleep 1;
+                echo ""
+                echo ""
+                read -rp "  (B)ack or (M)ain Menu: " yn
+                case $yn in
+                    [Bb]* ) manage; break;;
+                    [Mm]* ) main; break;;
+                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+                esac
+                break;;
+            [Ss]* ) resume_custom; break;;
+            [Bb]* ) manage; break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+        esac
+    done
+}
+
+resume_custom() {
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                               ${NC}";
+        echo -e "${LIGHTPURPLE} -------------------------------------------------${NC}";
+        echo ""
+        echo " The Elastomic box is required."
+        echo -e " Select the boxes you would like to turn back on along with it:"
+        echo ""
+        read -rp " Resume the Windows10 VM? [Y/N]: " yn
+        case $yn in
+            [Yy]* ) WINDOWS="ts.windows10"; break;;
+            [Nn]* ) WINDOWS=""; break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+        esac
+    done
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                               ${NC}";
+        echo -e "${LIGHTPURPLE} -------------------------------------------------${NC}";
+        echo ""
+        read -rp "Resume the Centos7 VM? [Y/N]: " yn
+        case $yn in
+            [Yy]* ) CENTOS="ts.centos7"; break;;
+            [Nn]* ) CENTOS=""; break;;
+            [Bb]* ) clear; deploy; break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+        esac
+    done
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                               ${NC}";
+        echo -e "${LIGHTPURPLE} -------------------------------------------------${NC}";
+        echo ""
+        echo ""
+        echo " You have chosen resume (turn back on) the following boxes:"
+        echo ""
+        echo "  - CONTROL..: "${ELASTOMIC}" (required)"
+        echo "  - target...: "${WINDOWS}""
+        echo "  - target...: "${CENTOS}""
+        echo ""
+        read -rp " Confirm to proceed. [Y/N]: " yn
+        case $yn in
+            [Yy]* )
+                vagrant resume --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+                sleep 10;
+                break;;
+            [Nn]* ) manage; break;;
+            [Bb]* )
+                clear;
+                main;
+                break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+        esac
+    done
+}
 
 # Checks to see if vagrant exists
 requirements() {
@@ -937,7 +1046,7 @@ snapshot() {
     echo ""
     for machine in elastomic centos7 windows10
     do
-        vagrant snapshot save ts."$machine" ts."$machine"_initial;
+        vagrant snapshot save ts."${machine}" ts."${machine}"_initial;
     done
     echo "";
     echo "";
@@ -951,7 +1060,7 @@ snapshot_restore() {
     echo "Restoring Snapshot..."
     for machine in elastomic centos7 windows10
     do
-        vagrant snapshot restore ts."$machine" ts."$machine"_initial
+        vagrant snapshot restore ts."${machine}" ts."${machine}"_initial
     done
 }
 
@@ -961,7 +1070,7 @@ nuke_pave() {
     echo ""
     echo -e "         ${LIGHTRED}Destruction Commencing...${NC}"
     echo ""
-    vagrant destroy -f ts.elastomic "${CENTOS}" "${WINDOWS}";
+    vagrant destroy -f "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
 
     for machine in elastomic windows10 centos7
     do
