@@ -718,7 +718,7 @@ manage() {
         echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
         echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
         echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
-        echo -e "${LIGHTPURPLE}   (B)ack to Main                                 ${NC}";
+        echo -e "${LIGHTPURPLE}   (B)ack to Main or (E)xit                       ${NC}";
         echo -e "${LIGHTPURPLE} ------------------------------------------------ ${NC}";
         echo ""
         echo ""
@@ -778,6 +778,7 @@ manage() {
                 case $yn in
                     [Bb]* ) manage; break;;
                     [Mm]* ) main; break;;
+                    [Ee]* ) main; break;;
                     * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
                 esac
                 break;;
@@ -904,6 +905,7 @@ manage() {
                 main;
                 break;;
             [Bb]* ) clear; main; break;;
+            [Ee]* ) clear; exit; break;;
             * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
