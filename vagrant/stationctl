@@ -706,6 +706,7 @@ delete_indexes() {
     curl -X DELETE "192.168.33.10:9200/logs-*"
     curl -X DELETE "192.168.33.10:9200/winlogbeat-*"
     curl -X DELETE "192.168.33.10:9200/filebeat-*"
+    curl -X DELETE "192.168.33.10:9200/_data_stream/*"
 }
 
 
