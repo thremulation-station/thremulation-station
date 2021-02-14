@@ -42,4 +42,4 @@ Our goal from the very beginning has been to provide the following:
 
 ## Getting Started
 
-Ready to jump into things? Head over to the documentation at [docs.thremulation.io](https://www.docs.thremulation.io)!
+Ready to jump into things? Head over to the documentation at [docs.thremulation.io](https://docs.thremulation.io)!
