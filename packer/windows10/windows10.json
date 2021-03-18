@@ -66,6 +66,7 @@
         "./scripts/install-pwshssh.ps1",
         "./scripts/install-advaudit.ps1",
         "./scripts/disable-windef.ps1",
+        "./scripts/fix-invokeweb-secure-channel.ps1",
         "./scripts/install-shutup10.ps1",
         "./scripts/cleanout.ps1"
       ],
