@@ -116,5 +116,5 @@ elasticsearch.hosts: "http://localhost:9200"
 xpack.security.enabled: true
 telemetry.enabled: false
 telemetry.optIn: false
-xpack.ingestManager.fleet.tlsCheckDisabled: true
+xpack.fleet.agents.tlsCheckDisabled: tru
 xpack.encryptedSavedObjects.encryptionKey: 'fhjskloppd678ehkdfdlliverpoolfcr'
