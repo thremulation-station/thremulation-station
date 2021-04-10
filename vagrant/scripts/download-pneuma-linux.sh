@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PNEUMA_URL="https://s3.amazonaws.com/operator.payloads.open/payloads/pneuma/pneuma-linux"
-PNEUMA_SERVICE_FILE="https://raw.githubusercontent.com/webhead404/thremulation-operator/main/vagrant/scripts/pneuma-agent.service"
+PNEUMA_SERVICE_FILE="https://raw.githubusercontent.com/webhead404/thremulation-station/main/vagrant/scripts/pneuma-agent.service"
 INSTALL_DIR="/opt/pneuma"
 SCRIPTS_DIR="/vagrant"
 
