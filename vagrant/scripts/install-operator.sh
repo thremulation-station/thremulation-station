@@ -1,11 +1,12 @@
 OPERATOR_URL="https://s3.amazonaws.com/operator.versions/release-builds/0.9.20/operator-0.9.20.zip"
+VAGRANT_USER_HOME="/home/vagrant"
 
 
 # Install packages for X11 and Operator
 yum install unzip xorg-x11-xauth chromium -y
 
 # Create X11 file (sometimes it didn't seem to be created)
-touch $HOME/.Xauthority
+touch $VAGRANT_USER_HOME/.Xauthority
 
 # Stage and download and install Operator
 cd "$(mktemp -d)"
@@ -27,5 +28,5 @@ sudo firewall-cmd --reload
 
 # Make alias to shorthand Operator
 
-echo "alias operator=/opt/operator/operator" >> ~/.bashrc
+echo "alias operator=/opt/operator/operator" >> $VAGRANT_USER_HOME/.bashrc
 . ~/.bashrc
