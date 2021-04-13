@@ -29,4 +29,4 @@ sudo firewall-cmd --reload
 # Make alias to shorthand Operator
 
 echo "alias operator=/opt/operator/operator" >> $VAGRANT_USER_HOME/.bashrc
-. ~/.bashrc
+. $VAGRANT_USER_HOME/.bashrc
