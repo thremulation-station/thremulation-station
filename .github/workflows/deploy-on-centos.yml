@@ -1,0 +1,58 @@
+# Ensure you set the remote code execution policy or this will not work as it is unsigned code
+# if virtualizing the env then ensure nested virtualization also
+# "REQ: installation of all the componets prior to using stationctl. Cloning git is not required as it will happen
+# as part of the GH Actions process
+
+#TODO:
+# - Clean out old vagrant images
+# - Use vagrant instead of VBoxManage
+
+# This does a quick deploy aka (vagrant up). This is the first step for testing. 
+name: TS Quick Deploy - centos7
+
+# Controls when the action will run. 
+on:
+#Triggers the workflow on push or pull request events but only for the devel branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  user-qd-vagrant-up:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v2
+        
+        # Using VBoxManage instead of vagrant, vagrant listens only when it feels like it ("vagrant up" works but "destroy" doesn't). 
+        # Sleep is added to ensure that the vboxmanage has finished before deleting the box
+      
+      - name: Stop any active centos boxes
+        run: vboxmanage controlvm ts.centos7 poweroff && sleep 15
+
+      - name: Remove Previous Centos 7 Box
+        run: vboxmanage unregistervm ts.centos7 --delete
+
+      - name: Stop any running windows 10 boxes
+        run: vboxmanage controlvm ts.windows10 poweroff && sleep 15
+
+      - name: Remove Previous Windows Box
+        run: vboxmanage unregistervm ts.windows10 --delete
+ 
+      - name: Stop any Elastomic Boxes
+        run: vboxmanage controlvm ts.elastomic poweroff && sleep 15
+ 
+      - name: Remove Previous Elastomic  Box
+        run: vboxmanage unregistervm ts.elastomic --delete     
+        
+      - name: vagrant up to test deployment
+        run: vagrant up
+        working-directory: vagrant/
