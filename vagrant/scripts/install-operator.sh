@@ -1,4 +1,4 @@
-OPERATOR_URL="https://s3.amazonaws.com/operator.versions/release-builds/0.9.20/operator-0.9.20.zip"
+OPERATOR_URL="https://download.prelude.org/latest?platform=linux&variant=zip"
 VAGRANT_USER_HOME="/home/vagrant"
 
 
@@ -10,9 +10,9 @@ touch $VAGRANT_USER_HOME/.Xauthority
 
 # Stage and download and install Operator
 cd "$(mktemp -d)"
-wget $OPERATOR_URL
+curl --silent -LJ $OPERATOR_URL -o operator.zip
 sleep 10
-sudo unzip operator-0.9.20.zip -d /opt/operator
+sudo unzip operator.zip -d /opt/operator
 # Cleanup temporary directory
 cd ..
 rm -rf "$(pwd)"
