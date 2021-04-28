@@ -8,9 +8,9 @@ SCRIPTS_DIR="/vagrant"
 # Stage Pneuma download
 
 cd "$(mktemp -d)"
-wget $PNEUMA_URL
+curl $PNEUMA_URL -o pneuma-agent
 echo "Pulling service file via dev Github"
-wget $PNEUMA_SERVICE_FILE
+curl $PNEUMA_SERVICE_FILE -o pneuma-agent.service
 mkdir $INSTALL_DIR
 cp pneuma-linux $INSTALL_DIR
 chmod +x $INSTALL_DIR/pneuma-linux
