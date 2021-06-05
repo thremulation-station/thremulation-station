@@ -8,6 +8,9 @@ yum install unzip xorg-x11-xauth chromium -y
 # Create X11 file (sometimes it didn't seem to be created)
 touch $VAGRANT_USER_HOME/.Xauthority
 
+# Fixes permission on the Xauthority file
+chown vagrant:vagrant $VAGRANT_USER_HOME/.Xauthority
+
 # Stage and download and install Operator
 cd "$(mktemp -d)"
 curl --silent -LJ $OPERATOR_URL -o operator.zip
