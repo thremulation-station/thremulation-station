@@ -12,8 +12,8 @@ curl $PNEUMA_URL -o pneuma-agent
 echo "Pulling service file via dev Github"
 curl $PNEUMA_SERVICE_FILE -o pneuma-agent.service
 mkdir $INSTALL_DIR
-cp pneuma-linux $INSTALL_DIR
-chmod +x $INSTALL_DIR/pneuma-linux
+cp pneuma-agent $INSTALL_DIR
+chmod +x $INSTALL_DIR/pneuma-agent
 cp pneuma-agent.service /etc/systemd/system
 
 # Cleanup temporary directory
