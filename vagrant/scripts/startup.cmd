@@ -1,0 +1,1 @@
+powershell -ExecutionPolicy Bypass -File C:\Pneuma\start-pneuma.ps1
