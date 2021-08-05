@@ -1,0 +1,62 @@
+# spellchecker: disable
+---
+- name: windows-10
+  windows_version: "10"
+  driver_iso_url: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.189-1/virtio-win-0.1.189.iso
+  driver_iso_sha256: 97e9f9c7a47cb3d2ba744b8e1c78008a20a2804c89657fcae47113a96885c566
+  iso_url: https://software-download.microsoft.com/download/pr/19042.508.200927-1902.20h2_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso
+  sha256: 574f00380ead9e4b53921c33bf348b5a2fa976ffad1d5fa20466ddf7f0258964
+  template: windows.json
+  tags:
+    - windows
+    - client
+    - base
+
+- name: windows-server-2016
+  windows_version: "2016"
+  driver_iso_url: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.189-1/virtio-win-0.1.189.iso
+  driver_iso_sha256: 97e9f9c7a47cb3d2ba744b8e1c78008a20a2804c89657fcae47113a96885c566
+  iso_url: https://software-download.microsoft.com/download/pr/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO
+  sha256: 1ce702a578a3cb1ac3d14873980838590f06d5b7101c5daaccbac9d73f1fb50f
+  template: windows.json
+  tags:
+    - windows
+    - server
+    - base
+
+- name: centos-7
+  centos_version: "7"
+  iso_url: https://mirrors.edge.kernel.org/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-2009.iso
+  sha256: 07b94e6b1a0b0260b94c83d6bb76b26bf7a310dc78d7a9c7432809fb9bc6194a
+  template: centos.json
+  tags:
+    - linux
+    - base
+    - centos
+    - server
+
+- name: centos-8
+  centos_version: "8"
+  iso_url: https://mirrors.edge.kernel.org/centos/8/isos/x86_64/CentOS-8.2.2004-x86_64-minimal.iso
+  sha256: c67876a5602faa17f68b40ccf2628799b87454aa67700f0f57eec15c6ccdd98c
+  template: centos.json
+  tags:
+    - linux
+    - base
+    - centos
+    - server
+
+- name: centos-workstation-8
+  centos_version: "8ws"
+  iso_url: https://mirrors.edge.kernel.org/centos/8/isos/x86_64/CentOS-8.2.2004-x86_64-minimal.iso
+  sha256: c67876a5602faa17f68b40ccf2628799b87454aa67700f0f57eec15c6ccdd98c
+  template: centos.json
+  tags:
+    - linux
+    - base
+    - centos
+    - workstation
+  environment:
+    setup_xvnc: True
+    skip_gcp_tools: True
+...

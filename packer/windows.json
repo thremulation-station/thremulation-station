@@ -1,0 +1,157 @@
+{
+  "_comment0": "# spellchecker: disable",
+  "_comment1": "NAME=windows-10            WINDOWS_VERSION=10   DRIVER_ISO=./packer_cache/virtio-win.iso ISO_URL=https://software-download.microsoft.com/download/pr/19041.264.200511-0456.vb_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso                                             packer build windows.json",
+  "_comment2": "NAME=windows-server-2016   WINDOWS_VERSION=2016 DRIVER_ISO=./packer_cache/virtio-win.iso ISO_URL=https://software-download.microsoft.com/download/pr/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO                                                                           packer build windows.json",
+  "_comment3": "NAME=windows-server-2019   WINDOWS_VERSION=2019 DRIVER_ISO=./packer_cache/virtio-win.iso ISO_URL=https://software-download.microsoft.com/download/pr/17763.737.190906-2324.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us_1.iso                                                          packer build windows.json",
+  "builders": [
+    {
+      "accelerator": "{{ user `qemu_accelerator`}}",
+      "boot_command": "",
+      "boot_wait": "6m",
+      "communicator": "winrm",
+      "cpus": "{{ user `cpus`}}",
+      "disk_cache": "unsafe",
+      "disk_size": "{{user `disk_size`}}",
+      "disk_interface": "virtio-scsi",
+      "floppy_files": [
+        "{{user `autounattend`}}",
+        "./files/WindowsPowershell.lnk",
+        "./files/PinTo10.exe",
+        "./scripts/windows/fixnetwork.ps1",
+        "./scripts/windows/rearm-windows.ps1",
+        "./scripts/windows/disable-screensaver.ps1",
+        "./scripts/windows/disable-winrm.ps1",
+        "./scripts/windows/enable-winrm.ps1",
+        "./scripts/windows/microsoft-updates.bat",
+        "./scripts/windows/win-updates.ps1",
+        "./scripts/windows/unattend.xml",
+        "./scripts/windows/sysprep.bat"
+      ],
+      "format": "raw",
+      "headless": "{{ user `headless`}}",
+      "display": "{{ user `display`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_urls": [
+        "{{user `iso_url`}}"
+      ],
+      "cd_files": [
+        "{{ user `driver_iso_dir`}}/*"
+      ],
+      "memory": "{{ user `memory`}}",
+      "net_device": "virtio-net",
+      "output_directory": "output/{{ user `name` }}_{{ build_type }}",
+      "name": "{{ user `name` }}",
+      "type": "qemu",
+      "vm_name": "disk.raw",
+      "shutdown_timeout": "2h",
+      "shutdown_command": "",
+      "winrm_password": "{{ user `winrm_password` }}",
+      "winrm_timeout": "12h",
+      "winrm_username": "{{ user `winrm_username` }}"
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "name": "compress",
+        "type": "compress",
+        "output": "output/{{ user `name` }}_{{ build_type }}.tar.gz"
+      }
+    ],
+    [
+      {
+        "name": "gcp-import",
+        "output": "output/{{ user `name` }}_{{ build_type }}.tar.gz",
+        "type": "compress"
+      },
+      {
+        "type": "googlecompute-import",
+        "account_file": "{{ user `gcp_account_file`}}",
+        "project_id": "{{ user `gcp_project`}}",
+        "bucket": "{{ user `gcs_bucket`}}",
+        "image_guest_os_features": [
+          "WINDOWS",
+          "MULTI_IP_SUBNET",
+          "VIRTIO_SCSI_MULTIQUEUE"
+        ],
+        "image_labels": {
+          "buildstamp": "{{ timestamp }}",
+          "build_number": "{{ user `build_number`}}",
+          "commit": "{{ user `commit`}}"
+        },
+        "image_name": "{{ user `name`}}-{{ user `build_date`}}",
+        "image_description": "Microsoft Windows {{ user `name`}}, built on {{ user `build_date`}} with Packer.",
+        "image_family": "{{ user `name`}}"
+      }
+    ]
+  ],
+  "provisioners": [
+    {
+      "scripts": [
+        "./scripts/windows/gce-windows.ps1"
+      ],
+      "type": "powershell",
+      "execution_policy": "unrestricted",
+      "debug_mode": 1
+    },
+    {
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "remote_path": "/tmp/script.bat",
+      "scripts": [
+        "./scripts/windows/enable-rdp.bat"
+      ],
+      "type": "windows-shell"
+    },
+    {
+      "scripts": [
+        "./scripts/windows/debloat-windows.ps1"
+      ],
+      "type": "powershell"
+    },
+    {
+      "type": "windows-restart",
+      "restart_timeout": "15m"
+    },
+    {
+      "scripts": [
+        "./scripts/windows/set-powerplan.ps1"
+      ],
+      "type": "powershell"
+    },
+    {
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "remote_path": "/tmp/script.bat",
+      "scripts": [
+        "./scripts/windows/pin-powershell.bat",
+        "./scripts/windows/compile-dotnet-assemblies.bat",
+        "./scripts/windows/set-winrm-automatic.bat",
+        "./scripts/windows/dis-updates.bat"
+      ],
+      "type": "windows-shell"
+    }
+  ],
+  "variables": {
+    "windows_version": "{{ env `WINDOWS_VERSION` }}",
+    "autounattend": "installer-configs/windows-{{ user `windows_version` }}/Autounattend.xml",
+    "build_number": "{{ isotime \"20060102\" }}",
+    "build_date": "{{ isotime \"20060102\" }}",
+    "disk_size": "51200",
+    "cpus": "4",
+    "memory": "8192",
+    "headless": "false",
+    "display": "gtk",
+    "name": "{{ env `NAME` }}",
+    "iso_checksum": "file:win_iso.sha256",
+    "iso_url": "{{ env `ISO_URL` }}",
+    "driver_iso_dir": "{{ env `DRIVER_ISO_DIR` }}",
+    "qemu_accelerator": "kvm",
+    "winrm_password": "admin",
+    "winrm_username": "admin",
+    "version": "0.0.1",
+    "commit": "0000000",
+    "home": "{{ env `HOME` }}",
+    "gcs_bucket": "{{ env `GCS_BUCKET` }}",
+    "gcp_project": "{{ env `GCP_PROJECT` }}",
+    "gcp_account_file": "{{ user `home`}}/.config/gcloud/application_default_credentials.json"
+  }
+}
