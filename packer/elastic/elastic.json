@@ -25,7 +25,7 @@
       "shutdown_command": "echo 'vagrant'|sudo -S /sbin/halt -h -p",
       "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
       "virtualbox_version_file": ".vbox_version",
-      "vm_name": "packer-elastomic",
+      "vm_name": "packer-elastic",
       "vboxmanage": [
         [
           "modifyvm",
@@ -45,15 +45,7 @@
   "provisioners": [
     {
       "type": "ansible",
-      "playbook_file": "./ansible/elastomic-playbook.yml"
-    },
-    {
-      "type": "shell",
-      "scripts": "./scripts/install-atomicredteam.ps1"
-    },
-    {
-      "type": "shell",
-      "scripts": "./scripts/install-caldera.sh"
+      "playbook_file": "./ansible/elastic-playbook.yml"
     },
     {
       "type": "shell",
@@ -65,7 +57,7 @@
     {
       "type": "vagrant",
       "compression_level": "8",
-      "output": "../_output/{{.Provider}}-dev-elastomic-{{timestamp}}.box"
+      "output": "../_output/{{.Provider}}-dev-elastic-{{timestamp}}.box"
     }
   ]
 }
