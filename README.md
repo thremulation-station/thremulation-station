@@ -16,7 +16,7 @@
     <a href="https://thremulation.io">Thremulation.io</a> |
     <a href="https://github.com/thremulation-station/thremulation-station">Github</a> |
     <a href="https://twitter.com/thremulation">Twitter</a> |
-    <a href="https://discord.gg/mtNXN4QjHh">Discord</a>
+    <a href="https://join.slack.com/t/thremulation-station/shared_invite/zt-urwtghsh-GyJp8ENYQgtDQAP0JhcbRw">Slack</a>
     <br /><br />
 </b></p>
 
