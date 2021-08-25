@@ -35,6 +35,17 @@
     - centos
     - server
 
+- name: elastic-7
+  centos_version: "7"
+  iso_url: https://mirrors.edge.kernel.org/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-2009.iso
+  sha256: 07b94e6b1a0b0260b94c83d6bb76b26bf7a310dc78d7a9c7432809fb9bc6194a
+  template: elastic-7.json
+  tags:
+    - linux
+    - base
+    - centos
+    - server
+
 - name: centos-8
   centos_version: "8"
   iso_url: https://mirrors.edge.kernel.org/centos/8/isos/x86_64/CentOS-8.2.2004-x86_64-minimal.iso

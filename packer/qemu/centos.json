@@ -50,39 +50,12 @@
         }
     ],
     "post-processors": [
-        [
-            {
-                "name": "compress",
-                "type": "compress",
-                "output": "output/{{ user `name` }}_{{ build_type }}.tar.gz"
-            }
-        ],
-        [
-            {
-                "name": "gcp-import",
-                "output": "output/{{ user `name` }}_{{ build_type }}.tar.gz",
-                "type": "compress"
-            },
-            {
-                "type": "googlecompute-import",
-                "account_file": "{{ user `gcp_account_file`}}",
-                "project_id": "{{ user `gcp_project`}}",
-                "bucket": "{{ user `gcs_bucket`}}",
-                "image_guest_os_features": [
-                    "MULTI_IP_SUBNET",
-                    "VIRTIO_SCSI_MULTIQUEUE"
-                ],
-                "image_labels": {
-                    "buildstamp": "{{ timestamp }}",
-                    "build_number": "{{ user `build_number`}}",
-                    "commit": "{{ user `commit`}}"
-                },
-                "image_name": "{{ user `name`}}-{{ user `build_date`}}",
-                "image_description": "CentOS {{ user `name`}}, built on {{ user `build_date`}} with Packer.",
-                "image_family": "{{ user `name`}}"
-            }
-        ]
-    ],
+        {
+          "type": "vagrant",
+          "compression_level": "8",
+          "output": "../_output/{{.Provider}}-dev-centos7-{{timestamp}}.box"
+        }
+      ],
     "provisioners": [
         {
             "expect_disconnect": "true",
@@ -110,6 +83,10 @@
                 "chmod -R g-rwx,o-rwx ${sshdir}"
             ]
         },
+        {
+            "type": "ansible",
+            "playbook_file": "ansible/centos-playbook.yml"
+          },
         {
             "pause_before": "120s",
             "scripts": [
