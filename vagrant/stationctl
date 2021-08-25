@@ -22,7 +22,7 @@ esac
 ###############################################################################
 
 # boxes
-ELASTOMIC="ts.elastomic"
+ELASTIC="ts.elastic"
 WINDOWS="ts.windows10"
 CENTOS="ts.centos7"
 
@@ -414,7 +414,7 @@ deploy_quick() {
         echo " You have chosen to Quick-Deploy all boxes."
         echo " This includes the following configuration:"
         echo ""
-        echo "    Elastomic...:  EMULATE and DETECT"
+        echo "    Elastic...:  EMULATE and DETECT"
         echo ""
         echo "    Windows 10..:  Windows target box"
         echo ""
@@ -430,7 +430,7 @@ deploy_quick() {
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
                 echo "";
                 echo "";
-                vagrant up "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; sleep 5;
+                vagrant up "${ELASTIC}" "${WINDOWS}" "${CENTOS}"; sleep 5;
                 echo "";
                 echo "";
                 echo "";
@@ -455,7 +455,7 @@ deploy_quick() {
 }
 
 
-# Custom deploy consists of elastomic box PLUS:
+# Custom deploy consists of elastic box PLUS:
 deploy_custom() {
     while true; do
         clear
@@ -467,7 +467,7 @@ deploy_custom() {
         echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
         echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
-        echo "The Elastomic (control) box is required."
+        echo "The Elastic (control) box is required."
         echo "What TARGET boxes would you like to deploy?"
         echo ""
         read -rp "Deploy the Windows10 target? [Y/N]: " yn
@@ -508,14 +508,14 @@ deploy_custom() {
         echo ""
         echo "You have chosen the following Custom Deployment:"
         echo ""
-        echo "- CONTROL..: "${ELASTOMIC}" (required)"
+        echo "- CONTROL..: "${ELASTIC}" (required)"
         echo "- target...: "${WINDOWS}""
         echo "- target...: "${CENTOS}""
         echo ""
         read -rp "Confirm to proceed with deployment [Y/N]: " yn
         case $yn in
             [Yy]* )
-                vagrant up "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+                vagrant up "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
                 sleep 10;
                 snapshot;
                 break;;
@@ -541,7 +541,7 @@ deploy_staged() {
         echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
         echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
-        echo "  The Elastomic box is required and will be pulled."
+        echo "  The Elastic box is required and will be pulled."
         echo "  Select the TARGET boxes to include with it:"
         echo ""
         read -rp "  Pre-stage the Windows10 target? [Y/N]: " yn
@@ -582,7 +582,7 @@ deploy_staged() {
         echo ""
         echo "  You have chosen to Pre-stage the following boxes:"
         echo ""
-        echo "  - CONTROL..: ${ELASTOMIC}"
+        echo "  - CONTROL..: ${ELASTIC}"
         echo "  - target...: ${WINDOWS}"
         echo "  - target...: ${CENTOS}"
         echo ""
@@ -596,7 +596,7 @@ deploy_staged() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 sleep 3
-                for machine in dev-elastomic dev-windows10 dev-centos7
+                for machine in dev-elastic dev-windows10 dev-centos7
                 do
                     vagrant box add -cf "thremulation-station/${machine}";
                 done
@@ -653,7 +653,7 @@ status() {
         echo "   Vagrant Box Status:"
         echo -e "   ${LIGHTPURPLE}------------------${NC}";
         echo ""
-        vagrant status "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; sleep 2;
+        vagrant status "${ELASTIC}" "${WINDOWS}" "${CENTOS}"; sleep 2;
         echo ""
         echo ""
         echo "   Elasticsearch Cluster Status:"
@@ -687,7 +687,7 @@ status() {
 }
 
 
-# Checks the elasticsearch index health that lives on the elastomic box
+# Checks the elasticsearch index health that lives on the elastic box
 status_indexes() {
     curl -X GET "192.168.33.10:9200/_cluster/health?pretty"
 }
@@ -772,7 +772,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant suspend "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}"; # Added names because on windows leaving this blank does not work
+                vagrant suspend "${ELASTIC}" "${WINDOWS}" "${CENTOS}"; # Added names because on windows leaving this blank does not work
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -808,7 +808,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant reload --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+                vagrant reload --no-provision "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -876,7 +876,7 @@ manage() {
                 sleep 5;
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
-                vagrant destroy -f "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+                vagrant destroy -f "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
                 echo "";
                 echo "";
                 echo "  All VMs deleted! Returning to Menu";
@@ -938,7 +938,7 @@ resume() {
                 echo ""
                 echo ""
                 sleep 3;
-                vagrant resume  --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+                vagrant resume  --no-provision "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
                 sleep 1;
                 echo ""
                 echo ""
@@ -967,7 +967,7 @@ resume_custom() {
         echo -e "${LIGHTPURPLE}     (B)ack to Main                               ${NC}";
         echo -e "${LIGHTPURPLE} -------------------------------------------------${NC}";
         echo ""
-        echo " The Elastomic box is required."
+        echo " The Elastic box is required."
         echo -e " Select the boxes you would like to turn back on along with it:"
         echo ""
         read -rp " Resume the Windows10 VM? [Y/N]: " yn
@@ -1008,14 +1008,14 @@ resume_custom() {
         echo ""
         echo " You have chosen resume (turn back on) the following boxes:"
         echo ""
-        echo "  - CONTROL..: "${ELASTOMIC}" (required)"
+        echo "  - CONTROL..: "${ELASTIC}" (required)"
         echo "  - target...: "${WINDOWS}""
         echo "  - target...: "${CENTOS}""
         echo ""
         read -rp " Confirm to proceed. [Y/N]: " yn
         case $yn in
             [Yy]* )
-                vagrant resume --no-provision "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+                vagrant resume --no-provision "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
                 sleep 10;
                 break;;
             [Nn]* ) manage; break;;
@@ -1045,7 +1045,7 @@ fi
 snapshot() {
     echo ""
     echo ""
-    for machine in elastomic centos7 windows10
+    for machine in elastic centos7 windows10
     do
         vagrant snapshot save ts."${machine}" ts."${machine}"_initial;
     done
@@ -1059,7 +1059,7 @@ snapshot_restore() {
     echo ""
     echo ""
     echo "Restoring Snapshot..."
-    for machine in elastomic centos7 windows10
+    for machine in elastic centos7 windows10
     do
         vagrant snapshot restore ts."${machine}" ts."${machine}"_initial
     done
@@ -1071,9 +1071,9 @@ nuke_pave() {
     echo ""
     echo -e "         ${LIGHTRED}Destruction Commencing...${NC}"
     echo ""
-    vagrant destroy -f "${ELASTOMIC}" "${WINDOWS}" "${CENTOS}";
+    vagrant destroy -f "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
 
-    for machine in elastomic windows10 centos7
+    for machine in elastic windows10 centos7
     do
         vagrant box remove "thremulation-station/${machine}";
     done
