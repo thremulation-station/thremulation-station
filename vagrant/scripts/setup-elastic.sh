@@ -3,11 +3,13 @@
 set -o pipefail
 
 # Define variables
-STACK_VER="${ELASTIC_STACK_VERSION:-7.10.1}"
+STACK_VER="${ELASTIC_STACK_VERSION:-7.14.0}"
 KIBANA_URL="${KIBANA_URL:-http://127.0.0.1:5601}"
 ELASTICSEARCH_URL="${ELASTICSEARCH_URL:-http://127.0.0.1:9200}"
 KIBANA_AUTH="${KIBANA_AUTH:-}"
-ENABLE_PACKAGES=("endpoint" "windows")
+FLEET_SERVER_URL="${FLEET_SERVER_URL:-https://127.0.0.1:8220}"
+
+ENABLE_PACKAGES=("endpoint" "windows" "osquery_manager")
 HEADERS=(
     -H "kbn-version: ${STACK_VER}"
     -H 'Content-Type: application/json'
@@ -18,12 +20,6 @@ if [ -n "${KIBANA_AUTH}" ]; then
     HEADERS+=(-u "${KIBANA_AUTH}")
 fi
 
-# Install jq
-function install_jq() {
-    if ! command -v jq >/dev/null; then
-        sudo yum install -y jq
-    fi
-}
 
 # Collect integrations available deployment
 function list_packages() {
@@ -133,7 +129,7 @@ function delete_package_policy() {
 
 function get_default_policy() {
     curl --silent -XGET "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/agent_policies" |
-        jq --raw-output '.items[] | select(.name | startswith("Default")) | .id'
+        jq --raw-output '.items[] | select(.name | startswith("Default policy")) | .id'
 }
 
 function get_package_policy() {
@@ -143,10 +139,6 @@ function get_package_policy() {
         | jq --raw-output --arg name "${PKG_POLICY_NAME}" '.items[] | select(.name == $name)'
 }
 
-# Setup Fleet
-function setup_fleet() {
-    curl --silent -XPOST "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/setup" | jq
-}
 
 # Create Fleet User
 function create_fleet_user() {
@@ -166,7 +158,7 @@ function create_fleet_user() {
 
 # Configure Fleet Output
 function configure_fleet_outputs() {
-    printf '{"kibana_urls": ["%s"]}' "${KIBANA_URL}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/settings" -d @- | jq
+    printf '{"fleet_server_hosts": ["%s"]}' "${FLEET_SERVER_URL}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/settings" -d @- | jq
 
     OUTPUT_ID="$(curl --silent -XGET "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/outputs" | jq --raw-output '.items[] | select(.name == "default") | .id')"
     printf '{"hosts": ["%s"]}' "${ELASTICSEARCH_URL}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/outputs/${OUTPUT_ID}" -d @- | jq
@@ -189,8 +181,6 @@ function add_detection_engine_rules() {
 
 # Execute Fleet Funcionts
 function main() {
-    install_jq
-    setup_fleet
     create_fleet_user
     configure_fleet_outputs
     policy_id=$(get_default_policy)
