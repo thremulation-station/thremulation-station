@@ -1,0 +1,128 @@
+{
+    "_comment1": "NAME=centos-7 CENTOS_VERSION=7 ISO_URL=https://mirrors.edge.kernel.org/centos/7.8.2003/isos/x86_64/CentOS-7-x86_64-Minimal-2003.iso ISO_CHECKSUM=sha256:659691c28a0e672558b003d223f83938f254b39875ee7559d1a4a14c79173193 packer build -var commit=$(git rev-parse --short HEAD) centos.json",
+    "_comment2": "NAME=centos-8 CENTOS_VERSION=8 ISO_URL=https://mirrors.edge.kernel.org/centos/8.2.2004/isos/x86_64/CentOS-8.2.2004-x86_64-boot.iso  ISO_CHECKSUM=sha256:c67876a5602faa17f68b40ccf2628799b87454aa67700f0f57eec15c6ccdd98c packer build -var commit=$(git rev-parse --short HEAD) centos.json",
+    "builders": [
+        {
+            "accelerator": "{{ user `qemu_accelerator`}}",
+            "boot_command": [
+                "<up><wait><tab> text biosdevname=0 net.ifnames=0 ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos{{ user `centos_version` }}-ks.cfg<enter><wait>"
+            ],
+            "boot_wait": "10s",
+            "cpus": "{{ user `cpus`}}",
+            "disk_size": "{{ user `disk_size`}}",
+            "format": "raw",
+            "headless": "{{ user `headless`}}",
+            "display": "{{ user `display` }}",
+            "http_directory": "installer-configs/centos",
+            "iso_checksum": "{{ user `iso_checksum` }}",
+            "iso_urls": [
+                "{{ user `iso_local`}}",
+                "{{ user `iso_url`}}"
+            ],
+            "memory": "{{ user `memory`}}",
+            "name": "{{ user `name` }}",
+            "output_directory": "output/{{ build_name }}_{{ build_type }}",
+            "qemuargs": [
+                [
+                    "-device",
+                    "virtio-serial"
+                ],
+                [
+                    "-device",
+                    "virtio-rng"
+                ],
+                [
+                    "-device",
+                    "virtio-balloon"
+                ],
+                [
+                    "-device",
+                    "pvpanic"
+                ]
+            ],
+            "shutdown_command": "/sbin/shutdown -hP now",
+            "ssh_password": "root_password_will_be_deleted",
+            "ssh_port": 22,
+            "ssh_username": "root",
+            "ssh_wait_timeout": "10000s",
+            "type": "qemu",
+            "vm_name": "disk.raw"
+        }
+    ],
+    "post-processors": [
+        {
+          "type": "vagrant",
+          "compression_level": "8",
+          "output": "../_output/{{.Provider}}-dev-centos7-{{timestamp}}.box"
+        }
+      ],
+    "provisioners": [
+        {
+            "expect_disconnect": "true",
+            "scripts": [
+                "scripts/centos/base.sh",
+                "scripts/centos/network.sh",
+                "scripts/centos/ntp.sh",
+                "scripts/centos/yum.sh",
+                "scripts/centos/tuning.sh",
+                "scripts/centos/randomness.sh",
+                "scripts/centos/reboot.sh"
+            ],
+            "start_retry_timeout": "15m",
+            "type": "shell",
+            "environment_vars": "{{ user `environment`}}"
+        },
+        {
+            "type": "shell",
+            "inline": [
+                "# Adds ssh public key to user created during kickstart",
+                "sshdir=$(getent passwd 1000 | awk -F: '{ print $6\"/.ssh\" }')",
+                "mkdir -p ${sshdir}",
+                "echo '{{ user `ssh_public_key`}}' | tee -a ${sshdir}/authorized_keys",
+                "chown -R 1000:1000 ${sshdir}",
+                "chmod -R g-rwx,o-rwx ${sshdir}"
+            ]
+        },
+        {
+            "type": "ansible",
+            "playbook_file": "ansible/centos-playbook.yml"
+          },
+        {
+            "pause_before": "120s",
+            "scripts": [
+                "scripts/centos/kernel.sh",
+                "scripts/centos/gce-linux.sh",
+                "scripts/centos/floppy.sh",
+                "scripts/centos/ssh.sh",
+                "scripts/centos/xvncserver.sh",
+                "scripts/centos/unyum.sh",
+                "scripts/centos/cleanup.sh"
+            ],
+            "start_retry_timeout": "15m",
+            "type": "shell",
+            "environment_vars": "{{ user `environment`}}"
+        }
+    ],
+    "variables": {
+        "qemu_accelerator": "kvm",
+        "build_number": "{{ isotime \"20060102\" }}",
+        "build_date": "{{ isotime \"20060102\" }}",
+        "cpus": "2",
+        "disk_size": "20480M",
+        "memory": "1024",
+        "headless": "false",
+        "display": "gtk",
+        "name": "{{ env `NAME` }}",
+        "iso_checksum": "{{ env `ISO_CHECKSUM` }}",
+        "iso_local": "",
+        "iso_url": "{{ env `ISO_URL` }}",
+        "centos_version": "{{ env `CENTOS_VERSION` }}",
+        "environment": "",
+        "ssh_public_key": "{{ env `AUTHORIZED_KEYS`}}",
+        "commit": "0000000",
+        "home": "{{ env `HOME` }}",
+        "gcs_bucket": "{{ env `GCS_BUCKET` }}",
+        "gcp_project": "{{ env `GCP_PROJECT` }}",
+        "gcp_account_file": "{{ user `home`}}/.config/gcloud/application_default_credentials.json"
+    }
+}
