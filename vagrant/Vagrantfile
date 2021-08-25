@@ -17,15 +17,28 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
     end
 
+    
+    # Setup Fleet server
+    cfg.vm.provision "shell" do |s|
+      s.path = "./scripts/install-fleet-server.sh"
+      s.env = {
+          "ELASTIC_STACK_VERSION" => "7.14.0",
+          "KIBANA_URL" => "http://192.168.33.10:5601",
+          "KIBANA_AUTH" => "vagrant:vagrant",
+          "ELASTICSEARCH_URL" => "http://192.168.33.10:9200"
+      }
+    end
+
 
     # Setup the Elastic Stack
-    cfg.vm.provision "shell" do |s|
-      s.path = "./scripts/setup-elastic.sh"
-      s.env = {
-        "ELASTIC_STACK_VERSION" => "7.10.1",
+    cfg.vm.provision "shell" do |s2|
+      s2.path = "./scripts/setup-elastic.sh"
+      s2.env = {
+        "ELASTIC_STACK_VERSION" => "7.14.0",
         "KIBANA_URL" => "http://192.168.33.10:5601",
         "KIBANA_AUTH" => "vagrant:vagrant",
-        "ELASTICSEARCH_URL" => "http://192.168.33.10:9200"
+        "ELASTICSEARCH_URL" => "http://192.168.33.10:9200",
+        "FLEET_SERVER_URL" => "https://192.168.33.10:8220"
       }
     end
   end
@@ -75,10 +88,10 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell" do |s|
       s.path = "./scripts/install-ea-linux.sh"
       s.env = {
-        "ELASTIC_STACK_VERSION" => "7.10.1",
+        "ELASTIC_STACK_VERSION" => "7.14.0",
         "KIBANA_URL" => "http://192.168.33.10:5601",
         "KIBANA_AUTH" => "vagrant:vagrant",
-        "ELASTICSEARCH_URL" => "http://192.168.33.10:9200"
+        "FLEET_SERVER_URL" => "https://192.168.33.10:8220"
       }
     end
   end
