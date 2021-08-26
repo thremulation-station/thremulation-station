@@ -179,6 +179,12 @@ function add_detection_engine_rules() {
     curl --silent "${HEADERS[@]}" -XPUT "${KIBANA_URL}"/api/detection_engine/rules/prepackaged
 }
 
+# Enable Windows and Linux Detection Rules
+function enable_detection_rules() {
+    curl --silent -XPOST "${HEADERS[@]}" "${KIBANA_URL}/api/detection_engine/rules/_bulk_action" -d '{"query": "alert.attributes.tags: \"Windows\"","action": "enable"}'
+    curl --silent -XPOST "${HEADERS[@]}" "${KIBANA_URL}/api/detection_engine/rules/_bulk_action" -d '{"query": "alert.attributes.tags: \"Linux\"","action": "enable"}'
+}
+
 # Execute Fleet Funcionts
 function main() {
     create_fleet_user
@@ -187,6 +193,7 @@ function main() {
     configure_index_replicas
     add_detection_engine_index
     add_detection_engine_rules
+    enable_detection_rules
 
     # shellcheck disable=SC2068
     for item in ${ENABLE_PACKAGES[@]}; do
