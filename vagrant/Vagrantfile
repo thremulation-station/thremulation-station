@@ -1,7 +1,7 @@
 Vagrant.configure("2") do |config|
 
   config.vm.define "ts.elastomic", primary: true do |cfg|
-    cfg.vm.box = "thremulation-station/dev-elastomic"
+    cfg.vm.box = "thremulation-station/elastomic"
     # below version points to latest dev-testboxes commit hash
     cfg.vm.box_version = "0.9.9520c3b"
     cfg.vm.hostname = "elastomic"
@@ -33,7 +33,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "ts.windows10" do |cfg|
-    cfg.vm.box = "thremulation-station/dev-windows10"
+    cfg.vm.box = "thremulation-station/windows10"
     # below version points to latest dev-testboxes commit hash
     cfg.vm.box_version = "0.9.1608145966"
     cfg.vm.hostname = "windows10"
@@ -56,7 +56,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "ts.centos7" do |cfg|
-    cfg.vm.box = "thremulation-station/dev-centos7"
+    cfg.vm.box = "thremulation-station/centos7"
     # below version points to latest dev-testboxes commit hash
     cfg.vm.box_version = "0.9.9520c3b"
     cfg.vm.hostname = "centos7"
