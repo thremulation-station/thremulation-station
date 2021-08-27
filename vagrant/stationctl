@@ -596,7 +596,7 @@ deploy_staged() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 sleep 3
-                for machine in dev-elastomic dev-windows10 dev-centos7
+                for machine in elastomic windows10 centos7
                 do
                     vagrant box add -cf "thremulation-station/${machine}";
                 done
