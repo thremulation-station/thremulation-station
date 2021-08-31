@@ -35,6 +35,10 @@ jobs:
         # Using VBoxManage instead of vagrant, vagrant listens only when it feels like it ("vagrant up" works but "destroy" doesn't). 
         # Sleep is added to ensure that the vboxmanage has finished before deleting the box
       
+      - name: vagrant up to test deployment
+        run: vagrant up
+        working-directory: vagrant/
+      
       - name: Stop any active centos boxes
         run: vboxmanage controlvm ts.centos7 poweroff && sleep 15
 
@@ -52,7 +56,3 @@ jobs:
  
       - name: Remove Previous Elastomic  Box
         run: vboxmanage unregistervm ts.elastomic --delete     
-        
-      - name: vagrant up to test deployment
-        run: vagrant up
-        working-directory: vagrant/
