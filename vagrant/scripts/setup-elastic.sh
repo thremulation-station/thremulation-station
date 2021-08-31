@@ -13,6 +13,7 @@ ENABLE_PACKAGES=("endpoint" "windows" "osquery_manager")
 HEADERS=(
     -H "kbn-version: ${STACK_VER}"
     -H 'Content-Type: application/json'
+    -H 'kbn-xsrf: true'
 )
 
 # Prep for authorization to Elasticsearch/Kibana
@@ -201,6 +202,17 @@ function main() {
         pkg_ver=$(list_packages | jq --raw-output --arg name "${item}" 'select(.name == $name) | .version')
         enable_agent_package "${policy_id}" "${item}" "${pkg_ver}" "default"
     done
+
+    echo "Changing Endpoint policy with custom settings"
+
+    policy_result=$(curl --silent -XGET "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/agent_policies/${POLICY_ID}" | jq '.[].package_policies[] | select(.name=="endpoint-1")')
+    endpoint_policy_id=$(echo -n "${policy_result}" | jq --raw-output '.id')
+    endpoint_policy_request=$(echo -n "${policy_result}" | jq 'del(.id,.revision,.created_by,.created_at,.updated_by,.updated_at) | (.inputs[].config.policy.value.windows.antivirus_registration.enabled) |= "true" | (.inputs[].config.policy.value[].malware.mode) |= "detect"')
+    
+    endpoint_change_request=$(echo -n "${endpoint_policy_request}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/package_policies/${endpoint_policy_id}" -d @-)
+
+    echo -n ${endpoint_change_request} | jq
+
 }
 
 main "$@"
