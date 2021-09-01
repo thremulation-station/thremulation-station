@@ -354,11 +354,11 @@
         name: sshd
         state: restarted
         
-    - name: Mount Guest Additions ISO
+    - name: Mount GuestAdditions ISO
       src: /home/vagrant/VBoxGuestAdditions_6.1.2.6.iso
       fstype: iso9660
       opts: ro
       state: mounted
       
-    - name: Install Guest Additions
+    - name: Install GuestAdditions
       shell: /mnt/VBoxGuestAdditions.run
