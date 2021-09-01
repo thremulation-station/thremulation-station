@@ -376,6 +376,6 @@
       opts: ro
       state: mounted
 
-    - name: Install Guest Additions
+    - name: Install GuestAdditions
       shell: /mnt/VBoxGuestAdditions.run
      
