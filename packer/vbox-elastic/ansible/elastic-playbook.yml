@@ -362,4 +362,4 @@
         state: mounted
       
     - name: Install Guest Additions
-      shell: /mnt/VBoxGuestAdditions.run
+      shell: /mnt/VBoxLinuxAdditions.run
