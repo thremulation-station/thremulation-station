@@ -356,7 +356,7 @@
     - name: Mount Guest Additions ISO
       mount:
         path: /mnt/
-        src: /home/vagrant/VBoxGuestAdditions_6.1.2.6.iso
+        src: /home/vagrant/VBoxGuestAdditions_6.1.26.iso
         fstype: iso9660
         opts: ro
         state: mounted
