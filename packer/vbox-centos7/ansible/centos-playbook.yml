@@ -52,7 +52,7 @@
           - kernel-devel
           - make
           - perl
-          -bzip2
+          - bzip2
 
     - name: Install System Tools
       yum:
