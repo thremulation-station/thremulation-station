@@ -56,7 +56,6 @@
         state: present
       vars:
         packages:
-          - patch
           - gcc
           - kernel-headers
           - kernel-devel
