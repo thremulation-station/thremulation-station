@@ -40,6 +40,20 @@
     - name: Clean Yum Cache
       command: yum clean all
 
+
+    - name: Install Dependencies for VirtualBox Guest Additions
+      yum:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - gcc
+          - kernel-headers
+          - kernel-devel
+          - make
+          - perl
+          - bzip2
+
     - name: Install System Tools
       yum:
         name: "{{ packages }}"
@@ -53,7 +67,6 @@
           - git
           - wget
           - golang
-          - bzip2
 
     - name: Start Firewalld Service
       systemd:
@@ -354,3 +367,15 @@
       systemd:
         name: sshd
         state: restarted
+        
+    - name: Mount Guest Additions ISO
+      mount:
+        path: /mnt/
+        src: /home/vagrant/VBoxGuestAdditions_6.1.26.iso
+        fstype: iso9660
+        opts: ro
+        state: mounted
+
+    - name: Install Guest Additions
+      shell: /mnt/VBoxLinuxAdditions.run
+     

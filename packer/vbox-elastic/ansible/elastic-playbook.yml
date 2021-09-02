@@ -49,6 +49,25 @@
     - name: Clean Yum Cache
       command: yum clean all
 
+
+    - name: Install Dependencies for VirtualBox Guest Additions
+      yum:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - gcc
+          - kernel-headers
+          - kernel-devel
+          - make
+          - perl
+          - bzip2
+          
+    - name: Reboot for GuestAdditions
+      reboot:
+        reboot_timeout: 300
+
+
     - name: Install System Tools
       yum:
         name: "{{ packages }}"
@@ -85,6 +104,14 @@
       firewalld:
         zone: public
         port: 5601/tcp
+        permanent: true
+        immediate: true
+        state: enabled
+        
+    - name: Add Fleet Server Rule
+      firewalld:
+        zone: public
+        port: 8220/tcp
         permanent: true
         immediate: true
         state: enabled
@@ -325,3 +352,14 @@
       systemd:
         name: sshd
         state: restarted
+        
+    - name: Mount Guest Additions ISO
+      mount:
+        path: /mnt/
+        src: /home/vagrant/VBoxGuestAdditions_6.1.26.iso
+        fstype: iso9660
+        opts: ro
+        state: mounted
+      
+    - name: Install Guest Additions
+      shell: /mnt/VBoxLinuxAdditions.run
