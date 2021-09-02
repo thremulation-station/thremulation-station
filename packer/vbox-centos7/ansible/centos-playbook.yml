@@ -369,6 +369,7 @@
         state: restarted
         
     - name: Mount Guest Additions ISO
+      path: /mnt/
       src: /home/vagrant/VBoxGuestAdditions_6.1.2.6.iso
       fstype: iso9660
       opts: ro
