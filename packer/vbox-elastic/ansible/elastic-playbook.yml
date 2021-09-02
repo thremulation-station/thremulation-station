@@ -63,10 +63,6 @@
           - perl
           - bzip2
           
-    - name: Reboot for GuestAdditions
-      reboot:
-        reboot_timeout: 300
-
 
     - name: Install System Tools
       yum:
