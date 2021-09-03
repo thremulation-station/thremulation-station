@@ -23,9 +23,14 @@ This directory contains all code to build base boxes.
 Move to the directory specific to your target box and execute packer with the build 
 option followed by the JSON file. Example:  
 
-1. `cd thremulation-station/packer/vbox-centos7`
-2. `$ packer build centos7.json`
-3. WAIT...
+1. Download the Virtualbox Guest Additions ISO locally:
+    - `cd packer/_iso/ && curl -O https://download.virtualbox.org/virtualbox/6.1.26/VBoxGuestAdditions_6.1.26.iso`
+2. Move into a box folder:
+    - `cd ../packer/vbox-centos7`
+3. Run the build:
+    - `packer build centos7.json`
+    - `PACKER_LOG=1 packer build centos7.json`
+4. WAIT...
 
 Upon a successful run, the Vagrant .box files are saved to the `../_output` folder.
 
