@@ -3,14 +3,17 @@
 set -o pipefail
 
 # Define variables
-STACK_VER="${ELASTIC_STACK_VERSION:-7.10.1}"
+STACK_VER="${ELASTIC_STACK_VERSION:-7.14.0}"
 KIBANA_URL="${KIBANA_URL:-http://127.0.0.1:5601}"
 ELASTICSEARCH_URL="${ELASTICSEARCH_URL:-http://127.0.0.1:9200}"
 KIBANA_AUTH="${KIBANA_AUTH:-}"
-ENABLE_PACKAGES=("endpoint" "windows")
+FLEET_SERVER_URL="${FLEET_SERVER_URL:-https://127.0.0.1:8220}"
+
+ENABLE_PACKAGES=("endpoint" "windows" "osquery_manager")
 HEADERS=(
     -H "kbn-version: ${STACK_VER}"
     -H 'Content-Type: application/json'
+    -H 'kbn-xsrf: true'
 )
 
 # Prep for authorization to Elasticsearch/Kibana
@@ -18,12 +21,6 @@ if [ -n "${KIBANA_AUTH}" ]; then
     HEADERS+=(-u "${KIBANA_AUTH}")
 fi
 
-# Install jq
-function install_jq() {
-    if ! command -v jq >/dev/null; then
-        sudo yum install -y jq
-    fi
-}
 
 # Collect integrations available deployment
 function list_packages() {
@@ -133,7 +130,7 @@ function delete_package_policy() {
 
 function get_default_policy() {
     curl --silent -XGET "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/agent_policies" |
-        jq --raw-output '.items[] | select(.name | startswith("Default")) | .id'
+        jq --raw-output '.items[] | select(.name | startswith("Default policy")) | .id'
 }
 
 function get_package_policy() {
@@ -143,10 +140,6 @@ function get_package_policy() {
         | jq --raw-output --arg name "${PKG_POLICY_NAME}" '.items[] | select(.name == $name)'
 }
 
-# Setup Fleet
-function setup_fleet() {
-    curl --silent -XPOST "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/setup" | jq
-}
 
 # Create Fleet User
 function create_fleet_user() {
@@ -166,7 +159,7 @@ function create_fleet_user() {
 
 # Configure Fleet Output
 function configure_fleet_outputs() {
-    printf '{"kibana_urls": ["%s"]}' "${KIBANA_URL}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/settings" -d @- | jq
+    printf '{"fleet_server_hosts": ["%s"]}' "${FLEET_SERVER_URL}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/settings" -d @- | jq
 
     OUTPUT_ID="$(curl --silent -XGET "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/outputs" | jq --raw-output '.items[] | select(.name == "default") | .id')"
     printf '{"hosts": ["%s"]}' "${ELASTICSEARCH_URL}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/outputs/${OUTPUT_ID}" -d @- | jq
@@ -187,16 +180,21 @@ function add_detection_engine_rules() {
     curl --silent "${HEADERS[@]}" -XPUT "${KIBANA_URL}"/api/detection_engine/rules/prepackaged
 }
 
+# Enable Windows and Linux Detection Rules
+function enable_detection_rules() {
+    curl --silent -XPOST "${HEADERS[@]}" "${KIBANA_URL}/api/detection_engine/rules/_bulk_action" -d '{"query": "alert.attributes.tags: \"Windows\"","action": "enable"}'
+    curl --silent -XPOST "${HEADERS[@]}" "${KIBANA_URL}/api/detection_engine/rules/_bulk_action" -d '{"query": "alert.attributes.tags: \"Linux\"","action": "enable"}'
+}
+
 # Execute Fleet Funcionts
 function main() {
-    install_jq
-    setup_fleet
     create_fleet_user
     configure_fleet_outputs
     policy_id=$(get_default_policy)
     configure_index_replicas
     add_detection_engine_index
     add_detection_engine_rules
+    enable_detection_rules
 
     # shellcheck disable=SC2068
     for item in ${ENABLE_PACKAGES[@]}; do
@@ -204,6 +202,17 @@ function main() {
         pkg_ver=$(list_packages | jq --raw-output --arg name "${item}" 'select(.name == $name) | .version')
         enable_agent_package "${policy_id}" "${item}" "${pkg_ver}" "default"
     done
+
+    echo "Changing Endpoint policy with custom settings"
+
+    policy_result=$(curl --silent -XGET "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/agent_policies/${POLICY_ID}" | jq '.[].package_policies[] | select(.name=="endpoint-1")')
+    endpoint_policy_id=$(echo -n "${policy_result}" | jq --raw-output '.id')
+    endpoint_policy_request=$(echo -n "${policy_result}" | jq 'del(.id,.revision,.created_by,.created_at,.updated_by,.updated_at) | (.inputs[].config.policy.value.windows.antivirus_registration.enabled) |= "true" | (.inputs[].config.policy.value[].malware.mode) |= "detect"')
+    
+    endpoint_change_request=$(echo -n "${endpoint_policy_request}" | curl --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/package_policies/${endpoint_policy_id}" -d @-)
+
+    echo -n ${endpoint_change_request} | jq
+
 }
 
 main "$@"

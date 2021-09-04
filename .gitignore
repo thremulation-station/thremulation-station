@@ -5,7 +5,7 @@
 **packer_cache/
 
 # ignore iso files
-**_iso/
+**.iso
 
 # ignore packer output .box files
 packer/output/*.box

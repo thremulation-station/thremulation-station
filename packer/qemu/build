@@ -1,0 +1,379 @@
+#!/bin/bash -eu
+
+# uncomment to debug
+#set -x
+
+set -o pipefail
+
+IMAGES_YML=images.yml
+
+red=$'\e[1;31m'
+grn=$'\e[1;32m'
+blu=$'\e[1;34m'
+# mag=$'\e[1;35m'
+# cyn=$'\e[1;36m'
+white=$'\e[0m'
+
+# These globals are set by argument parsing for program flow
+declare list
+declare -a tag
+declare -a name
+declare validate
+declare quiet
+declare verbose
+declare debug
+declare accel
+declare sha256sum
+declare commit
+declare headless
+declare skip_import
+
+# Setup logging
+script_logging_level="INFO"
+
+# Default accelerator
+default_accel="kvm"
+
+# Default console
+default_display="gtk"
+
+# For now, this is a special case for Windows
+function get_driver_iso() {
+    iso_url="${1}"
+    iso_path="${2}"
+    iso_sha256="${3}"
+    iso_extract_dir="${4}"
+
+    if [ ! -f "${iso_path}" ]; then
+        if curl -o "${iso_path}" "${iso_url}"; then
+            logit "${iso_path} successfully downloaded." "INFO"
+        else
+            logit "Failed to download driver iso from ${blu}${iso_url}${white}." "ERROR"
+            exit 1
+        fi
+    fi
+
+    if ! { echo "${iso_sha256}  ${iso_path}" | $sha256sum -c -; }; then
+        logit "SHA256 didn't match for ${red}${iso_path}${white}!" "ERROR"
+        exit 1
+    else
+        logit "SHA256 validated for ${grn}${iso_path}${white}!" "INFO"
+    fi
+
+    # The verified ISO is the source of truth, so re-extract each time
+    if [ -d "${iso_extract_dir}" ]; then
+        rm -rf "${iso_extract_dir}"
+    fi
+
+    if ! 7z x "-o${iso_extract_dir}" "${iso_path}"; then
+        logit "Something went wrong with ISO extraction!" "ERROR"
+        exit 1
+    fi
+
+}
+
+function logit() {
+    local log_message=$1
+    local log_priority=$2
+
+    case "${log_priority}" in
+    DEBUG)
+        if [ "${script_logging_level}" == "DEBUG" ]; then
+            printf "[%s] %s\n" "${log_priority}" "${log_message}"
+        fi
+        ;;
+    INFO)
+        if [ "${script_logging_level}" == "DEBUG" ] ||
+            [ "${script_logging_level}" == "INFO" ]; then
+            printf "[%s] %s\n" "${log_priority}" "${log_message}"
+        fi
+        ;;
+    WARN)
+        if [ "${script_logging_level}" == "DEBUG" ] ||
+            [ "${script_logging_level}" == "INFO" ] ||
+            [ "${script_logging_level}" == "WARN" ]; then
+            printf "[%s] %s\n" "${log_priority}" "${log_message}"
+        fi
+        ;;
+    ERROR)
+        if [ "${script_logging_level}" == "DEBUG" ] ||
+            [ "${script_logging_level}" == "INFO" ] ||
+            [ "${script_logging_level}" == "WARN" ] ||
+            [ "${script_logging_level}" == "ERROR" ]; then
+            printf "[%s] %s\n" "${log_priority}" "${log_message}"
+        fi
+        ;;
+    *) ;;
+    esac
+}
+
+function check_prereqs() {
+    local retval=0
+    local os_kernel
+
+    if ! command -v packer &>/dev/null; then
+        logit "${red}packer could not be found${white}!" "ERROR"
+        logit "See https://www.packer.io/ for install instructions." "ERROR"
+        retval=1
+    fi
+
+    if ! command -v curl &>/dev/null; then
+        logit "${red}curl could not be found${white}!" "ERROR"
+        logit "Use your operating system package manager to install it." "ERROR"
+        retval=1
+    fi
+
+    if command -v sha256sum &>/dev/null; then
+        sha256sum="$(command -v sha256sum)"
+    elif command -v sha256 &>/dev/null; then
+        sha256sum="$(command -v sha256)"
+    elif command -v shasum &>/dev/null; then
+        sha256sum="$(command -v shasum) -a256"
+    else
+        logit "${red}sha256sum, sha256, or shasum programs could not be found${white}" "ERROR"
+        logit "Use your operating system package manager to install it." "ERROR"
+        retval=1
+    fi
+
+    if ! command -v git &>/dev/null; then
+        logit "${red}git could not be found${white}." "WARN"
+        logit "Commit info will not be added to the image." "WARN"
+    else
+        if git status >/dev/null; then
+            commit=$(git rev-parse --short HEAD)
+        fi
+    fi
+
+    if ! command -v yq &>/dev/null; then
+        logit "${red}yq could not be found!${white}" "ERROR"
+        logit "See https://github.com/mikefarah/yq for install instructions." "ERROR"
+        retval=1
+    fi
+
+    if ! command -v jq &>/dev/null; then
+        logit "${red}jq could not be found!${white}" "ERROR"
+        logit "See https://stedolan.github.io/jq/ for install instructions." "ERROR"
+        retval=1
+    fi
+
+    if ! command -v docopts &>/dev/null; then
+        logit "${red}docopts could not be found!${white}" "ERROR"
+        logit "See https://github.com/docopt/docopts#install for install instructions." "ERROR"
+        retval=1
+    fi
+
+    if ! command -v 7z &>/dev/null; then
+        logit "${red}p7zip (7z) could not be found!${white}" "ERROR"
+        logit "Use your operating system package manager to install it." "ERROR"
+        retval=1
+    fi
+
+    if [ ! -f "${IMAGES_YML}" ]; then
+        logit "Unable to find ${red}${IMAGES_YML}${white} configuration file!" "ERROR"
+        retval=-1
+    fi
+
+    os_kernel=$(uname)
+    if [ "${os_kernel}" == "Darwin" ]; then
+        default_accel="hvf"
+        default_display="cocoa"
+    elif [ "${os_kernel}" == "Linux" ]; then
+        default_accel="kvm"
+        default_display="gtk"
+    else
+        logit "This has only been tested on Linux and Darwin! This may be really slow." "WARN"
+    fi
+
+    if [ "${retval}" -ne 0 ]; then
+        exit "${retval}"
+    fi
+}
+
+function indent() { sed 's/^/  /'; }
+
+function list() {
+    echo "Available builds:"
+    yq eval '.[].name' "${IMAGES_YML}" | indent
+
+    echo
+    echo "Available tags:"
+    yq eval '.[].tags' "${IMAGES_YML}"  | sort -u | sed 's/^- //' | indent
+
+    echo
+    echo "For full details, review ${blu}${IMAGES_YML}${white}."
+    exit 0
+}
+
+function main() {
+    local builds="[]"
+
+    if [ "${quiet}" == "true" ]; then
+        script_logging_level="ERROR"
+    fi
+
+    if [ "${verbose}" == "true" ]; then
+        script_logging_level="INFO"
+    fi
+
+    if [ "${debug}" == "true" ]; then
+        script_logging_level="DEBUG"
+    fi
+
+    if [ "${list}" == "true" ]; then
+        list
+    fi
+
+    if [ -n "${tag[*]}" ]; then
+        first=1
+        tags='['
+        for item in "${tag[@]}"; do
+            if [ ${first} -eq 0 ]; then
+                tags+=','
+            else
+                first=0
+            fi
+            tags+='"'${item}'"'
+        done
+        tags+=']'
+        builds=$(yq eval -j images.yml | jq --argjson tags "${tags}" '[.[] | select(.tags[] | index($tags[]))] | unique_by(.name)')
+    fi
+
+    if [ -n "${name[*]}" ]; then
+        first=1
+        names='['
+        for item in "${name[@]}"; do
+            if [ ${first} -eq 0 ]; then
+                names+=','
+            else
+                first=0
+            fi
+
+            names+='"'${item}'"'
+        done
+        names+=']'
+        builds=$(yq eval -j images.yml | jq --argjson names "${names}" '[.[] | select(.name | index($names[]))] | unique_by(.name)')
+    fi
+
+    # shellcheck disable=SC2128
+    if [[ ("${tag}" == "all" || -z "${tag}") && -z "${name}" ]]; then
+        logit "Selecting all builds." "INFO"
+        builds=$(yq r -j images.yml)
+    fi
+
+    if [ "$(echo "${builds}" | jq '. | length')" -lt 1 ]; then
+        logit "No builds selected." "ERROR"
+        exit 0
+    fi
+
+    for row in $(echo "${builds}" | jq -r '.[] | @base64'); do
+        _jq() {
+            echo "${row}" | base64 --decode | jq -r "${@:1}"
+        }
+
+        local _sha256
+        local _sha128
+        local _md5
+        local _iso_checksum
+        local _extra_json
+        local _extra_args
+        local _driver_iso_url
+        local _driver_iso_path
+        local _driver_iso_dir
+        local _driver_iso_sha256
+
+        _sha256=$(_jq '.sha256 // empty')
+        _sha128=$(_jq '.sha128 // empty')
+        _md5=$(_jq '.md5 // empty')
+        _iso_checksum=${_sha256:-${_sha128:-${_md5:-}}}
+        _environment=$(_jq '.environment // empty | to_entries | map("\(.key)=\(.value)") | join(",")')
+        _extra_args=""
+
+        printf -v _extra_json '{"iso_checksum": "%s", "qemu_accelerator": "%s", "environment": "%s"}' "${_iso_checksum}" "${accel}" "${_environment}"
+
+        _driver_iso_url=$(_jq '.driver_iso_url // empty')
+        _driver_iso_sha256=$(_jq '.driver_iso_sha256 // empty')
+        _driver_iso_path="./packer_cache/$(basename "${_driver_iso_url}")"
+        _driver_iso_dir="./packer_cache/$(basename "${_driver_iso_url}" .iso)"
+
+        mkdir -p ./packer_cache
+        if [ -n "${_driver_iso_url}" ]; then
+            get_driver_iso "${_driver_iso_url}" "${_driver_iso_path}" "${_driver_iso_sha256}" "${_driver_iso_dir}"
+
+            _extra_json=$(echo "${_extra_json}" | jq --arg driver_iso_dir "${_driver_iso_dir}" '. + {"driver_iso_dir": $driver_iso_dir}')
+        fi
+
+        if [ "${headless}" == "true" ]; then
+            _extra_json=$(echo "${_extra_json}" | jq '. + {"headless": "true"}')
+        else
+            _extra_json=$(echo "${_extra_json}" | jq --arg display "${default_display}" '. + {"headless": "false", "display": $display}')
+        fi
+
+        if [ "${skip_import}" == "true" ]; then
+            _extra_args+=" -except=gcp-import"
+        fi
+
+        if [ -n "${commit}" ]; then
+            _extra_json=$(echo "${_extra_json}" | jq --arg commit "${commit}" '. + {"commit": $commit}')
+        fi
+
+        vars_json=$(_jq '. | del(.tags)' | jq --argjson extra_json "${_extra_json}" '. += $extra_json')
+
+        logit "Running packer with following variables: " "DEBUG"
+        vars_json_debug=$(echo "${vars_json}" | jq '.' | sed '2,$s/^/[DEBUG] /')
+        logit "${vars_json_debug}" "DEBUG"
+
+        if [ "${validate}" == "true" ]; then
+            # shellcheck disable=SC2086
+            if echo "${vars_json}" | packer validate ${_extra_args} -var-file /dev/stdin "$(_jq '.template')"; then
+                logit "Packer template ${grn}$(_jq '.template')${white} validated for build named ${grn}$(_jq '.name')${white} successfully." "INFO"
+                exit 0
+            else
+                retval=$?
+                logit "${red}$(_jq '.template')${white} failed validation for build named ${red}$(_jq '.name')${white}." "ERROR"
+                exit ${retval}
+            fi
+        else
+            # shellcheck disable=SC2086
+            if ! (echo "${vars_json}" | packer build ${_extra_args} -var-file /dev/stdin "$(_jq '.template')"); then
+                retval=$?
+                logit "Packer failed to build for template ${red}$(_jq '.template')${white} for the build named ${red}$(_jq '.name')${white}." "ERROR"
+                exit ${retval}
+            else
+                exit 0
+            fi
+        fi
+    done
+
+}
+
+check_prereqs
+
+eval "$(
+    docopts -V - -h - : "$@" <<EOF
+Usage:  build --list
+        build [-q|-v|-d] [--accel=<accel>] --validate [--skip-import] ([--tag=<tag> ...] | [<name> ...])
+        build [-q|-v|-d] [--accel=<accel>] [--headless] [--skip-import] --tag=<tag> ...
+        build [-q|-v|-d] [--accel=<accel>] [--headless] [--skip-import] [<name> ...]
+
+Options:
+    -t, --tag=<tag>     Specify a tag to filter builds. Can be used multiple times. [default: all]
+    --accel=<accel>     Specify qemu accelerator to use (i.e. kvm on Linux or hvf on Mac). [default: ${default_accel}]
+    --headless          Run the machine without a console [default: false]
+    --skip-import       Runs the build and skips the GCP import post-provisioner
+    -q, --quiet         Suppress output except for errors.
+    -v, --verbose       Generate verbose messages.
+    -d, --debug         Generate debugging output (includes verbose messages).
+    --help              Show help options.
+    --version           Print program version.
+----
+build 0.0.1
+Author: Derek "dcode" Ditch
+
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+If you break it, you get to keep both pieces.
+EOF
+)"
+
+main
