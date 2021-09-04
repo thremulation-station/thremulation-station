@@ -64,6 +64,18 @@
           - wget
 
 ###################################
+# Disk Resize
+###################################
+
+    - name: Extend an existing partition to fill all available space
+      community.general.parted:
+        device: /dev/sda
+        number: "{{ sda_info.partitions | length }}"
+        part_end: "100%"
+        resize: true
+        state: present
+
+###################################
 # Firewall
 ###################################
 
