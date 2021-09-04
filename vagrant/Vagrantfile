@@ -17,6 +17,8 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
     end
 
+    # Setup Disk so we have more room to put elastic stack
+    cfg.vm.provision "setdisk", type: "shell", path: "./scripts/setup-disk.sh"
     
     # Setup Fleet server
     cfg.vm.provision "shell" do |s|

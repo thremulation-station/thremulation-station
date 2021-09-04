@@ -28,7 +28,7 @@ Thremulation Station is an approachable small-scale threat emulation and detecti
 <br>
 <br>
 
-> **TL;DR** If you're ready to skip the reading and jump into things, head to the [Quickstart / Installation](/quickstart/installation.md) section.
+> **TL;DR** If you're ready to skip the reading and jump into things, head to the [Quickstart / Installation](https://docs.thremulation.io/quickstart/installation/) section.
 
 
 ## Project Goals
