@@ -15,3 +15,6 @@ else{
   choco install golang -y 
 
   choco install notepadplusplus -y
+
+  choco install mingw -y 
+

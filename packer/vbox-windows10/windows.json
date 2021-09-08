@@ -61,6 +61,7 @@
         "./scripts/disable-autologin.ps1",
         "./scripts/disable-uac.ps1",
         "./scripts/no-expiration.ps1",
+        "./scripts/install-openjdk.ps1",
         "./scripts/install-choco.ps1",
         "./scripts/install-sysmon.ps1",
         "./scripts/install-pwshssh.ps1",

@@ -13,3 +13,5 @@ cd "C:\Users\vagrant\audit"
 .\3_Set_User_Registry_Auditing.cmd
 
 .\Set_User_Registry_Auditing.ps1
+
+auditpol.exe /set /subcategory:"Handle Manipulation" /success:enable /failure:disable
