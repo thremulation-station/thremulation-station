@@ -16,5 +16,7 @@ else{
 
   choco install notepadplusplus -y
 
+  choco install javaruntime -y
+
   choco install mingw -y 
 
