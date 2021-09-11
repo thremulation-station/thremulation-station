@@ -9,7 +9,7 @@
 <h2 align="center"><b>Threat emulation and detection for your laptop</b></h2>
 
 <p align="center">
-   Collection of open source tools working together to enable a reasonably capable machine to serve as a local cyber range.
+   Collection of free and open tools working together to enable a reasonably capable machine to serve as a local cyber range.
 </p>
 
 <p align="center"><b>
