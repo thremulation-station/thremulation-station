@@ -59,7 +59,7 @@
             "--vram",
             "32"
           ]
-        ],
+        ]
       }
     ],
     "provisioners": [
