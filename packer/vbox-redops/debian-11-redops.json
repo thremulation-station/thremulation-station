@@ -52,8 +52,14 @@
             "{{.Name}}",
             "--cpus",
             "1"
+          ],
+          [
+            "modifyvm",
+            "{{.Name}}",
+            "--vram",
+            "32"
           ]
-        ]
+        ],
       }
     ],
     "provisioners": [
