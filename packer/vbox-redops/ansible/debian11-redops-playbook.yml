@@ -13,9 +13,6 @@
         - https://artifacts.elastic.co/GPG-KEY-elasticsearch
         - https://packages.microsoft.com/keys/microsoft.asc
       retries: 5
-#    - name: Add EPEL Repository
-#      yum:
-#        name: epel-release
 
 
     - name: Add Microsoft Repository
@@ -23,11 +20,6 @@
         repo: deb [arch=amd64] https://packages.microsoft.com/debian/10/prod/ buster main
         state: present
         update_cache: yes
-#        description: Microsoft Repo for RHEL-based
-#        enabled: yes
-#        gpgcheck: yes
-#        baseurl: https://packages.microsoft.com/rhel/7/prod/
-#        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
         filename: packages-microsoft-prod
 
     - name: Clean Cache
@@ -59,53 +51,53 @@
     - name: Start Firewalld Service
       command: systemctl start ufw
 
-#    - name: Start Firewalld Service
-#      systemd:
-#        name: firewalld
-#        state: started
-#        enabled: yes
-
 
 
 ####################################
 # Install XCFE
-
-#    - name: Install X Window System
-#      command: yum groupinstall "X Window System" -y
 
     - name: Install XFCE 4
       apt:
         name: xfce4
         state: present
 
-#    - name: Install XFCE
-#      command: yum groupinstall "Xfce" -y
+    #- name: Install XRDP
+    #  apt:
+    #    name: xrdp
+    #    state: present
 
-#    - name: Set Graphic Target
-#      file:
-#        src: /usr/lib/systemd/system/graphical.target
-#        dest: /etc/systemd/system/default.target
-#        state: link
+    #- name: Add XRDP user to SSL-cert group
+    #  command: adduser xrdp ssl-cert
 
-    - name: Install XRDP
-      apt:
-        name: xrdp
-        state: present
-
-    - name: Add XRDP user to SSL-cert group
-      command: adduser xrdp ssl-cert
-
-
-#    - name: Reboot to set graphical target
-#      reboot:
-#        reboot_timeout: 300
 
 ####################################
 # Operator 
-    - name: Add Pneuma Firewall Rule
+    - name: Add Operator TCP Firewall Rule
       ufw:
          rule: allow
          port: '2323'
+         proto: tcp
+         state: enabled
+
+         
+    - name: Add Operator UDP Firewall Rule
+      ufw:
+         rule: allow
+         port: '4545'
+         proto: tcp
+         state: enabled
+         
+    - name: Add Operator HTTP Firewall Rule
+      ufw:
+         rule: allow
+         port: '3391'
+         proto: tcp
+         state: enabled
+         
+    - name: Add Operator Reverse Shell Firewall Rule
+      ufw:
+         rule: allow
+         port: '3007'
          proto: tcp
          state: enabled
 
@@ -129,11 +121,11 @@
          state: enabled
 
 
-    - name: Reload
-      command: systemctl daemon-reload
+    #- name: Reload
+    #  command: systemctl daemon-reload
 
-    - name: Start XRDP Service
-      command: systemctl enable xrdp
+    #- name: Start XRDP Service
+    #  command: systemctl enable xrdp
 
 
 ###################################
