@@ -49,6 +49,9 @@
           - git
           - wget
           - golang
+          - firefox-esr
+          - gedit
+          - terminator
 
     - name: Prep to start services
       command: systemctl daemon-reload
