@@ -77,7 +77,8 @@
         "{{template_dir}}/scripts/sudoers.sh",
         "{{template_dir}}/scripts/vagrant.sh",
         "{{template_dir}}/scripts/systemd.sh",
-        "{{template_dir}}/scripts/virtualbox.sh"
+        "{{template_dir}}/scripts/virtualbox.sh",
+        "{{template_dir}}/scripts/xfce-settings.sh
         ]
       },
       
