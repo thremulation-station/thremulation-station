@@ -84,7 +84,7 @@
       ufw:
          rule: allow
          port: '4545'
-         proto: tcp
+         proto: udp
          state: enabled
          
     - name: Add Operator HTTP Firewall Rule
