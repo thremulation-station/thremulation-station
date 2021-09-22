@@ -2,6 +2,9 @@
 
 VAGRANT_HOME="/home/vagrant"
 
+mkdir $VAGRANT_HOME/{Desktop,Downloads,Templates,Public,Documents,Music,Pictures,Videos}
+chown -R $VAGRANT_HOME/*
+
 touch $VAGRANT_HOME/.config/user-dirs.dirs
 
 echo "
