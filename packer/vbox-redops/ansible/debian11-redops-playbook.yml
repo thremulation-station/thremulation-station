@@ -60,6 +60,33 @@
       apt:
         name: xfce4
         state: present
+        
+    - name: Set Graphic Target
+      file:
+        src: /usr/lib/systemd/system/graphical.target
+        dest: /etc/systemd/system/default.target
+        state: link
+
+    - name: Reboot to bootstrap XFCE
+      reboot:
+        reboot_timeout: 300
+
+    - name: Create User Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode: '0700'
+      loop:
+        - /home/vagrant/Desktop
+        - /home/vagrant/Downloads
+        - /home/vagrant/Templates
+        - /home/vagrant/Public
+        - /home/vagrant/Documents
+        - /home/vagrant/Music
+        - /home/vagrant/Pictures
+        - /home/vagrant/Videos
 
     #- name: Install XRDP
     #  apt:
