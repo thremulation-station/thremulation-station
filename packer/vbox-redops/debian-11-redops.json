@@ -71,14 +71,14 @@
         "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E sh -eux '{{.Path}}'",
         "expect_disconnect": true,
         "scripts": [
-        "{{template_dir}}/scripts/update.sh",
-        "{{template_dir}}/scripts/sshd.sh",
-        "{{template_dir}}/scripts/networking.sh",
-        "{{template_dir}}/scripts/sudoers.sh",
-        "{{template_dir}}/scripts/vagrant.sh",
-        "{{template_dir}}/scripts/systemd.sh",
-        "{{template_dir}}/scripts/virtualbox.sh",
-        "{{template_dir}}/scripts/xfce-settings.sh"
+        "scripts/update.sh",
+        "scripts/sshd.sh",
+        "scripts/networking.sh",
+        "scripts/sudoers.sh",
+        "scripts/vagrant.sh",
+        "scripts/systemd.sh",
+        "scripts/virtualbox.sh",
+        "scripts/xfce-settings.sh"
         ]
       },
       
@@ -89,7 +89,10 @@
       },
       {
         "type": "shell",
-        "scripts": "scripts/cleanup.sh",
+        "scripts": [
+        "scripts/xfce-settings.sh",
+        "scripts": "scripts/cleanup.sh"
+        ],
         "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
       }
     ],
