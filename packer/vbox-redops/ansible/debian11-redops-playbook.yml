@@ -96,7 +96,7 @@
     - name: Add XRDP user to SSL-cert group
       command: adduser xrdp ssl-cert
 
-   - name: Add XRDP rule
+    - name: Add XRDP rule
       ufw:
          rule: allow
          port: '3389'
