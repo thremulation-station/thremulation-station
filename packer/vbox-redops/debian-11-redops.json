@@ -91,7 +91,7 @@
         "type": "shell",
         "scripts": [
         "scripts/xfce-settings.sh",
-        "scripts": "scripts/cleanup.sh"
+        "scripts/cleanup.sh"
         ],
         "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
       }
