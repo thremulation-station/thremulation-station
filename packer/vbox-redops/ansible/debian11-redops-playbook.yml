@@ -61,17 +61,6 @@
         name: xfce4
         state: present
 
-    - name: Remove lightdm
-      apt:
-        name: lightdm
-        state: absent
-        
-    - name: Install SDDM
-      apt:
-        name: sddm
-        state: present
-
-
     - name: Set Graphic Target
       file:
         src: /usr/lib/systemd/system/graphical.target
@@ -99,14 +88,20 @@
         - /home/vagrant/Pictures
         - /home/vagrant/Videos
 
-    #- name: Install XRDP
-    #  apt:
-    #    name: xrdp
-    #    state: present
+   - name: Install XRDP
+     apt:
+       name: xrdp
+       state: present
 
-    #- name: Add XRDP user to SSL-cert group
-    #  command: adduser xrdp ssl-cert
+   - name: Add XRDP user to SSL-cert group
+     command: adduser xrdp ssl-cert
 
+   - name: Add XRDP rule
+      ufw:
+         rule: allow
+         port: '3389'
+         proto: tcp
+         state: enabled
 
 ####################################
 # Operator 
@@ -139,17 +134,6 @@
          proto: tcp
          state: enabled
 
-#    - name: Install XRDP
-#      yum:
-#        name: xrdp
-#        state: present
-
-    - name: Add XRDP rule
-      ufw:
-         rule: allow
-         port: '3389'
-         proto: tcp
-         state: enabled
 
     - name: Add SSH Rule for Vagrant
       ufw:
