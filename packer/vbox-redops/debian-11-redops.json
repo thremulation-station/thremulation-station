@@ -77,8 +77,7 @@
         "scripts/sudoers.sh",
         "scripts/vagrant.sh",
         "scripts/systemd.sh",
-        "scripts/virtualbox.sh",
-        "scripts/xfce-settings.sh"
+        "scripts/virtualbox.sh"
         ]
       },
       
