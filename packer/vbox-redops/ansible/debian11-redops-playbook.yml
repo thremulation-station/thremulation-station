@@ -88,13 +88,13 @@
         - /home/vagrant/Pictures
         - /home/vagrant/Videos
 
-   - name: Install XRDP
-     apt:
-       name: xrdp
-       state: present
+    - name: Install XRDP
+      apt:
+        name: xrdp
+        state: present
 
-   - name: Add XRDP user to SSL-cert group
-     command: adduser xrdp ssl-cert
+    - name: Add XRDP user to SSL-cert group
+      command: adduser xrdp ssl-cert
 
    - name: Add XRDP rule
       ufw:
