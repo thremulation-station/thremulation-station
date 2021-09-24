@@ -60,7 +60,18 @@
       apt:
         name: xfce4
         state: present
+
+    - name: Remove lightdm
+      apt:
+        name: lightdm
+        state: absent
         
+    - name: Install SDDM
+      apt:
+        name: sddm
+        state: present
+
+
     - name: Set Graphic Target
       file:
         src: /usr/lib/systemd/system/graphical.target
