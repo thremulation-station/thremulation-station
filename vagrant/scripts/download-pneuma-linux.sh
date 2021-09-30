@@ -29,4 +29,6 @@ WantedBy=multi-user.target" > pneuma-agent.service
 cp pneuma-agent.service /etc/systemd/system
 
 systemctl enable pneuma-agent
-systemctl start pneuma-agent
+
+#Only enable this if you want pneuma started by default.
+#systemctl start pneuma-agent

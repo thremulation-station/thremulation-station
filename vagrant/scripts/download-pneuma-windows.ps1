@@ -13,6 +13,8 @@ Write-Output "Copying Pneuma scripts"
 
 # Replace with Copy-Item
 Copy-Item "$scripts_dir\start-pneuma.ps1" "$install_dir"
+
+# Only enable this if you want Pneuma started by default
 Copy-Item "$scripts_dir\startup.cmd" "$vagrant_startup"
 
 # Start Pneuma if it is in the path
@@ -20,5 +22,7 @@ Copy-Item "$scripts_dir\startup.cmd" "$vagrant_startup"
 If (Test-Path $install_dir\pneuma-windows.exe) 
 {
     Write-Output "Pneuma found in install directory! Starting Pneuma with default parameters..."
-    Start-Process -FilePath "C:\Pneuma\pneuma-windows.exe" -ArgumentList "-address 192.168.33.13:2323 -contact tcp -name pneuma-window -range thremulation"
+    
+    # Only enable this line if you want Pneuma to start by default
+    #Start-Process -FilePath "C:\Pneuma\pneuma-windows.exe" -ArgumentList "-address 192.168.33.13:2323 -contact tcp -name pneuma-window -range thremulation"
 }
