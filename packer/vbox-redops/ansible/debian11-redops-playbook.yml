@@ -1,0 +1,244 @@
+---
+  - hosts: all
+    become: yes
+    gather_facts: no
+
+    tasks:
+  
+    - name: Import APT Keys
+      apt_key:
+        state: present
+        url: "{{ item }}"
+      loop:
+        - https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        - https://packages.microsoft.com/keys/microsoft.asc
+      retries: 5
+
+
+    - name: Add Microsoft Repository
+      apt_repository:
+        repo: deb [arch=amd64] https://packages.microsoft.com/debian/10/prod/ buster main
+        state: present
+        update_cache: yes
+        filename: packages-microsoft-prod
+
+    - name: Clean Cache
+      command: apt-get clean
+
+    - name: Refresh apt-cache
+      command: apt-get update
+
+    - name: Install System Tools
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - ufw
+          - vim
+          - nano
+          - tmux
+          - git
+          - wget
+          - golang
+          - firefox-esr
+          - gedit
+          - terminator
+
+    - name: Prep to start services
+      command: systemctl daemon-reload
+
+    - name: Start Firewalld Service
+      command: systemctl start ufw
+
+
+
+####################################
+# Install XCFE
+
+    - name: Install XFCE 4
+      apt:
+        name: xfce4
+        state: present
+
+    - name: Set Graphic Target
+      file:
+        src: /usr/lib/systemd/system/graphical.target
+        dest: /etc/systemd/system/default.target
+        state: link
+
+    - name: Reboot to bootstrap XFCE
+      reboot:
+        reboot_timeout: 300
+
+    - name: Create User Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode: '0700'
+      loop:
+        - /home/vagrant/Desktop
+        - /home/vagrant/Downloads
+        - /home/vagrant/Templates
+        - /home/vagrant/Public
+        - /home/vagrant/Documents
+        - /home/vagrant/Music
+        - /home/vagrant/Pictures
+        - /home/vagrant/Videos
+
+    - name: Install XRDP
+      apt:
+        name: xrdp
+        state: present
+
+    - name: Add XRDP user to SSL-cert group
+      command: adduser xrdp ssl-cert
+
+    - name: Add XRDP rule
+      ufw:
+         rule: allow
+         port: '3389'
+         proto: tcp
+         state: enabled
+
+####################################
+# Operator 
+    - name: Add Operator TCP Firewall Rule
+      ufw:
+         rule: allow
+         port: '2323'
+         proto: tcp
+         state: enabled
+
+         
+    - name: Add Operator UDP Firewall Rule
+      ufw:
+         rule: allow
+         port: '4545'
+         proto: udp
+         state: enabled
+         
+    - name: Add Operator HTTP Firewall Rule
+      ufw:
+         rule: allow
+         port: '3391'
+         proto: tcp
+         state: enabled
+         
+    - name: Add Operator Reverse Shell Firewall Rule
+      ufw:
+         rule: allow
+         port: '3007'
+         proto: tcp
+         state: enabled
+
+
+    - name: Add SSH Rule for Vagrant
+      ufw:
+         rule: allow
+         port: '22'
+         proto: tcp
+         state: enabled
+
+
+    #- name: Reload
+    #  command: systemctl daemon-reload
+
+    #- name: Start XRDP Service
+    #  command: systemctl enable xrdp
+
+
+###################################
+# Powershell
+###################################
+
+    - name: Install Powershell
+      apt:
+        name: powershell
+        state: present
+
+    - name: Enable Powershell Remoting
+      command: pwsh -Command {Enable-PSRemoting -Force}
+
+
+###################################
+# SSH Configuration
+###################################
+
+    - name: Uncomment Pass Auth Yes
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#PasswordAuthentication\s+yes'
+        line: PasswordAuthentication yes
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Comment out Passauth No
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication\s+no'
+        line: '# PasswordAuthentication no'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Allow SSH Pubkey Auth
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#PubkeyAuthentication\s+yes'
+        line: 'PubkeyAuthentication yes'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Add PS Subsystem to PS remote over SSH
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: 'Subsystem powershell /usr/bin/pwsh -sshs -NoLogo'
+        create: yes
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Create Vagrant User SSH Directory
+      file:
+        path: /home/vagrant/.ssh
+        state: directory
+        owner: vagrant
+        mode: '0700'
+
+    - name: Retrieve Default Vagrant Pub Key
+      command: wget --no-check-certificate https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub -O /home/vagrant/.ssh/authorized_keys
+
+    # - name: Copy Authorizedkeys File
+    #   copy:
+    #     src: ./files/authorizedkeys
+    #     dest: /home/vagrant/.ssh/authorizedkeys
+    #     owner: vagrant
+    #     group: vagrant
+    #     mode: '0600'
+  
+    - name: Update Permissions of SSH Key
+      file:
+        path: /home/vagrant/.ssh/authorized_keys
+        state: file
+        owner: vagrant
+        mode: '0600'
+  
+    - name: Add AuthorizedKeysFile to Config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AuthorizedKeysFile\s+\.ssh/authorized_keys'
+        line: 'AuthorizedKeysFile %h/.ssh/authorized_keys'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Restart sshd service
+      systemd:
+        name: sshd
+        state: restarted
+     
