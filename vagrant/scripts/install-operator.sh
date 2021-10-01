@@ -15,24 +15,25 @@ chmod +x Operator.appImage && chown vagrant: Operator.appImage
 
 # Dropping bootstrap script
 echo "Setting up first boot for Operator"
-mkdir /opt/operator
-cp /vagrant/bootstrap_operator.sh /opt/operator
+#mkdir /opt/operator
+#chown vagrant: /opt/operator
+cp /vagrant/scripts/bootstrap_operator.sh $VAGRANT_HOME/Desktop
+chown vagrant: $VAGRANT_HOME/Desktop/bootstrap_operator.sh
 
-echo "[Unit]
-Description=bootstrap-operator
-ConditionPathExists=/home/vagrant/.config/Operator/login.prelude.org/settings.yml
+#echo "[Unit]
+#Description=Bootstrap-Operator
+#[Service]
+#ExecStart=/opt/operator/bootstrap_operator.sh
+#Restart=on-failure
+#StartLimitInterval=600
+#RestartSec=15
+#StartLimitBurst=16
+#[Install]
+#WantedBy=multi-user.target" > bootstrap-operator.service
+#cp bootstrap-operator.service /etc/systemd/system
 
-[Service]
-Type=oneshot
-ExecStart=/opt/bootstrap_operator.sh
 
-[Install]
-WantedBy=multi-user.target" > bootstrap-operator.service
-cp bootstrap-operator.service /etc/systemd/system
-
-systemctl enable bootstrap-operator
-systemctl start bootstrap-operator
-
+#bash /opt/operator/bootstrap_operator.sh
 
 # For when Operator gets support for Debian directly
 #dpkg -i operator.deb
