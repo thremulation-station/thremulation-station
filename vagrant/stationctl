@@ -387,7 +387,7 @@ deploy() {
         echo "2. Custom Deployment...: choose targets you want"
         echo "3. Staged Deployment...: download boxes you want"
         echo ""
-        read -rp " Select Above Option: " yn
+        read -rp " Select Above Option [or (B)ack]: " yn
         case $yn in
             [1]* ) deploy_quick; break;;
             [2]* ) deploy_custom; break;;
@@ -740,7 +740,7 @@ manage() {
         echo -e "9. ${LIGHTRED}Nuke and Pave${NC}...:  destroy all vms and boxes"
         echo ""
         echo ""
-        read -rp "  Select Above Option: " yn
+        read -rp "  Select Above Option [or (B)ack]: " yn
         case $yn in
             [1]* )
                 echo ""
@@ -928,7 +928,7 @@ resume() {
         echo " Resume (A)ll ..............: resume all currently suspended VMs"
         echo " Resume (S)elected Boxes....: choose what VMs to turn back on"
         echo ""
-        read -rp " Select Above Option: " yn
+        read -rp " Select Above Option [or (B)ack]: " yn
         case $yn in
             [Aa]* ) 
                 echo ""
