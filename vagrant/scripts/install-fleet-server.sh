@@ -68,8 +68,6 @@ function download_and_install_agent () {
 
     echo "Setting up Fleet Server. This could take a minute.."
     curl --silent -XPOST "${AUTH[@]}" "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/setup" | jq
-    sudo firewall-cmd --add-port=8220/tcp --permanent
-    sudo firewall-cmd --reload
 
     POLICY_ID=$(curl --silent -XGET "${AUTH[@]}" "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/agent_policies" | jq --raw-output '.items[] | select(.name | startswith("Default Fleet")) | .id')
 
