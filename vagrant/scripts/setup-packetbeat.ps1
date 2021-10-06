@@ -11,7 +11,7 @@ If ( $HTTP_Status -eq 200 ) {
   Write-Host "elastomic box is reachable -- proceeding:"
   Start-Sleep -s 2
   Write-Host "Running Packetbeat Setup Command"
-  winlogbeat --path.config C:\ProgramData\chocolatey\lib\packetbeat\tools setup
+  packetbeat --path.config C:\ProgramData\chocolatey\lib\packetbeat\tools setup
 }
 Else {
   Write-Host "Unable to contact elastic over port 9200 -- Quitting."
