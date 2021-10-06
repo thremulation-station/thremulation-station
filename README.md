@@ -23,7 +23,7 @@
 
 <hr />
 <br>
-Thremulation Station is an approachable small-scale threat emulation and detection range. It leans on Atomic Red Team for emulating threats, and the Elastic Endpoint Agent for detection.
+Thremulation Station is an approachable small-scale threat emulation and detection range. Use Prelude Operator to **emulate** threats, and the Elastic Endpoint Agent to **detect**.
 
 <br>
 <br>
@@ -33,12 +33,17 @@ Thremulation Station is an approachable small-scale threat emulation and detecti
 
 ## Project Goals
 
-Our goal from the very beginning has been to provide the following:
+Our goal are to provide a local environment that:
 
-1. Lightweight range that can operate on a laptop with a _minimum_ of 4 threads and 8G of RAM
-1. Support the big 3 host operating systems (initial linux path is RHEL-based)
-1. Present users a smooth path to execute threats and observe them with Elastic 
-1. Provide a singular TUI (Station Control) that can be used to manage all aspects
+1. Can operate on a laptop with a _minimum_ of 4 threads and 8G of RAM
+1. Supports the big 3 host operating systems (initial linux path is RHEL-based)
+1. Gives users a smooth path to execute threats and observe them with Elastic
+
+
+## Disclaimer
+
+Thremulation Station is a great environment to experiment and learn security techniques, but should not be 
+considered a full-featured malware sandbox. _Know what you're doing, break it, you buy it._
 
 ## Getting Started
 
