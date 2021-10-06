@@ -49,7 +49,10 @@
     },
     {
       "type": "shell",
-      "scripts": "./scripts/cleanup.sh",
+      "scripts": [
+      "./scripts/virtualbox.sh",
+      "./scripts/cleanup.sh"
+      ],
       "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     }
   ],
