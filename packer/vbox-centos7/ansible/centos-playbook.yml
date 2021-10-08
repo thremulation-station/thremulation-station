@@ -55,11 +55,39 @@
           - wget
           - golang
 
+#    - name: Create Elastic Agent Directory
+#      file:
+#        path: /tmp/elastic-agent
+#        state: directory
+#        owner: vagrant
+#        group: vagrant
+#        mode: '0700'
+
+    - name: Download And Uncompress Elastic Agent
+      unarchive:
+        src: https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{{ lab.stack_version }}-linux-x86_64.tar.gz
+        dest: /tmp/
+        remote_src: yes
+
+    - name: Create Pneuma Directory
+      file:
+        path: /opt/pneuma
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode: '0700'
+
+    - name: Download Pneuma Agent
+      get_url:
+        url: https://s3.amazonaws.com/operator.payloads.open/payloads/pneuma/pneuma-linux
+        dest: /opt/pneuma/
+
     - name: Start Firewalld Service
       systemd:
         name: firewalld
         state: started
         enabled: yes
+        
 
 ###################################
 # Cockpit

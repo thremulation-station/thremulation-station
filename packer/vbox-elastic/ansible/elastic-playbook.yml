@@ -62,6 +62,29 @@
           - golang
           - openssl-devel
           - wget
+          - jq
+
+#    - name: Install Elastic Agent
+#      get_uri:
+#        url: https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-"{{ stack_ver }}-linux-x86_64.tar.gz"
+#      dest: /tmp
+#      vars:
+#        stack_ver:
+#          - 7.14
+
+    - name: Create Elastic Agent Directory
+      file:
+        path: /tmp/elastic-agent
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode: '0700'
+
+    - name: Download And Uncompress Elastic Agent
+      unarchive:
+        src: https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{{ lab.stack_version }}-linux-x86_64.tar.gz
+        dest: /tmp/
+        remote_src: yes
 
 ###################################
 # Firewall

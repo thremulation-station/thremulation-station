@@ -9,15 +9,6 @@ ELASTICSEARCH_URL="${ELASTICSEARCH_URL:-http://127.0.0.1:9200}"
 ES_SERVICE="elasticsearch"
 KIBANA_SERVICE="kibana"
 
-
-AGENT_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-${STACK_VER}-linux-x86_64.tar.gz"
-
-function install_jq() {
-    if ! command -v jq; then
-        sudo yum install -y jq
-    fi
-}
-
 function check_elasticsearch_service() { 
     echo "Checking Elasticsearch"
     if (( $(ps -ef | grep -v grep | grep $ES_SERVICE | wc -l) > 0 ))
@@ -68,6 +59,8 @@ function download_and_install_agent () {
 
     echo "Setting up Fleet Server. This could take a minute.."
     curl --silent -XPOST "${AUTH[@]}" "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/setup" | jq
+    sudo firewall-cmd --add-port=8220/tcp --permanent
+    sudo firewall-cmd --reload
 
     POLICY_ID=$(curl --silent -XGET "${AUTH[@]}" "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/agent_policies" | jq --raw-output '.items[] | select(.name | startswith("Default Fleet")) | .id')
 
@@ -77,17 +70,9 @@ function download_and_install_agent () {
     
     echo "Enrolling agent using policy ID: "${POLICY_ID}""
 
-    cd "$(mktemp -d)"
-    curl --silent -LJ "${AGENT_URL}" | tar xzf -
-    cd "$(basename "$(basename "${AGENT_URL}")" .tar.gz)"
-    sudo ./elastic-agent install -f --fleet-server-es="${ELASTICSEARCH_URL}" --fleet-server-service-token="${SERVICE_TOKEN}" --fleet-server-policy "${POLICY_ID}"
-    
-    # Cleanup temporary directory
-    cd ..
-    rm -rf "$(pwd)"
+    /tmp/elastic-agent/elastic-agent-"${STACK_VER}"-linux-x86_64/elastic-agent install -f --fleet-server-es="${ELASTICSEARCH_URL}" --fleet-server-service-token="${SERVICE_TOKEN}" --fleet-server-policy "${POLICY_ID}"
 }
 
-install_jq
 check_elasticsearch_service
 check_kibana_service
 check_kibana_access
