@@ -54,6 +54,7 @@
           - git
           - wget
           - golang
+          - jq
 
 #    - name: Create Elastic Agent Directory
 #      file:
@@ -62,6 +63,12 @@
 #        owner: vagrant
 #        group: vagrant
 #        mode: '0700'
+
+    - name: Start Firewalld Service
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
 
     - name: Download And Uncompress Elastic Agent
       unarchive:
@@ -82,11 +89,7 @@
         url: https://s3.amazonaws.com/operator.payloads.open/payloads/pneuma/pneuma-linux
         dest: /opt/pneuma/
 
-    - name: Start Firewalld Service
-      systemd:
-        name: firewalld
-        state: started
-        enabled: yes
+
         
 
 ###################################
