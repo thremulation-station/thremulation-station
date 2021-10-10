@@ -4,10 +4,6 @@ $scripts_dir = "C:\vagrant\scripts"
 $vagrant_startup = "C:\Users\vagrant\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
 New-Item -Path $install_dir -Type directory | Out-Null
 
-# Download Pneuma for Windows
-
-Write-Output "Downloading Pneuma"
-Invoke-WebRequest -UseBasicParsing -Uri $OperatorAgentUrl -OutFile "$install_dir\pneuma-windows.exe"
 Write-Output "Copying Pneuma scripts"
 
 
