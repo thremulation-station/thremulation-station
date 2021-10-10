@@ -2,7 +2,6 @@ $OperatorAgentUrl = "https://s3.amazonaws.com/operator.payloads.open/payloads/pn
 $install_dir = "C:\Pneuma"
 $scripts_dir = "C:\vagrant\scripts"
 $vagrant_startup = "C:\Users\vagrant\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
-New-Item -Path $install_dir -Type directory | Out-Null
 
 Write-Output "Copying Pneuma scripts"
 
