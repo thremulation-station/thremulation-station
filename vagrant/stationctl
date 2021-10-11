@@ -83,9 +83,10 @@ main() {
     done
 }
 
-# Resuable Menu Headers
 
-tsmenusetup() {
+# Main deployment screen, ask for quick or custom
+setup() {
+    while true; do
         clear
         echo -e "${LIGHTPURPLE}      __________     ____    __               ${NC}";
         echo -e "${LIGHTPURPLE}     /_  __/ __/    / __/__ / /___ _____      ${NC}";
@@ -95,54 +96,6 @@ tsmenusetup() {
         echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
         echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
-}
-
-
-tsmenudeploy() {
-        clear
-        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
-        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
-        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
-        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
-        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
-        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
-        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
-        echo ""
-}
-
-
-
-
-tsmenustatus() {
-        clear
-        echo -e "${LIGHTPURPLE}      __________     ______       __          ${NC}";
-        echo -e "${LIGHTPURPLE}     /_  __/ __/    / __/ /____ _/ /___ _____ ${NC}";
-        echo -e "${LIGHTPURPLE}      / / _\ \     _\ \/ __/ _ \/ __/ // (_-< ${NC}";
-        echo -e "${LIGHTPURPLE}     /_/ /___/    /___/\__/\_,_/\__/\_,_/___/ ${NC}";
-        echo -e "${LIGHTPURPLE}                                              ${NC}";
-        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
-        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
-        echo ""
-}
-
-
-tsmenumanage() {
-        clear
-        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
-        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
-        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
-        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
-        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
-        echo -e "${LIGHTPURPLE}   (B)ack to Main or (E)xit                       ${NC}";
-        echo -e "${LIGHTPURPLE} ------------------------------------------------ ${NC}";
-        echo ""
-}
-
-# Main deployment screen, ask for quick or custom
-setup() {
-    while true; do
-        clear
-        tsmenusetup()
         echo "1. macOS..........: supported"
         echo "2. Windows 10.....: supported"
         echo "3. Linux (RHEL)...: supported"
@@ -163,7 +116,14 @@ setup() {
 setup_mac() {
     while true; do
         clear
-        tsmenusetup()
+        echo -e "${LIGHTPURPLE}      __________     ____    __               ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/    / __/__ / /___ _____      ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \     _\ \/ -_) __/ // / _ \     ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/    /___/\__/\__/\_,_/ .__/     ${NC}";
+        echo -e "${LIGHTPURPLE}                                  /_/         ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
         echo -e " You have chosen macOS as your host Operating System. \n This option will attempt to install the required\n packages listed below."
         echo ""
         echo -e "${ORANGE} Before you proceed, make sure you have the Brew\n package manager installed!! [https://brew.sh]${NC}"
@@ -222,7 +182,14 @@ vagrant plugin install \
 setup_windows() {
     while true; do
         clear
-        tsmenusetup()
+        echo -e "${LIGHTPURPLE}      __________     ____    __               ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/    / __/__ / /___ _____      ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \     _\ \/ -_) __/ // / _ \     ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/    /___/\__/\__/\_,_/ .__/     ${NC}";
+        echo -e "${LIGHTPURPLE}                                  /_/         ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
         echo -e " You have chosen Windows10 as your host Operating \n System. This option will attempt to install the\n required packages listed below. Note: Vagrant \n will required a restart when complete..."
         echo ""
         echo -e "${ORANGE} Make sure you have the Chocolatey package \n manager installed!! [https://chocolatey.org/]${NC}"
@@ -275,7 +242,14 @@ setup_windows_install() {
 setup_rhel() {
     while true; do
         clear
-        tsmenusetup()
+        echo -e "${LIGHTPURPLE}      __________     ____    __               ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/    / __/__ / /___ _____      ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \     _\ \/ -_) __/ // / _ \     ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/    /___/\__/\__/\_,_/ .__/     ${NC}";
+        echo -e "${LIGHTPURPLE}                                  /_/         ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
         echo -e " You have chosen a RHEL-based distro (preferrably \n Centos7) as your host Operating System. This option \n will attempt to install the required packages: "
         echo ""
         echo ""
@@ -401,7 +375,14 @@ fedora_install() {
 deploy() {
     while true; do
         clear
-        tsmenudeploy()
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
         echo "1. Quick Deployment....: deploy all target boxes"
         echo "2. Custom Deployment...: choose targets you want"
         echo "3. Staged Deployment...: download boxes you want"
@@ -422,7 +403,14 @@ deploy() {
 deploy_quick() {
     while true; do
         clear
-        tsmenudeploy()
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
         echo " You have chosen to Quick-Deploy all boxes."
         echo " This includes the following configuration:"
         echo ""
@@ -467,12 +455,19 @@ deploy_quick() {
 }
 
 
-# Custom deploy consists of elastomic box PLUS:
+# Custom deploy consists of elastic box PLUS:
 deploy_custom() {
     while true; do
         clear
-        tsmenudeploy()
-        echo "The Elastomic (control) box is required."
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
+        echo "The Elastic (control) box is required."
         echo "What TARGET boxes would you like to deploy?"
         echo ""
         read -rp "Deploy the Windows10 target? [Y/N]: " yn
@@ -484,7 +479,14 @@ deploy_custom() {
     done
     while true; do
         clear
-        tsmenudeploy()
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
         read -rp "Deploy the Centos7 target? [Y/N]: " yn
         case $yn in
             [Yy]* ) CENTOS="ts.centos7"; break;;
@@ -495,7 +497,14 @@ deploy_custom() {
     done
     while true; do
         clear
-        tsmenudeploy()
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
         echo ""
         echo "You have chosen the following Custom Deployment:"
         echo ""
@@ -524,8 +533,15 @@ deploy_custom() {
 deploy_staged() {
     while true; do
         clear
-        tsmenudeploy()
-        echo "  The Elastomic box is required and will be pulled."
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
+        echo "  The Elastic box is required and will be pulled."
         echo "  Select the TARGET boxes to include with it:"
         echo ""
         read -rp "  Pre-stage the Windows10 target? [Y/N]: " yn
@@ -537,7 +553,14 @@ deploy_staged() {
     done
     while true; do
         clear
-        tsmenudeploy()
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
         read -rp "  Pre-stage the Centos7 target? [Y/N]: " yn
         case $yn in
             [Yy]* ) CENTOS="ts.centos7"; break;;
@@ -548,7 +571,15 @@ deploy_staged() {
     done
     while true; do
         clear
-        tsmenudeploy()
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
+        echo ""
         echo "  You have chosen to Pre-stage the following boxes:"
         echo ""
         echo "  - CONTROL..: ${ELASTIC}"
@@ -565,7 +596,7 @@ deploy_staged() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 sleep 3
-                for machine in elastomic windows10 centos7
+                for machine in elastic windows10 centos7
                 do
                     vagrant box add -cf "thremulation-station/${machine}";
                 done
@@ -610,7 +641,15 @@ deploy_staged() {
 status() {
     while true; do
         clear
-        tsmenustatus()
+        echo -e "${LIGHTPURPLE}      __________     ______       __          ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/    / __/ /____ _/ /___ _____ ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \     _\ \/ __/ _ \/ __/ // (_-< ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/    /___/\__/\_,_/\__/\_,_/___/ ${NC}";
+        echo -e "${LIGHTPURPLE}                                              ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
+        echo ""
         echo "   Vagrant Box Status:"
         echo -e "   ${LIGHTPURPLE}------------------${NC}";
         echo ""
@@ -648,7 +687,7 @@ status() {
 }
 
 
-# Checks the elasticsearch index health that lives on the elastomic box
+# Checks the elasticsearch index health that lives on the elastic box
 status_indexes() {
     curl -X GET "192.168.33.10:9200/_cluster/health?pretty"
 }
@@ -675,7 +714,15 @@ delete_indexes() {
 manage() {
     while true; do
         clear
-        tsmenumanage()
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}   (B)ack to Main or (E)xit                       ${NC}";
+        echo -e "${LIGHTPURPLE} ------------------------------------------------ ${NC}";
+        echo ""
+        echo ""
         echo -e "${LIGHTPURPLE}             --- Maintenance ---${NC}"
         echo ""
         echo "1. List............:  list all current boxes"
@@ -868,7 +915,14 @@ manage() {
 resume() {
     while true; do
         clear
-        tsmenumanage()
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}   (B)ack to Main                                 ${NC}";
+        echo -e "${LIGHTPURPLE} ------------------------------------------------ ${NC}";
+        echo ""
         echo -e "${LIGHTPURPLE}             --- Resume ---${NC}"
         echo ""
         echo " Resume (A)ll ..............: resume all currently suspended VMs"
@@ -905,8 +959,15 @@ resume() {
 resume_custom() {
     while true; do
         clear
-        tsmenumanage()
-        echo " The Elastomic box is required."
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                               ${NC}";
+        echo -e "${LIGHTPURPLE} -------------------------------------------------${NC}";
+        echo ""
+        echo " The Elastic box is required."
         echo -e " Select the boxes you would like to turn back on along with it:"
         echo ""
         read -rp " Resume the Windows10 VM? [Y/N]: " yn
@@ -918,7 +979,14 @@ resume_custom() {
     done
     while true; do
         clear
-        tsmenumanage()
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                               ${NC}";
+        echo -e "${LIGHTPURPLE} -------------------------------------------------${NC}";
+        echo ""
         read -rp "Resume the Centos7 VM? [Y/N]: " yn
         case $yn in
             [Yy]* ) CENTOS="ts.centos7"; break;;
@@ -929,7 +997,15 @@ resume_custom() {
     done
     while true; do
         clear
-        tsmenumanage()
+        echo -e "${LIGHTPURPLE}    __________     __  ___                        ${NC}";
+        echo -e "${LIGHTPURPLE}   /_  __/ __/    /  |/  /__  ___  ___  ___  ___  ${NC}";
+        echo -e "${LIGHTPURPLE}    / / _\ \     / /|_/ / _ \/ _ \/ _ \/ _ \/ -_) ${NC}";
+        echo -e "${LIGHTPURPLE}   /_/ /___/    /_/  /_/\_,_/_//_/\_,_/\_, /\__/  ${NC}";
+        echo -e "${LIGHTPURPLE}                                      /___/       ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                               ${NC}";
+        echo -e "${LIGHTPURPLE} -------------------------------------------------${NC}";
+        echo ""
+        echo ""
         echo " You have chosen resume (turn back on) the following boxes:"
         echo ""
         echo "  - CONTROL..: "${ELASTIC}" (required)"
@@ -969,7 +1045,7 @@ fi
 snapshot() {
     echo ""
     echo ""
-    for machine in elastomic centos7 windows10
+    for machine in elastic centos7 windows10
     do
         vagrant snapshot save ts."${machine}" ts."${machine}"_initial;
     done
@@ -983,7 +1059,7 @@ snapshot_restore() {
     echo ""
     echo ""
     echo "Restoring Snapshot..."
-    for machine in elastomic centos7 windows10
+    for machine in elastic centos7 windows10
     do
         vagrant snapshot restore ts."${machine}" ts."${machine}"_initial
     done
@@ -997,7 +1073,7 @@ nuke_pave() {
     echo ""
     vagrant destroy -f "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
 
-    for machine in elastomic windows10 centos7
+    for machine in elastic windows10 centos7
     do
         vagrant box remove "thremulation-station/${machine}";
     done
