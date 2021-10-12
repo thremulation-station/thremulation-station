@@ -65,24 +65,24 @@
 # Cockpit
 ###################################
 
-    - name: Add Cockpit Firewall Rule
-      firewalld:
-        zone: public
-        port: 9090/tcp
-        permanent: yes
-        immediate: yes
-        state: enabled
+    # - name: Add Cockpit Firewall Rule
+    #   firewalld:
+    #     zone: public
+    #     port: 9090/tcp
+    #     permanent: yes
+    #     immediate: yes
+    #     state: enabled
 
-    - name: Install Cockpit
-      yum: 
-        name: cockpit
-        state: present
+    # - name: Install Cockpit
+    #   yum: 
+    #     name: cockpit
+    #     state: present
 
-    - name: Enable Cockpit Service
-      systemd: 
-        name: cockpit
-        state: started
-        enabled: yes
+    # - name: Enable Cockpit Service
+    #   systemd: 
+    #     name: cockpit
+    #     state: started
+    #     enabled: yes
 
 
 ###################################
@@ -121,13 +121,13 @@
         group: root
         mode: '0700'
 
-    - name: Stop Auditd Service
-      command: service auditd stop
+    # - name: Stop Auditd Service
+    #   command: service auditd stop
   
-    - name: Disable Auditd Service
-      systemd:
-        name: auditd
-        enabled: no
+    # - name: Disable Auditd Service
+    #   systemd:
+    #     name: auditd
+    #     enabled: no
 
 
 ###################################
@@ -240,27 +240,27 @@
 # Auditbeat
 ###################################
 
-    - name: Install Auditbeat
-      yum:
-        name: auditbeat
-        state: present
+    # - name: Install Auditbeat
+    #   yum:
+    #     name: auditbeat
+    #     state: present
 
-    - name: Copy Auditbeat Configuration
-      copy:
-        src: ./files/auditbeat.yml
-        dest: /etc/auditbeat/auditbeat.yml
-        owner: root
-        group: root
-        mode: '0600'
+    # - name: Copy Auditbeat Configuration
+    #   copy:
+    #     src: ./files/auditbeat.yml
+    #     dest: /etc/auditbeat/auditbeat.yml
+    #     owner: root
+    #     group: root
+    #     mode: '0600'
 
-    # - name: Run Auditbeat Setup
-    #   command: auditbeat setup --dashboards
+    # # - name: Run Auditbeat Setup
+    # #   command: auditbeat setup --dashboards
 
-    - name: Start & Enable Auditbeat
-      systemd:
-        name: auditbeat
-        state: started
-        enabled: yes
+    # - name: Start & Enable Auditbeat
+    #   systemd:
+    #     name: auditbeat
+    #     state: started
+    #     enabled: yes
 
 
 ###################################
