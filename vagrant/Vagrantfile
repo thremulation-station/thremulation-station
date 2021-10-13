@@ -88,7 +88,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "download-install-pneuma-linux", type: "shell", path: "./scripts/download-pneuma-linux.sh"
 
     # Setup Auditbeat
-    cfg.vm.provision "auditbeatsetup", type: "shell", path: "./scripts/setup-linux-beats.sh"
+    cfg.vm.provision "filebeatsetup", type: "shell", path: "./scripts/setup-linux-beats.sh"
     
     # Setup Disk so we have more room
     cfg.vm.provision "setdisk", type: "shell", path: "./scripts/setup-disk.sh"

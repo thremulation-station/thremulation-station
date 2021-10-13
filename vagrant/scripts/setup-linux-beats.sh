@@ -8,7 +8,6 @@ do
   if [ "${STATUS}" == "200" ]; then
     echo "Elasticsearch is up. Proceeding"
     sudo filebeat setup;
-    sudo auditbeat setup --dashboards;
     echo "Setup script complete!";
     break
   else
