@@ -44,6 +44,7 @@
           - firefox-esr
           - gedit
           - terminator
+          - dos2unix
 
     - name: Prep to start services
       command: systemctl daemon-reload
