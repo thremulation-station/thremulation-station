@@ -22,6 +22,10 @@ cp /vagrant/scripts/bootstrap_operator.sh $VAGRANT_HOME/Desktop
 chown vagrant: $VAGRANT_HOME/Desktop/bootstrap_operator.sh
 chmod +x $VAGRANT_HOME/Desktop/bootstrap_operator.sh
 
+# Additionally run dos2unix in case of converstion issues.
+# https://stackoverflow.com/questions/33272542/bash-invalid-option-when-run-in-bash-script-fine-on-console
+dos2unix $VAGRANT_HOME/Desktop/bootstrap_operator.sh
+
 
 ## Idea for a service. Needs some love and attention. 
 #echo "[Unit]
