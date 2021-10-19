@@ -105,6 +105,12 @@
 
 ####################################
 # Operator 
+
+    - name: Download Operator
+      get_url:
+        url: https://download.prelude.org/latest?platform=linux&variant=appImage
+        dest: /home/vagrant/Desktop/
+
     - name: Add Operator TCP Firewall Rule
       ufw:
          rule: allow
