@@ -5,7 +5,7 @@ do
 	if [ -f "$OPERATOR_SETTINGS" ]; then
     notify-send "Killing Operator temporarily so it will accept connections from the range.."
     sleep 5
-	  sed -i 's/127.0.0.1/192.168.58.13/g' $OPERATOR_SETTINGS
+	  sed -i 's/127.0.0.1/192.168.56.13/g' $OPERATOR_SETTINGS
     ps --no-headers axk comm o pid,args | awk '$2 ~ "/tmp/"{print $1}' | xargs kill
     notify-send "Operator killed after applying new settings! Starting again.."
     sleep 5

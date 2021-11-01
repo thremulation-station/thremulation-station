@@ -1,5 +1,5 @@
 # First we create the request.
-$HTTP_Request = [System.Net.WebRequest]::Create('http://192.168.58.10:9200')
+$HTTP_Request = [System.Net.WebRequest]::Create('http://192.168.56.10:9200')
 
 # We then get a response from the site.
 $HTTP_Response = $HTTP_Request.GetResponse()

@@ -18,7 +18,7 @@ echo "[Unit]
 Description=Pneuma-Agent
 
 [Service]
-ExecStart=/opt/pneuma/pneuma-agent -address "192.168.58.13:2323" -contact "tcp" -name "pneuma-centos7" -range "thremulation"
+ExecStart=/opt/pneuma/pneuma-agent -address "192.168.56.13:2323" -contact "tcp" -name "pneuma-centos7" -range "thremulation"
 Restart=on-failure
 StartLimitInterval=600
 RestartSec=15

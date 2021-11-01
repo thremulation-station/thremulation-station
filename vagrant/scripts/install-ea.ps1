@@ -10,9 +10,9 @@ $headers = @{
   "Authorization" = $basicAuthHeader;
   "kbn-xsrf"      = "reporting"
 }
-$kibana_url = "http://192.168.58.10:5601"
-$elasticsearch_url = "http://192.168.58.10:9200"
-$fleet_server_url = "https://192.168.58.10:8220"
+$kibana_url = "http://192.168.56.10:5601"
+$elasticsearch_url = "http://192.168.56.10:9200"
+$fleet_server_url = "https://192.168.56.10:8220"
 
 # Retrieve Stack Version
 Invoke-WebRequest -UseBasicParsing -Uri $elasticsearch_url -OutFile version.json
