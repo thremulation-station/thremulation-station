@@ -44,8 +44,8 @@ dev-windows10        (virtualbox, 0)
 ```
 
 
-### run devbox-testing vagrant file
+<!-- ### run devbox-testing vagrant file
 
-working dir: `thremulation-station/devbox-testing`  
+working dir: `thremulation-station/devbox-testing`   -->
 
 - spin range using local dev-boxes: `vagrant up`
