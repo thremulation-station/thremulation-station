@@ -21,21 +21,27 @@ esac
 # define variables
 ###############################################################################
 
-# boxes
+
+############ box sources - dev or production
+
 ELASTIC="ts.elastic"
 WINDOWS="ts.windows10"
 CENTOS="ts.centos7"
+REDOPS="ts.redops"
+
+
+############ dependency installs
 
 RHELFAM=""
 
 
-# host stats
+############ host stats in banner
 CPU=""
 MEM=""
 DISK=""
 
 
-# colors
+############ coloring
 
 ORANGE='\033[0;33m'
 LIGHTRED='\033[1;31m'
@@ -98,7 +104,7 @@ setup() {
         echo ""
         echo "1. macOS..........: supported"
         echo "2. Windows 10.....: supported"
-        echo "3. Linux (RHEL)...: supported"
+        echo "3. Linux (RHEL)...: experimental"
         echo ""
         read -rp " Select your Host Operating System: " yn
         case $yn in
@@ -414,11 +420,13 @@ deploy_quick() {
         echo " You have chosen to Quick-Deploy all boxes."
         echo " This includes the following configuration:"
         echo ""
-        echo "    Elastic...:  EMULATE and DETECT"
+        echo "    Elastic.....:  EMULATE and DETECT"
         echo ""
         echo "    Windows 10..:  Windows target box"
         echo ""
         echo "    CentOS 7....:  Linux target box"
+        echo ""
+        echo "    Redops......:  Linux adversary box"
         echo ""
         echo ""
         read -rp " Proceed to deploy this configuration? [Y/N]: " yn
@@ -430,7 +438,7 @@ deploy_quick() {
                 echo -e " ${LIGHTPURPLE}---------------------------------------------${NC}";
                 echo "";
                 echo "";
-                vagrant up "${ELASTIC}" "${WINDOWS}" "${CENTOS}"; sleep 5;
+                vagrant up "${ELASTIC}" "${WINDOWS}" "${CENTOS}" "${REDOPS}"; sleep 5;
                 echo "";
                 echo "";
                 echo "";
@@ -505,17 +513,36 @@ deploy_custom() {
         echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
         echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
+        read -rp "Deploy the Redops (redteam) adversary box? [Y/N]: " yn
+        case $yn in
+            [Yy]* ) REDOPS="ts.redops"; break;;
+            [Nn]* ) REDOPS=""; break;;
+            [Bb]* ) clear; deploy; break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+        esac
+    done
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
-        echo "You have chosen the following Custom Deployment:"
         echo ""
-        echo "- CONTROL..: "${ELASTIC}" (required)"
-        echo "- target...: "${WINDOWS}""
-        echo "- target...: "${CENTOS}""
+        echo " You have chosen the following Custom Deployment:"
+        echo ""
+        echo " - CONTROL..: "${ELASTIC}" (required)"
+        echo " - target...: "${WINDOWS}""
+        echo " - target...: "${CENTOS}""
+        echo " - redops...: "${REDOPS}""
         echo ""
         read -rp "Confirm to proceed with deployment [Y/N]: " yn
         case $yn in
             [Yy]* )
-                vagrant up "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
+                vagrant up "${ELASTIC}" "${WINDOWS}" "${CENTOS}" "${REDOPS}";
                 sleep 10;
                 snapshot;
                 break;;
@@ -566,7 +593,25 @@ deploy_staged() {
             [Yy]* ) CENTOS="ts.centos7"; break;;
             [Nn]* ) CENTOS=""; break;;
             [Bb]* ) clear; deploy; break;;
-            * ) echo "Selection invalid, try again.";;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
+        esac
+    done
+    while true; do
+        clear
+        echo -e "${LIGHTPURPLE}      __________  ___           __            ${NC}";
+        echo -e "${LIGHTPURPLE}     /_  __/ __/ / _ \___ ___  / /__  __ __   ${NC}";
+        echo -e "${LIGHTPURPLE}      / / _\ \  / // / -_) _ \/ / _ \/ // /   ${NC}";
+        echo -e "${LIGHTPURPLE}     /_/ /___/ /____/\__/ .__/_/\___/\_, /    ${NC}";
+        echo -e "${LIGHTPURPLE}                       /_/          /___/     ${NC}";
+        echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
+        echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
+        echo ""
+        read -rp "  Pre-stage the Redops (redteam) adversary box? [Y/N]: " yn
+        case $yn in
+            [Yy]* ) REDOPS="ts.redops"; break;;
+            [Nn]* ) REDOPS=""; break;;
+            [Bb]* ) clear; deploy; break;;
+            * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
         esac
     done
     while true; do
@@ -585,6 +630,7 @@ deploy_staged() {
         echo "  - CONTROL..: ${ELASTIC}"
         echo "  - target...: ${WINDOWS}"
         echo "  - target...: ${CENTOS}"
+        echo "  - redops...: "${REDOPS}""
         echo ""
         read -rp "  Confirm to proceed with pulling the above [Y/N]: " yn
         case $yn in
@@ -653,7 +699,7 @@ status() {
         echo "   Vagrant Box Status:"
         echo -e "   ${LIGHTPURPLE}------------------${NC}";
         echo ""
-        vagrant status "${ELASTIC}" "${WINDOWS}" "${CENTOS}"; sleep 2;
+        vagrant status "${ELASTIC}" "${WINDOWS}" "${CENTOS}" "${REDOPS}"; sleep 2;
         echo ""
         echo ""
         echo "   Elasticsearch Cluster Status:"
@@ -772,7 +818,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant suspend "${ELASTIC}" "${WINDOWS}" "${CENTOS}"; # Added names because on windows leaving this blank does not work
+                vagrant suspend "${ELASTIC}" "${WINDOWS}" "${CENTOS}" "${REDOPS}"; # Added names because on windows leaving this blank does not work
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -808,7 +854,7 @@ manage() {
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                vagrant reload --no-provision "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
+                vagrant reload --no-provision "${ELASTIC}" "${WINDOWS}" "${CENTOS}" "${REDOPS}";
                 echo ""
                 echo ""
                 read -rp " (B)ack or (M)ain Menu: " yn
@@ -876,7 +922,7 @@ manage() {
                 sleep 5;
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
-                vagrant destroy -f "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
+                vagrant destroy -f "${ELASTIC}" "${WINDOWS}" "${CENTOS}" "${REDOPS}";
                 echo "";
                 echo "";
                 echo "  All VMs deleted! Returning to Menu";
@@ -938,7 +984,7 @@ resume() {
                 echo ""
                 echo ""
                 sleep 3;
-                vagrant resume  --no-provision "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
+                vagrant resume  --no-provision "${ELASTIC}" "${WINDOWS}" "${CENTOS}" "${REDOPS}";
                 sleep 1;
                 echo ""
                 echo ""
@@ -1011,11 +1057,12 @@ resume_custom() {
         echo "  - CONTROL..: "${ELASTIC}" (required)"
         echo "  - target...: "${WINDOWS}""
         echo "  - target...: "${CENTOS}""
+        echo "  - redops...: "${REDOPS}""
         echo ""
         read -rp " Confirm to proceed. [Y/N]: " yn
         case $yn in
             [Yy]* )
-                vagrant resume --no-provision "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
+                vagrant resume --no-provision "${ELASTIC}" "${WINDOWS}" "${CENTOS}" "${REDOPS}";
                 sleep 10;
                 break;;
             [Nn]* ) manage; break;;
@@ -1071,7 +1118,7 @@ nuke_pave() {
     echo ""
     echo -e "         ${LIGHTRED}Destruction Commencing...${NC}"
     echo ""
-    vagrant destroy -f "${ELASTIC}" "${WINDOWS}" "${CENTOS}";
+    vagrant destroy -f "${ELASTIC}" "${WINDOWS}" "${CENTOS}" "${REDOPS}";
 
     for machine in elastic windows10 centos7
     do
