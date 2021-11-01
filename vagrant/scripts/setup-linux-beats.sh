@@ -4,7 +4,7 @@
 echo "This part takes about 2 minutes, please let it complete."
 while true
 do
-  STATUS=$(curl -I http://192.168.33.10:9200 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+  STATUS=$(curl -I http://192.168.58.10:9200 2>/dev/null | head -n 1 | cut -d$' ' -f2)
   if [ "${STATUS}" == "200" ]; then
     echo "Elasticsearch is up. Proceeding"
     sudo filebeat setup;

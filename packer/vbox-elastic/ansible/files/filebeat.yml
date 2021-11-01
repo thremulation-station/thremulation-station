@@ -18,11 +18,11 @@ filebeat.inputs:
 
   
 output.elasticsearch:  
-  hosts: ["192.168.33.10:9200"]
+  hosts: ["192.168.58.10:9200"]
 
 
 setup.kibana:  
-  host: "192.168.33.10:5601"  
+  host: "192.168.58.10:5601"  
   username: vagrant  
   password: vagrant
   setup.dashboards.enabled: true

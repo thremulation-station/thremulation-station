@@ -689,24 +689,24 @@ status() {
 
 # Checks the elasticsearch index health that lives on the elastic box
 status_indexes() {
-    curl -X GET "192.168.33.10:9200/_cluster/health?pretty"
+    curl -X GET "192.168.58.10:9200/_cluster/health?pretty"
 }
 
 
 # Checks that Kibana is reachable
 status_kibana() {
-    curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://192.168.33.10:5601/api/status
+    curl -s -o /dev/null -w "%{http_code}" -kIu vagrant:vagrant http://192.168.58.10:5601/api/status
 }
 
 
 # Curl the Elasticsearch API to dump the index, not the index pattern
 # Resetting that would be a pain to do over and over and over...
 delete_indexes() {
-    curl -X GET "192.168.33.10:9200/_cat/indices"
-    curl -X DELETE "192.168.33.10:9200/logs-*"
-    curl -X DELETE "192.168.33.10:9200/winlogbeat-*"
-    curl -X DELETE "192.168.33.10:9200/filebeat-*"
-    curl -X DELETE "192.168.33.10:9200/_data_stream/*"
+    curl -X GET "192.168.58.10:9200/_cat/indices"
+    curl -X DELETE "192.168.58.10:9200/logs-*"
+    curl -X DELETE "192.168.58.10:9200/winlogbeat-*"
+    curl -X DELETE "192.168.58.10:9200/filebeat-*"
+    curl -X DELETE "192.168.58.10:9200/_data_stream/*"
 }
 
 
