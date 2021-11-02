@@ -1130,7 +1130,7 @@ fi
 snapshot() {
     echo ""
     echo ""
-    for machine in elastic centos7 windows10
+    for machine in elastic centos7 windows10 redops
     do
         vagrant snapshot save ts."${machine}" ts."${machine}"_initial;
     done
@@ -1144,7 +1144,7 @@ snapshot_restore() {
     echo ""
     echo ""
     echo "Restoring Snapshot..."
-    for machine in elastic centos7 windows10
+    for machine in elastic centos7 windows10 redops
     do
         vagrant snapshot restore ts."${machine}" ts."${machine}"_initial
     done
@@ -1158,7 +1158,7 @@ nuke_pave() {
     echo ""
     vagrant destroy -f "${ELASTIC}" "${WINDOWS}" "${CENTOS}" "${REDOPS}";
 
-    for machine in elastic windows10 centos7
+    for machine in elastic windows10 centos7 redops
     do
         vagrant box remove "thremulation-station/${machine}";
     done
