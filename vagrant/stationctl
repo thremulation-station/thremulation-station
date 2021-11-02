@@ -915,16 +915,12 @@ manage() {
                 echo ""
                 echo ""
                 echo ""
-                echo " Alerts cleared!";
+                echo " Alerts cleared! Going back to the main menu.";
                 echo -e "  ${LIGHTPURPLE}-----------------------------------${NC}";
                 echo ""
                 echo ""
-                read -rp "  (B)ack or (M)ain Menu: " yn
-                case $yn in
-                    [Bb]* ) manage; break;;
-                    [Mm]* ) main; break;;
-                    * ) echo -e "\n${RED} Selection invalid, try again:${NC} "; sleep 2;;
-                esac
+                sleep 5;
+                main;
                 break;;
             [8]* )
                 echo ""
