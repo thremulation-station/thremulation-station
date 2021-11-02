@@ -1,7 +1,7 @@
 Vagrant.configure("2") do |config|
 
   config.vm.define "ts.elastic", primary: true do |cfg|
-    cfg.vm.box = "thremulation-station/dev-elastic"
+    cfg.vm.box = "dev-elastic"
     #cfg.vm.box_version = "0.9.30"
     cfg.vm.hostname = "elastic"
     cfg.disksize.size = "256GB"
@@ -46,7 +46,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "ts.windows10" do |cfg|
-    cfg.vm.box = "thremulation-station/dev-windows10"
+    cfg.vm.box = "dev-windows10-variable"
     #cfg.vm.box_version = "0.9.30"
     cfg.vm.hostname = "windows10"
     #cfg.vbguest.auto_update = true
@@ -62,14 +62,30 @@ Vagrant.configure("2") do |config|
       vb.cpus = 2
     end
 
+    cfg.vm.provision "invoke-secure-channel", type: "shell", path: "./scripts/fix-invokeweb-secure-channel.ps1"
+    #cfg.vm.provision "exprfix", type: "shell", path: "./scripts/install-guest-tools.ps1",
+    #cfg.vm.provision "exprfix", type: "shell", path:"./scripts/enable-rdp.ps1",
+    #cfg.vm.provision "exprfix", type: "shell", path: "./scripts/disable-hibernate.ps1",
+    #cfg.vm.provision "exprfix", type: "shell", path:"./scripts/disable-autologin.ps1",
+    #cfg.vm.provision "exprfix", type: "shell", path:"./scripts/disable-uac.ps1",
+    #cfg.vm.provision "exprfix", type: "shell", path:"./scripts/no-expiration.ps1",
+    cfg.vm.provision "openjdk", type: "shell", path: "./scripts/install-openjdk.ps1"
+    cfg.vm.provision "choco", type: "shell", path: "./scripts/install-choco.ps1"
+    cfg.vm.provision "sysmon", type: "shell", path: "./scripts/install-sysmon.ps1"
+    #cfg.vm.provision "exprfix", type: "shell", path:"./scripts/install-pwshssh.ps1",
+    #cfg.vm.provision "exprfix", type: "shell", path: "./scripts/install-advaudit.ps1"
+    #cfg.vm.provision "exprfix", type: "shell", path: "./scripts/disable-windef.ps1",
+    cfg.vm.provision "install-shutup10", type: "shell", path: "./scripts/install-shutup10.ps1"
+    cfg.vm.provision "shutup10-config", type: "shell", path: "./scripts/install-shutup10config.ps1"
+    cfg.vm.provision "making-w10-great", type: "shell", path: "./scripts/cleanout.ps1"
+    cfg.vm.provision "debloat", type: "shell", path: "./scripts/debloater.ps1"
     cfg.vm.provision "exprfix", type: "shell", path: "./scripts/fix-windows-expiration.ps1"
-    cfg.vm.provision "shutup10", type: "shell", path: "./scripts/install-shutup10config.ps1"
-    cfg.vm.provision "installea", type: "shell", path: "./scripts/install-ea.ps1"
-    cfg.vm.provision "download-install-pneuma-windows", type: "shell", path: "./scripts/download-pneuma-windows.ps1"
+    #cfg.vm.provision "installea", type: "shell", path: "./scripts/install-ea.ps1"
+    #cfg.vm.provision "download-install-pneuma-windows", type: "shell", path: "./scripts/download-pneuma-windows.ps1"
   end
 
   config.vm.define "ts.centos7" do |cfg|
-    cfg.vm.box = "thremulation-station/dev-centos7"
+    cfg.vm.box = "dev-centos"
     #cfg.vm.box_version = "0.9.30"
     cfg.vm.hostname = "centos7"
     #cfg.vbguest.auto_update = true
@@ -103,12 +119,12 @@ Vagrant.configure("2") do |config|
     end
 
     # Setup Disk so we have more room
-    cfg.vm.provision "setdisk", type: "shell", path: "./scripts/setup-disk.sh"
+    #cfg.vm.provision "setdisk", type: "shell", path: "./scripts/setup-disk.sh"
 
   end
 
   config.vm.define "ts.redops" do |cfg|
-    cfg.vm.box = "debian-redops-box"
+    cfg.vm.box = "geerlingguy/debian10"
     #cfg.vm.box_version = "0.9.30"
     cfg.vm.hostname = "debian-redops"
     #cfg.vbguest.auto_update = true
