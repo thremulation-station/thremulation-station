@@ -43,7 +43,7 @@ function check_kibana_access() {
     sleep 120
     while true
     do
-      STATUS=$(curl -I http://192.168.33.10:5601/login 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+      STATUS=$(curl -I http://192.168.56.10:5601/login 2>/dev/null | head -n 1 | cut -d$' ' -f2)
       if [ "${STATUS}" == "200" ]; then
         echo "Kibana is up. Proceeding"
         break

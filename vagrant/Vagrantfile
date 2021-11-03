@@ -1,13 +1,11 @@
 Vagrant.configure("2") do |config|
 
   config.vm.define "ts.elastic", primary: true do |cfg|
-    cfg.vm.box = "thremulation-station/dev-elastic"
-    #cfg.vm.box_version = "0.9.30"
+    cfg.vm.box = "dev-elastic"
     cfg.vm.hostname = "elastic"
     cfg.disksize.size = "256GB"
-    #cfg.vbguest.auto_update = true
     cfg.vm.synced_folder '.', '/vagrant', disabled: true
-    cfg.vm.network "private_network", ip: "192.168.33.10", auto_config: true
+    cfg.vm.network "private_network", ip: "192.168.56.10", auto_config: true
     cfg.vm.network "forwarded_port", guest: 5601, host: 5601
     cfg.vm.network "forwarded_port", guest: 9200, host: 9200
     cfg.vm.provider :virtualbox do |vb|
@@ -18,39 +16,38 @@ Vagrant.configure("2") do |config|
     end
 
     # Setup Disk so we have more room to put elastic stack
-    cfg.vm.provision "setdisk", type: "shell", path: "./scripts/setup-disk.sh"
+    cfg.vm.provision "setdisk", type: "shell", path: "../vagrant/scripts/setup-disk.sh"
     
     # Setup Fleet server
     cfg.vm.provision "shell" do |s|
-      s.path = "./scripts/install-fleet-server.sh"
+      s.path = "../vagrant/scripts/install-fleet-server.sh"
       s.env = {
           "ELASTIC_STACK_VERSION" => "7.14.0",
-          "KIBANA_URL" => "http://192.168.33.10:5601",
+          "KIBANA_URL" => "http://192.168.56.10:5601",
           "KIBANA_AUTH" => "vagrant:vagrant",
-          "ELASTICSEARCH_URL" => "http://192.168.33.10:9200"
+          "ELASTICSEARCH_URL" => "http://192.168.56.10:9200"
       }
     end
 
-
     # Setup the Elastic Stack
     cfg.vm.provision "shell" do |s2|
-      s2.path = "./scripts/setup-elastic.sh"
+      s2.path = "../vagrant/scripts/setup-elastic.sh"
       s2.env = {
         "ELASTIC_STACK_VERSION" => "7.14.0",
-        "KIBANA_URL" => "http://192.168.33.10:5601",
+        "KIBANA_URL" => "http://192.168.56.10:5601",
         "KIBANA_AUTH" => "vagrant:vagrant",
-        "ELASTICSEARCH_URL" => "http://192.168.33.10:9200",
-        "FLEET_SERVER_URL" => "https://192.168.33.10:8220"
+        "ELASTICSEARCH_URL" => "http://192.168.56.10:9200",
+        "FLEET_SERVER_URL" => "https://192.168.56.10:8220"
       }
     end
   end
 
+
+
   config.vm.define "ts.windows10" do |cfg|
-    cfg.vm.box = "thremulation-station/dev-windows10"
-    #cfg.vm.box_version = "0.9.30"
+    cfg.vm.box = "dev-windows10"
     cfg.vm.hostname = "windows10"
-    #cfg.vbguest.auto_update = true
-    cfg.vm.network "private_network", ip: "192.168.33.11", auto_config: true
+    cfg.vm.network "private_network", ip: "192.168.56.11", auto_config: true
 
     config.vm.network "forwarded_port", guest: 3389, host: 33389, auto_correct: true
     cfg.vm.guest = "windows"
@@ -62,21 +59,20 @@ Vagrant.configure("2") do |config|
       vb.cpus = 2
     end
 
-    cfg.vm.provision "exprfix", type: "shell", path: "./scripts/fix-windows-expiration.ps1"
-    cfg.vm.provision "shutup10", type: "shell", path: "./scripts/install-shutup10config.ps1"
-    cfg.vm.provision "installea", type: "shell", path: "./scripts/install-ea.ps1"
-    cfg.vm.provision "download-install-pneuma-windows", type: "shell", path: "./scripts/download-pneuma-windows.ps1"
+    cfg.vm.provision "exprfix", type: "shell", path: "../vagrant/scripts/fix-windows-expiration.ps1"
+    cfg.vm.provision "shutup10", type: "shell", path: "../vagrant/scripts/install-shutup10config.ps1"
+    cfg.vm.provision "installea", type: "shell", path: "../vagrant/scripts/install-ea.ps1"
+    cfg.vm.provision "download-install-pneuma-windows", type: "shell", path: "../vagrant/scripts/download-pneuma-windows.ps1"
   end
 
+
+
   config.vm.define "ts.centos7" do |cfg|
-    cfg.vm.box = "thremulation-station/dev-centos7"
-    #cfg.vm.box_version = "0.9.30"
+    cfg.vm.box = "dev-centos7"
     cfg.vm.hostname = "centos7"
-    #cfg.vbguest.auto_update = true
     cfg.vm.synced_folder '.', '/vagrant', disabled: true
-    cfg.vm.network "private_network", ip: "192.168.33.12", auto_config: true
+    cfg.vm.network "private_network", ip: "192.168.56.12", auto_config: true
     cfg.vm.network "forwarded_port", guest: 80, host: 8080
-    cfg.vm.network "forwarded_port", guest: 9090, host: 9090
     cfg.vm.provider :virtualbox do |vb|
       vb.name = "ts.centos7"
       vb.memory = 1024
@@ -85,35 +81,35 @@ Vagrant.configure("2") do |config|
     end
 
     # Setup Pneuma agent and service
-    cfg.vm.provision "download-install-pneuma-linux", type: "shell", path: "./scripts/download-pneuma-linux.sh"
+    cfg.vm.provision "download-install-pneuma-linux", type: "shell", path: "../vagrant/scripts/download-pneuma-linux.sh"
 
     # Setup Auditbeat
-    cfg.vm.provision "filebeatsetup", type: "shell", path: "./scripts/setup-linux-beats.sh"
+    cfg.vm.provision "filebeatsetup", type: "shell", path: "../vagrant/scripts/setup-linux-beats.sh"
 
     # Install and Enroll Elastic Agent
     cfg.vm.provision "shell" do |s|
-      s.path = "./scripts/install-ea-linux.sh"
+      s.path = "../vagrant/scripts/install-ea-linux.sh"
       s.env = {
         "ELASTIC_STACK_VERSION" => "7.14.0",
-        "KIBANA_URL" => "http://192.168.33.10:5601",
+        "KIBANA_URL" => "http://192.168.56.10:5601",
         "KIBANA_AUTH" => "vagrant:vagrant",
-        "ELASTICSEARCH_URL" => "http://192.168.33.10:9200",
-        "FLEET_SERVER_URL" => "https://192.168.33.10:8220"
+        "ELASTICSEARCH_URL" => "http://192.168.56.10:9200",
+        "FLEET_SERVER_URL" => "https://192.168.56.10:8220"
       }
     end
 
     # Setup Disk so we have more room
-    cfg.vm.provision "setdisk", type: "shell", path: "./scripts/setup-disk.sh"
+    #cfg.vm.provision "setdisk", type: "shell", path: "../vagrant/scripts/setup-disk.sh"
 
   end
 
+
+
   config.vm.define "ts.redops" do |cfg|
-    cfg.vm.box = "debian-redops-box"
-    #cfg.vm.box_version = "0.9.30"
-    cfg.vm.hostname = "debian-redops"
-    #cfg.vbguest.auto_update = true
+    cfg.vm.box = "dev-debian11-red"
+    cfg.vm.hostname = "redops"
     cfg.vm.synced_folder ".", "/vagrant", type: "rsync"
-    cfg.vm.network "private_network", ip: "192.168.33.13", auto_config: true
+    cfg.vm.network "private_network", ip: "192.168.56.13", auto_config: true
     cfg.vm.network "forwarded_port", guest: 3389, host: 43389
     cfg.vm.provider :virtualbox do |vb|
       vb.name = "ts.redops"
@@ -122,6 +118,6 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
     end
     # Install Operator
-    cfg.vm.provision "install-operator", type: "shell", path: "./scripts/install-operator.sh"
+    cfg.vm.provision "install-operator", type: "shell", path: "../vagrant/scripts/install-operator.sh"
   end
 end

@@ -226,7 +226,7 @@
 
     # - name: Create Detection Engine Index
     #   uri:
-    #     url: http://192.168.33.10:5601/api/detection_engine/index
+    #     url: http://192.168.56.10:5601/api/detection_engine/index
     #     method: POST
     #     status_code: 200
     #     user: "{{ vagrant.user }}"
@@ -236,7 +236,7 @@
 
     # - name: Put Prepackaged Rules
     #   uri:
-    #     url: http://192.168.33.10:5601/api/detection_engine/rules/prepackaged
+    #     url: http://192.168.56.10:5601/api/detection_engine/rules/prepackaged
     #     method: PUT
     #     body_format: json
     #     body: >
