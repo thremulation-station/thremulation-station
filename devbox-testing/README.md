@@ -12,8 +12,8 @@ WIP!
         - vagrant plugin install winrm
         - vagrant plugin install winrm-fs
 - jump into `devbox-testing` dir
-- download all .box files from the latest commit folder on webserver @ 100.103.49.86
-    - curl -LO http://<WGIP>/35a1cbd/boxes.tar.gz ./boxes
+- download all .box files from the latest commit folder on webserver @ tailscaleip
+    - `curl -LO http://<WGIP>/35a1cbd/boxes.tar.gz ./boxes`
 
 
 ### extract and delete tar
