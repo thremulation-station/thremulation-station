@@ -1,4 +1,4 @@
-OPERATOR_URL="https://download.prelude.org/latest?platform=linux&variant=appImage"
+OPERATOR_URL="https://download.prelude.org/latest?arch=x64&platform=linux&variant=appImage"
 VAGRANT_HOME="/home/vagrant"
 PLUGIN_DIR="/home/vagrant/.config/Operator/login.prelude.org/plugins"
 
