@@ -1,5 +1,6 @@
-OPERATOR_URL="https://download.prelude.org/latest?platform=linux&variant=appImage"
+OPERATOR_URL="https://download.prelude.org/latest?arch=x64&platform=linux&variant=appImage"
 VAGRANT_HOME="/home/vagrant"
+PLUGIN_DIR="/home/vagrant/.config/Operator/login.prelude.org/plugins"
 
 # Stage and download and install Operator
 
@@ -13,34 +14,10 @@ mv operator.appImage Operator.appImage
 chmod +x Operator.appImage && chown vagrant: Operator.appImage
 
 
-# Dropping bootstrap script
+# Installing custom plugin
 
-echo "Setting up first boot for Operator"
-#mkdir /opt/operator
-#chown vagrant: /opt/operator
-cp /vagrant/scripts/bootstrap_operator.sh $VAGRANT_HOME/Desktop
-chown vagrant: $VAGRANT_HOME/Desktop/bootstrap_operator.sh
-chmod +x $VAGRANT_HOME/Desktop/bootstrap_operator.sh
-
-# Additionally run dos2unix in case of converstion issues.
-# https://stackoverflow.com/questions/33272542/bash-invalid-option-when-run-in-bash-script-fine-on-console
-dos2unix $VAGRANT_HOME/Desktop/bootstrap_operator.sh
-
-
-## Idea for a service. Needs some love and attention. 
-#echo "[Unit]
-#Description=Bootstrap-Operator
-#[Service]
-#ExecStart=/opt/operator/bootstrap_operator.sh
-#Restart=on-failure
-#StartLimitInterval=600
-#RestartSec=15
-#StartLimitBurst=16
-#[Install]
-#WantedBy=multi-user.target" > bootstrap-operator.service
-#cp bootstrap-operator.service /etc/systemd/system
-
-#bash /opt/operator/bootstrap_operator.sh
-
-# For when Operator gets support for Debian directly
-#dpkg -i operator.deb
+echo "Installing custom plugin for Operator"
+mkdir -p $VAGRANT_HOME/.config/Operator/login.prelude.org/plugins/ServerChange
+chown -R vagrant: $VAGRANT_HOME/.config/Operator/
+cp /vagrant/resources/{config.yml,ServerChange.html} $PLUGIN_DIR/ServerChange
+chmod +x $PLUGIN_DIR/ServerChange/ServerChange.html
