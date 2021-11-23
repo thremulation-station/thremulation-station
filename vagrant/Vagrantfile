@@ -1,7 +1,8 @@
 Vagrant.configure("2") do |config|
 
   config.vm.define "ts.elastic", primary: true do |cfg|
-    cfg.vm.box = "dev-elastic"
+    cfg.vm.box = "thremulation-station/elastic"
+    cfg.vm.box_version = "0.9.30"
     cfg.vm.hostname = "elastic"
     cfg.disksize.size = "256GB"
     cfg.vm.synced_folder '.', '/vagrant', disabled: true
@@ -45,7 +46,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "ts.windows10" do |cfg|
-    cfg.vm.box = "dev-windows10"
+    cfg.vm.box = "thremulation-station/windows10"
+    cfg.vm.box_version = "0.9.30"
     cfg.vm.hostname = "windows10"
     cfg.vm.network "private_network", ip: "192.168.56.11", auto_config: true
 
@@ -68,7 +70,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "ts.centos7" do |cfg|
-    cfg.vm.box = "dev-centos7"
+    cfg.vm.box = "thremulation-station/centos7"
+    cfg.vm.box_version = "0.9.30"
     cfg.vm.hostname = "centos7"
     cfg.vm.synced_folder '.', '/vagrant', disabled: true
     cfg.vm.network "private_network", ip: "192.168.56.12", auto_config: true
@@ -106,7 +109,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "ts.redops" do |cfg|
-    cfg.vm.box = "dev-debian11-red"
+    cfg.vm.box = "thremulation-station/redops"
+    cfg.vm.box_version = "0.9.30"
     cfg.vm.hostname = "redops"
     cfg.vm.synced_folder ".", "/vagrant", type: "rsync"
     cfg.vm.network "private_network", ip: "192.168.56.13", auto_config: true
