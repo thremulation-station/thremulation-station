@@ -1,15 +1,18 @@
 #!/bin/bash -eu
 
 set -o pipefail
-sudo yum install -y cloud-utils-growpart
+sudo apt-get install -y cloud-init cloud-utils cloud-initramfs-growroot parted
 the_root_device='/dev/sda'
-the_dynamic_partition='2'
+the_dynamic_partition='5'
 the_dynamic_partition_path="${the_root_device}${the_dynamic_partition}"
-the_root_vgname='centos'
+the_root_vgname='debian11'
 the_root_lvname='root'
 the_root_lvpath="/dev/${the_root_vgname}/${the_root_lvname}"
 
 # Grow the partition table
+# For some reason have to grow sda2 before I can grow the correct one?
+growpart "${the_root_device}" 2
+# Actual do the work
 growpart "${the_root_device}" "${the_dynamic_partition}"
 sync; sync; sync
 
@@ -22,5 +25,5 @@ pvresize "${the_dynamic_partition_path}"
 sync; sync; sync
 
 # Resize logical volume to the full disk, then grow the filesystem
-lvresize -l +100%FREE --resizefs /dev/centos/root
+lvresize -l +100%FREE --resizefs /dev/packer-debian11-redops-vg/root
 sync; sync; sync
