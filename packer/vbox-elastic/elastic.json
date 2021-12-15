@@ -1,66 +1,104 @@
 {
   "variables": {
-    "version": "6.1.26"
+    "version": "6.1.30"
   },
   "builders": [
     {
       "type": "virtualbox-iso",
       "boot_command": [
-        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+        "<esc><wait>",
+        "install <wait>",
+        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg <wait>",
+        "debian-installer=en_US.UTF-8 <wait>",
+        "auto <wait>",
+        "locale=en_US.UTF-8 <wait>",
+        "kbd-chooser/method=us <wait>",
+        "keyboard-configuration/xkb-keymap=us <wait>",
+        "netcfg/get_hostname={{ .Name }} <wait>",
+        "netcfg/get_domain=thremulator.io <wait>",
+        "fb=false <wait>",
+        "debconf/frontend=noninteractive <wait>",
+        "console-setup/ask_detect=false <wait>",
+        "console-keymaps-at/keymap=us <wait>",
+        "grub-installer/bootdev=/dev/sda <wait>",
+        "<enter><wait>"
       ],
       "boot_wait": "10s",
       "disk_size": 81920,
-      "guest_os_type": "RedHat_64",
+      "guest_os_type": "Debian_64",
       "headless": true,
       "http_directory": "http",
       "iso_urls": [
-        "CentOS-7-x86_64-Minimal-2009.iso",
-        "http://mirrors.mit.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-2009.iso"
+        "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-11.1.0-amd64-netinst.iso"
       ],
-      "iso_checksum": "sha256:07b94e6b1a0b0260b94c83d6bb76b26bf7a310dc78d7a9c7432809fb9bc6194a",
-      "ssh_username": "vagrant",
-      "ssh_password": "vagrant",
-      "ssh_port": 22,
-      "ssh_wait_timeout": "1800s",
-      "shutdown_command": "echo 'vagrant'|sudo -S /sbin/halt -h -p",
-      "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
-      "virtualbox_version_file": ".vbox_version",
-      "vm_name": "packer-elastic",
-      "vboxmanage": [
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--memory",
-          "4096"
-        ],
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--cpus",
-          "2"
+        "iso_checksum": "8488abc1361590ee7a3c9b00ec059b29dfb1da40f8ba4adf293c7a30fa943eb2",
+        "ssh_username": "vagrant",
+        "ssh_password": "vagrant",
+        "ssh_port": 22,
+        "ssh_wait_timeout": "1800s",
+        "shutdown_command": "echo 'vagrant'|sudo -S /sbin/halt -h -p",
+        "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+        "virtualbox_version_file": ".vbox_version",
+        "vm_name": "packer-debian11-redops",
+        "vboxmanage": [
+          [
+            "modifyvm",
+            "{{.Name}}",
+            "--memory",
+            "1024"
+          ],
+          [
+            "modifyvm",
+            "{{.Name}}",
+            "--cpus",
+            "1"
+          ],
+          [
+            "modifyvm",
+            "{{.Name}}",
+            "--vram",
+            "32"
+          ]
         ]
-      ]
-    }
-  ],
-  "provisioners": [
-    {
-      "type": "ansible",
-      "playbook_file": "./ansible/elastic-playbook.yml"
-    },
-    {
-      "type": "shell",
-      "scripts": [
-      "./scripts/virtualbox.sh",
-      "./scripts/cleanup.sh"
-      ],
-      "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
-    }
-  ],
-  "post-processors": [
-    {
-      "type": "vagrant",
-      "compression_level": "8",
-      "output": "../_output/{{.Provider}}-dev-elastic-{{timestamp}}.box"
-    }
-  ]
-}
+      }
+    ],
+    "provisioners": [
+      { 
+        "environment_vars": [
+        "HOME_DIR=/home/vagrant"
+        ],
+        "type": "shell",
+        "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E sh -eux '{{.Path}}'",
+        "expect_disconnect": true,
+        "scripts": [
+        "scripts/update.sh",
+        "scripts/sshd.sh",
+        "scripts/networking.sh",
+        "scripts/sudoers.sh",
+        "scripts/vagrant.sh",
+        "scripts/systemd.sh",
+        "scripts/virtualbox.sh"
+        ]
+      },
+      
+      {
+        "type": "ansible",
+        "playbook_file": "ansible/elastic-playbook.yml"
+        
+      },
+      {
+        "type": "shell",
+        "scripts": [
+        "scripts/cleanup.sh"
+        ],
+        "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
+      }
+    ],
+    "post-processors": [
+      {
+        "type": "vagrant",
+        "compression_level": "8",
+        "output": "../_output/{{.Provider}}-dev-elastic-red-{{timestamp}}.box"
+      }
+    ]
+  }
