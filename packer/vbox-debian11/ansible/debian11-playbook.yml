@@ -54,8 +54,11 @@
     - name: Prep to start services
       command: systemctl daemon-reload
 
-    - name: Start Firewalld Service
-      command: systemctl start ufw
+    - name: Start & Enable Firewall Service
+      systemd: 
+        name: ufw
+        state: started
+        enabled: yes
 
 
 
@@ -75,11 +78,10 @@
         enabled: yes
     
     - name: Add Nginx Firewall Rule
-      firewalld:
-        zone: public
-        service: http
-        permanent: yes
-        immediate: yes
+      ufw:
+        rule: allow
+        port: '80'
+        proto: tcp
         state: enabled
 
 
