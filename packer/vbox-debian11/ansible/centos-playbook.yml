@@ -5,84 +5,58 @@
 
     tasks:
   
-    - name: Import RPM Keys
-      rpm_key:
+    - name: Import APT Keys
+      apt_key:
         state: present
-        key: "{{ item }}"
+        url: "{{ item }}"
       loop:
-        - https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
         - https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
-    - name: Add EPEL Repository
-      yum:
-        name: epel-release
-
     - name: Add Elastic Repository
-      yum_repository:
-        name: elastic
-        description: Elasticsearch repository for 7.x packages
-        enabled: yes
-        gpgcheck: yes
-        baseurl: https://artifacts.elastic.co/packages/7.x/yum
-        gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
-        file: elastic
+      apt_repository:
+        repo: deb [arch=amd64] https://artifacts.elastic.co/packages/7.x/apt stable main
+        state: present
+        update_cache: yes
 
-    - name: Add Microsoft Repository
-      yum_repository:
-        name: packages-microsoft-com-prod
-        description: Microsoft Repo for RHEL-based
-        enabled: yes
-        gpgcheck: yes
-        baseurl: https://packages.microsoft.com/rhel/7/prod/
-        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
-        file: prod
 
-    - name: Clean Yum Cache
-      command: yum clean all
+  # Need to Debianify this and the others
+    #- name: Add Microsoft Repository
+    #  yum_repository:
+    #    name: packages-microsoft-com-prod
+    #    description: Microsoft Repo for RHEL-based
+    #    enabled: yes
+    #    gpgcheck: yes
+    #    baseurl: https://packages.microsoft.com/rhel/7/prod/
+    #    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+    #    file: prod
 
+    - name: Clean Cache
+      command: apt-get clean
+
+    - name: Refresh apt-cache
+      command: apt-get update
 
     - name: Install System Tools
-      yum:
+      apt:
         name: "{{ packages }}"
         state: present
       vars:
         packages:
+          - ufw
           - vim
           - nano
           - tmux
-          - cockpit
           - git
-          - wget
           - golang
+          - wget
+          - apt-transport-https
+
+    - name: Prep to start services
+      command: systemctl daemon-reload
 
     - name: Start Firewalld Service
-      systemd:
-        name: firewalld
-        state: started
-        enabled: yes
+      command: systemctl start ufw
 
-###################################
-# Cockpit
-###################################
-
-    # - name: Add Cockpit Firewall Rule
-    #   firewalld:
-    #     zone: public
-    #     port: 9090/tcp
-    #     permanent: yes
-    #     immediate: yes
-    #     state: enabled
-
-    # - name: Install Cockpit
-    #   yum: 
-    #     name: cockpit
-    #     state: present
-
-    # - name: Enable Cockpit Service
-    #   systemd: 
-    #     name: cockpit
-    #     state: started
-    #     enabled: yes
 
 
 ###################################
@@ -90,7 +64,7 @@
 ###################################
 
     - name: Install Nginx Webserver
-      yum: 
+      apt: 
         name: nginx
         state: present
 
@@ -135,7 +109,7 @@
 ###################################
 
     - name: Install Rsyslog
-      yum:
+      apt:
         name: rsyslog
         state: present
 
@@ -152,7 +126,7 @@
 ###################################
 
     - name: Install Samba Server
-      yum:
+      apt:
         name: "{{ packages }}"
         state: present
       vars:
@@ -211,7 +185,7 @@
 ###################################
 
     - name: Install Filebeat
-      yum:
+      apt:
         name: filebeat
         state: present    
 
@@ -267,13 +241,13 @@
 # Powershell
 ###################################
 
-    - name: Install Powershell
-      yum:
-        name: powershell
-        state: present
+    #- name: Install Powershell
+    #  apt:
+    #    name: powershell
+    #    state: present
 
-    - name: Enable Powershell Remoting
-      command: pwsh -Command {Enable-PSRemoting -Force}
+    #- name: Enable Powershell Remoting
+    #  command: pwsh -Command {Enable-PSRemoting -Force}
 
 
 ###################################
