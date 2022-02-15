@@ -150,11 +150,11 @@
         enabled: yes
 
     - name: Add Samba Firewall Rule
-      firewalld:
-        zone: public
-        service: samba
-        permanent: yes
-        immediate: yes
+      ufw:
+        ufw:
+        rule: allow
+        port: '445'
+        proto: tcp
         state: enabled
     
     - name: Create Samba Share Directory
