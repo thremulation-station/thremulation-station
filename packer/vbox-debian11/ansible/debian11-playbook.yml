@@ -138,11 +138,11 @@
           - samba-client
           - samba-common
     
-    #- name: Start & Enable SMB Service
-    #  systemd: 
-    #    name: smb
-    #    state: started
-    #    enabled: yes
+    - name: Start & Enable SMB Service
+      systemd: 
+        name: smbd
+        state: started
+        enabled: yes
         
     #- name: Start & Enable NMB Service
     #  systemd: 
