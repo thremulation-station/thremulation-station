@@ -256,6 +256,13 @@
 # SSH Configuration
 ###################################
 
+    - name: Add SSH Rule for Vagrant
+      ufw:
+         rule: allow
+         port: '22'
+         proto: tcp
+         state: enabled
+
     - name: Uncomment Pass Auth Yes
       lineinfile:
         path: /etc/ssh/sshd_config
