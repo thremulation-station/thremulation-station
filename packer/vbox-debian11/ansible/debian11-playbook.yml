@@ -89,13 +89,14 @@
 # Auditd
 ###################################
 
-    - name: Copy Auditd Configuration
-      copy:
-        src: ./files/audit.rules
-        dest: /etc/audit/audit.rules
-        owner: root
-        group: root
-        mode: '0700'
+# figure out auditd
+    #- name: Copy Auditd Configuration
+    # copy:
+    #    src: ./files/audit.rules
+    #    dest: /etc/audit/audit.rules
+    #    owner: root
+    #    group: root
+    #    mode: '0700'
 
     # - name: Stop Auditd Service
     #   command: service auditd stop
@@ -137,49 +138,48 @@
           - samba-client
           - samba-common
     
-    - name: Start & Enable SMB Service
-      systemd: 
-        name: smb
-        state: started
-        enabled: yes
+    #- name: Start & Enable SMB Service
+    #  systemd: 
+    #    name: smb
+    #    state: started
+    #    enabled: yes
         
-    - name: Start & Enable NMB Service
-      systemd: 
-        name: nmb
-        state: started
-        enabled: yes
+    #- name: Start & Enable NMB Service
+    #  systemd: 
+    #    name: nmb
+    #    state: started
+    #    enabled: yes
 
     - name: Add Samba Firewall Rule
       ufw:
-        ufw:
         rule: allow
         port: '445'
         proto: tcp
         state: enabled
     
-    - name: Create Samba Share Directory
-      file:
-        path: /srv/samba/anonymous
-        state: directory
-        mode: '0755'
-        owner: nobody
-        group: nobody
+    #- name: Create Samba Share Directory
+    #  file:
+    #    path: /srv/samba/anonymous
+    #    state: directory
+    #    mode: '0755'
+    #    owner: nobody
+    #    group: nobody
 
-    - name: Configure Samba
-      copy:
-        src: ./files/smb.conf
-        dest: /etc/samba/smb.conf
-        owner: root
-        group: root
-        mode: '0544'
+    #- name: Configure Samba
+    #  copy:
+    #    src: ./files/smb.conf
+    #    dest: /etc/samba/smb.conf
+    #    owner: root
+    #    group: root
+    #    mode: '0544'
 
-    - name: Copy Data to SMB Share
-      copy:
-        src: ./files/executive-credentials.secret
-        dest: /srv/samba/anonymous
+    #- name: Copy Data to SMB Share
+    #  copy:
+    #    src: ./files/executive-credentials.secret
+    #    dest: /srv/samba/anonymous
         
-    - name: Set SELinux Context on Samba Share
-      command: chcon -Rt samba_share_t /srv/samba/anonymous
+    #- name: Set SELinux Context on Samba Share
+    #  command: chcon -Rt samba_share_t /srv/samba/anonymous
 
 
 ###################################
