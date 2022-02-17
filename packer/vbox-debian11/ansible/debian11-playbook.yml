@@ -61,6 +61,26 @@
         enabled: yes
 
 
+###################################
+# SELinux
+###################################
+
+    - name: Install SELinux Packages
+      apt:
+        name: "{{ se-packages }}"
+        state: present
+      vars:
+        packages:
+          - selinux-basics 
+          - selinux-policy-default
+          - auditd
+
+    #- name: Download Default Policy
+
+    - name: Enable SELinux
+      command: selinux-activate
+
+
 
 ###################################
 # Web Server
@@ -89,22 +109,19 @@
 # Auditd
 ###################################
 
-# figure out auditd
-    #- name: Copy Auditd Configuration
-    # copy:
-    #    src: ./files/audit.rules
-    #    dest: /etc/audit/audit.rules
-    #    owner: root
-    #    group: root
-    #    mode: '0700'
+    - name: Copy Auditd Configuration
+      copy:
+        src: ./files/audit.rules
+        dest: /etc/audit/audit.rules
+        owner: root
+        group: root
+        mode: '0700'
 
-    # - name: Stop Auditd Service
-    #   command: service auditd stop
+    - name: Disable Auditd Service
+      systemd:
+        name: auditd
+        enabled: no
   
-    # - name: Disable Auditd Service
-    #   systemd:
-    #     name: auditd
-    #     enabled: no
 
 
 ###################################
@@ -144,11 +161,11 @@
         state: started
         enabled: yes
         
-    #- name: Start & Enable NMB Service
-    #  systemd: 
-    #    name: nmb
-    #    state: started
-    #    enabled: yes
+    - name: Start & Enable NMB Service
+      systemd: 
+        name: nmb
+        state: started
+        enabled: yes
 
     - name: Add Samba Firewall Rule
       ufw:
@@ -157,29 +174,29 @@
         proto: tcp
         state: enabled
     
-    #- name: Create Samba Share Directory
-    #  file:
-    #    path: /srv/samba/anonymous
-    #    state: directory
-    #    mode: '0755'
-    #    owner: nobody
-    #    group: nobody
+    - name: Create Samba Share Directory
+      file:
+        path: /srv/samba/anonymous
+        state: directory
+        mode: '0755'
+        owner: nobody
+        group: nogroup
 
-    #- name: Configure Samba
-    #  copy:
-    #    src: ./files/smb.conf
-    #    dest: /etc/samba/smb.conf
-    #    owner: root
-    #    group: root
-    #    mode: '0544'
+    - name: Configure Samba
+      copy:
+        src: ./files/smb.conf
+        dest: /etc/samba/smb.conf
+        owner: root
+        group: root
+        mode: '0544'
 
-    #- name: Copy Data to SMB Share
-    #  copy:
-    #    src: ./files/executive-credentials.secret
-    #    dest: /srv/samba/anonymous
+    - name: Copy Data to SMB Share
+      copy:
+        src: ./files/executive-credentials.secret
+        dest: /srv/samba/anonymous
         
     #- name: Set SELinux Context on Samba Share
-    #  command: chcon -Rt samba_share_t /srv/samba/anonymous
+      command: chcon -Rt samba_share_t /srv/samba/anonymous
 
 
 ###################################
