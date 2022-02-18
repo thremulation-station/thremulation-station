@@ -45,19 +45,13 @@
             "modifyvm",
             "{{.Name}}",
             "--memory",
-            "1024"
+            "4096"
           ],
           [
             "modifyvm",
             "{{.Name}}",
             "--cpus",
-            "1"
-          ],
-          [
-            "modifyvm",
-            "{{.Name}}",
-            "--vram",
-            "32"
+            "2"
           ]
         ]
       }

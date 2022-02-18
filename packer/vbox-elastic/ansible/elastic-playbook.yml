@@ -20,6 +20,7 @@
         url: "{{ item }}"
       loop:
         - https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        - https://packages.microsoft.com/keys/microsoft.asc
 
     - name: Add Elastic Repository
       apt_repository:
@@ -27,6 +28,12 @@
         state: present
         update_cache: yes
         #filename: packages-microsoft-prod
+
+    - name: Add Microsoft Repository
+      apt_repository:
+        repo: deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-bullseye-prod bullseye main
+        state: present
+        update_cache: yes
 
     - name: Clean Cache
       command: apt-get clean
@@ -243,13 +250,13 @@
 # Powershell
 ###################################
 
-    #- name: Install Powershell
-    #  apt:
-    #    name: powershell
-    #    state: present
+    - name: Install Powershell
+      apt:
+        name: powershell
+        state: present
 
-    #- name: Enable Powershell Remoting
-    #  command: pwsh -Command {Enable-PSRemoting -Force}
+    - name: Enable Powershell Remoting
+      command: pwsh -Command {Enable-PSRemoting -Force}
 
 
 ###################################

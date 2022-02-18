@@ -11,13 +11,13 @@
         url: "{{ item }}"
       loop:
         - https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        - https://packages.microsoft.com/keys/microsoft.asc
 
     - name: Add Elastic Repository
       apt_repository:
         repo: deb [arch=amd64] https://artifacts.elastic.co/packages/7.x/apt stable main
         state: present
         update_cache: yes
-
 
   # Need to Debianify this and the others
     - name: Add Microsoft Repository
