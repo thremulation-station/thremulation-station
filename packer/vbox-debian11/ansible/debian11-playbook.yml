@@ -20,15 +20,11 @@
 
 
   # Need to Debianify this and the others
-    #- name: Add Microsoft Repository
-    #  yum_repository:
-    #    name: packages-microsoft-com-prod
-    #    description: Microsoft Repo for RHEL-based
-    #    enabled: yes
-    #    gpgcheck: yes
-    #    baseurl: https://packages.microsoft.com/rhel/7/prod/
-    #    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
-    #    file: prod
+    - name: Add Microsoft Repository
+      apt_repository:
+        repo: deb [arch-amd64] https://packages.microsoft.com/repos/microsoft-debian-bullseye-prod bullseye main
+        state: present
+        update_cache: yes
 
     - name: Clean Cache
       command: apt-get clean
@@ -59,27 +55,6 @@
         name: ufw
         state: started
         enabled: yes
-
-
-###################################
-# SELinux
-###################################
-
-    - name: Install SELinux Packages
-      apt:
-        name: "{{ se-packages }}"
-        state: present
-      vars:
-        packages:
-          - selinux-basics 
-          - selinux-policy-default
-          - auditd
-
-    #- name: Download Default Policy
-
-    - name: Enable SELinux
-      command: selinux-activate
-
 
 
 ###################################
@@ -163,7 +138,7 @@
         
     - name: Start & Enable NMB Service
       systemd: 
-        name: nmb
+        name: nmbd
         state: started
         enabled: yes
 
@@ -195,9 +170,8 @@
         src: ./files/executive-credentials.secret
         dest: /srv/samba/anonymous
         
-    #- name: Set SELinux Context on Samba Share
+    - name: Set SELinux Context on Samba Share
       command: chcon -Rt samba_share_t /srv/samba/anonymous
-
 
 ###################################
 # Filebeat
@@ -260,13 +234,13 @@
 # Powershell
 ###################################
 
-    #- name: Install Powershell
-    #  apt:
-    #    name: powershell
-    #    state: present
+    - name: Install Powershell
+      apt:
+        name: powershell
+        state: present
 
-    #- name: Enable Powershell Remoting
-    #  command: pwsh -Command {Enable-PSRemoting -Force}
+    - name: Enable Powershell Remoting
+      command: pwsh -Command {Enable-PSRemoting -Force}
 
 
 ###################################
