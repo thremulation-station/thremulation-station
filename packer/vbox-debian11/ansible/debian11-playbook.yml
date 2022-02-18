@@ -22,7 +22,7 @@
   # Need to Debianify this and the others
     - name: Add Microsoft Repository
       apt_repository:
-        repo: deb [arch-amd64] https://packages.microsoft.com/repos/microsoft-debian-bullseye-prod bullseye main
+        repo: deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-bullseye-prod bullseye main
         state: present
         update_cache: yes
 
