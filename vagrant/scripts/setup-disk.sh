@@ -25,5 +25,5 @@ pvresize "${the_dynamic_partition_path}"
 sync; sync; sync
 
 # Resize logical volume to the full disk, then grow the filesystem
-lvresize -l +100%FREE --resizefs /dev/packer-debian11-redops-vg/root
+lvresize -l +100%FREE --resizefs /dev/packer-elastic-vg/root
 sync; sync; sync

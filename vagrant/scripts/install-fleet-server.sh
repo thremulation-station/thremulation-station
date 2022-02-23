@@ -14,7 +14,7 @@ AGENT_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-ag
 
 function install_jq() {
     if ! command -v jq; then
-        sudo yum install -y jq
+        sudo apt-get install -y jq
     fi
 }
 
