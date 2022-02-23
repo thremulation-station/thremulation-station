@@ -27,7 +27,6 @@
         repo: deb [arch=amd64] https://artifacts.elastic.co/packages/7.x/apt stable main
         state: present
         update_cache: yes
-        #filename: packages-microsoft-prod
 
     - name: Add Microsoft Repository
       apt_repository:
@@ -190,6 +189,7 @@
       apt:
         name: kibana={{ lab.stack_version }}
         state: present
+
 
     - name: Update Kibana Config
       copy:
