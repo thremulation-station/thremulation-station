@@ -19,7 +19,6 @@
         state: present
         update_cache: yes
 
-  # Need to Debianify this and the others
     - name: Add Microsoft Repository
       apt_repository:
         repo: deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-bullseye-prod bullseye main
@@ -172,6 +171,17 @@
         
     - name: Set SELinux Context on Samba Share
       command: chcon -Rt samba_share_t /srv/samba/anonymous
+
+###################################
+# Pneuma
+###################################
+
+    - name: Add Pneuma Firewall Rule
+      ufw:
+        rule: allow
+        port: '2323'
+        proto: tcp
+        state: enabled
 
 ###################################
 # Filebeat

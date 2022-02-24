@@ -39,7 +39,7 @@
 
     - name: Refresh apt-cache
       command: apt-get update
-    
+
     - name: Install System Tools
       apt:
         name: "{{ packages }}"

@@ -16,8 +16,14 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
     end
 
+
+    # Fix Local DNS
+    cfg.vm.provision "set-hosts-file", type: "shell", inline: "printf '\n127.0.0.1  elastic' >> /etc/hosts"
+
+
     # Setup Disk so we have more room to put elastic stack
     cfg.vm.provision "setdisk", type: "shell", path: "../vagrant/scripts/setup-disk.sh"
+
     
     # Setup Fleet server
     cfg.vm.provision "shell" do |s|
@@ -46,8 +52,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "ts.windows10" do |cfg|
-    cfg.vm.box = "thremulation-station/windows10"
-    cfg.vm.box_version = "0.9.30"
+    cfg.vm.box = "dev-windows10"
+    #cfg.vm.box_version = "0.9.30"
     cfg.vm.hostname = "windows10"
     cfg.vm.network "private_network", ip: "192.168.56.11", auto_config: true
 
@@ -77,11 +83,14 @@ Vagrant.configure("2") do |config|
     cfg.vm.network "private_network", ip: "192.168.56.12", auto_config: true
     cfg.vm.network "forwarded_port", guest: 80, host: 8080
     cfg.vm.provider :virtualbox do |vb|
-      vb.name = "ts.centos7"
+      vb.name = "ts.debian11"
       vb.memory = 1024
       vb.cpus = 1
       vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
     end
+
+    # Fix Local DNS
+    cfg.vm.provision "set-hosts-file", type: "shell", inline: "printf '\n127.0.0.1  debian11' >> /etc/hosts"
 
     # Setup Pneuma agent and service
     cfg.vm.provision "download-install-pneuma-linux", type: "shell", path: "../vagrant/scripts/download-pneuma-linux.sh"
@@ -93,7 +102,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell" do |s|
       s.path = "../vagrant/scripts/install-ea-linux.sh"
       s.env = {
-        "ELASTIC_STACK_VERSION" => "7.14.0",
+        "ELASTIC_STACK_VERSION" => "7.16.3",
         "KIBANA_URL" => "http://192.168.56.10:5601",
         "KIBANA_AUTH" => "vagrant:vagrant",
         "ELASTICSEARCH_URL" => "http://192.168.56.10:9200",
@@ -109,8 +118,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "ts.redops" do |cfg|
-    cfg.vm.box = "thremulation-station/redops"
-    cfg.vm.box_version = "0.9.30"
+    cfg.vm.box = "dev-redops"
+    #cfg.vm.box_version = "0.9.30"
     cfg.vm.hostname = "redops"
     cfg.vm.synced_folder ".", "/vagrant", type: "rsync"
     cfg.vm.network "private_network", ip: "192.168.56.13", auto_config: true
@@ -121,6 +130,10 @@ Vagrant.configure("2") do |config|
       vb.cpus = 2
       vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
     end
+
+    # Fix Local DNS
+    cfg.vm.provision "set-hosts-file", type: "shell", inline: "printf '\n127.0.0.1  redops`' >> /etc/hosts"
+
     # Install Operator
     cfg.vm.provision "install-operator", type: "shell", path: "../vagrant/scripts/install-operator.sh"
   end

@@ -2,7 +2,7 @@
 
 set -o pipefail
 
-STACK_VER="${ELASTIC_STACK_VERSION:-7.14.0}"
+STACK_VER="${ELASTIC_STACK_VERSION:-7.16.3}"
 KIBANA_URL="${KIBANA_URL:-http://127.0.0.1:5601}"
 KIBANA_AUTH="${KIBANA_AUTH:-}"
 ELASTICSEARH_URL="${ELASTICSEARCH_URL:-}"
@@ -11,7 +11,7 @@ AGENT_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-ag
 
 function install_jq() {
     if ! command -v jq; then
-        sudo yum install -y jq
+        sudo apt-get install -y jq
     fi
 }
 function download_and_install_agent() {

@@ -71,7 +71,8 @@
         "scripts/sudoers.sh",
         "scripts/vagrant.sh",
         "scripts/systemd.sh",
-        "scripts/virtualbox.sh"
+        "scripts/virtualbox.sh",
+        "scripts/selinux.sh"
         ]
       },
       
@@ -92,7 +93,7 @@
       {
         "type": "vagrant",
         "compression_level": "8",
-        "output": "../_output/{{.Provider}}-dev-elastic-{{timestamp}}.box"
+        "output": "../_output/{{.Provider}}-dev-debian11-{{timestamp}}.box"
       }
     ]
   }

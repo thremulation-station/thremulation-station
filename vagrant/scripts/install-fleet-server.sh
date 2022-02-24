@@ -12,6 +12,7 @@ KIBANA_SERVICE="kibana"
 
 AGENT_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-${STACK_VER}-linux-x86_64.tar.gz"
 
+
 function install_jq() {
     if ! command -v jq; then
         sudo apt-get install -y jq

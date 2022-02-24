@@ -12,7 +12,6 @@
       loop:
         - https://artifacts.elastic.co/GPG-KEY-elasticsearch
         - https://packages.microsoft.com/keys/microsoft.asc
-      retries: 5
 
 
     - name: Add Microsoft Repository
