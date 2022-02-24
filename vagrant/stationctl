@@ -256,7 +256,7 @@ setup_rhel() {
         echo -e "${LIGHTPURPLE}     (B)ack to Main                           ${NC}";
         echo -e "${LIGHTPURPLE} ---------------------------------------------${NC}";
         echo ""
-        echo -e " You have chosen a RHEL-based distro (preferrably \n CENTOS7) as your host Operating System. This option \n will attempt to install the required packages: "
+        echo -e " You have chosen a RHEL-based distro (preferrably \n Centos7) as your host Operating System. This option \n will attempt to install the required packages: "
         echo ""
         echo ""
         echo "  virtualbox.....:  hypervisor"
