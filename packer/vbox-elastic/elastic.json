@@ -29,7 +29,7 @@
       "headless": true,
       "http_directory": "http",
       "iso_urls": [
-        "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-11.2.0-amd64-netinst.iso"
+        "https://cdimage.debian.org/cdimage/archive/11.2.0/amd64/iso-cd/debian-11.2.0-amd64-netinst.iso"
       ],
         "iso_checksum": "45c9feabba213bdc6d72e7469de71ea5aeff73faea6bfb109ab5bad37c3b43bd",
         "ssh_username": "vagrant",
