@@ -1,24 +1,27 @@
 #!/bin/bash
 
 PNEUMA_URL="https://s3.amazonaws.com/operator.payloads.open/payloads/pneuma/pneuma-linux"
-INSTALL_DIR="/opt/pneuma"
+INSTALL_DIR="/opt"
 SCRIPTS_DIR="/vagrant"
 
 # Stage Pneuma download
 
-cd "$(mktemp -d)"
-curl $PNEUMA_URL -o pneuma-agent
-mkdir $INSTALL_DIR
-cp pneuma-agent $INSTALL_DIR
-chmod +x $INSTALL_DIR/pneuma-agent
+# S3 is blocking download
+#cd "$(mktemp -d)"
+#curl $PNEUMA_URL -o pneuma-agent
+#mkdir $INSTALL_DIR
+#cp pneuma-agent $INSTALL_DIR
+#chmod +x $INSTALL_DIR/pneuma-agent
 
+#S3 is blocking Pneuma download, pulling from Operator directly
+curl "http://192.168.56.13:3391/payloads/cea74c95ce1366db3d0d8fb1fc2f9b871fdd1e92/pneuma-linux" > /opt/pneuma && chmod +x /opt/pneuma
 
 
 echo "[Unit]
 Description=Pneuma-Agent
 
 [Service]
-ExecStart=/opt/pneuma/pneuma-agent -address "192.168.56.13:2323" -contact "tcp" -name "pneuma-debian11" -range "thremulation"
+ExecStart=nohup /opt/pneuma -name "$(hostname)" -address 192.168.56.13:2323
 Restart=on-failure
 StartLimitInterval=600
 RestartSec=15

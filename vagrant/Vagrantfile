@@ -1,7 +1,16 @@
+$set_operator_variables = <<SCRIPT
+tee "/etc/profile.d/operator_vars.sh" > "/dev/null" <<EOF
+# Operator variables
+export operator_session_key=#{ENV['operator_session_key']}
+export operator_login_email=#{ENV['operator_login_email']}
+export operator_login_token=#{ENV['operator_login_token']}
+EOF
+SCRIPT
+
 Vagrant.configure("2") do |config|
 
   config.vm.define "ts.elastic", primary: true do |cfg|
-    cfg.vm.box = "dev-elastic"
+    cfg.vm.box = "dev-elastic-8"
     #cfg.vm.box_version = "0.9.30"
     cfg.vm.hostname = "elastic"
     cfg.disksize.size = "256GB"
@@ -24,7 +33,11 @@ Vagrant.configure("2") do |config|
     # Setup Disk so we have more room to put elastic stack
     cfg.vm.provision "setdisk", type: "shell", path: "../vagrant/scripts/setup-disk.sh"
 
-    
+    # Fix network interface
+    cfg.vm.provision "set_interface", type: "shell", path: "../vagrant/scripts/set_interface.sh"
+
+
+
     # Setup Fleet server
     cfg.vm.provision "shell" do |s|
       s.path = "../vagrant/scripts/install-fleet-server.sh"
@@ -124,6 +137,10 @@ Vagrant.configure("2") do |config|
     cfg.vm.synced_folder ".", "/vagrant", type: "rsync"
     cfg.vm.network "private_network", ip: "192.168.56.13", auto_config: true
     cfg.vm.network "forwarded_port", guest: 3389, host: 43389
+    cfg.vm.network "forwarded_port", guest: 50051, host: 50052
+    cfg.vm.network "forwarded_port", guest: 8888, host: 8889
+
+
     cfg.vm.provider :virtualbox do |vb|
       vb.name = "ts.redops"
       vb.memory = 2048
@@ -132,9 +149,15 @@ Vagrant.configure("2") do |config|
     end
 
     # Fix Local DNS
-    cfg.vm.provision "set-hosts-file", type: "shell", inline: "printf '\n127.0.0.1  redops`' >> /etc/hosts"
+    cfg.vm.provision "set-hosts-file", type: "shell", inline: "printf '\n127.0.0.1  redops' >> /etc/hosts"
+
+    cfg.vm.provision "shell", inline: $set_operator_variables, run: "always"
+
+    cfg.vm.provision "shell" do |s|
+      s.path = "../vagrant/scripts/install-headless.sh"
+    end
 
     # Install Operator
-    cfg.vm.provision "install-operator", type: "shell", path: "../vagrant/scripts/install-operator.sh"
-  end
+    #cfg.vm.provision "install-operator", type: "shell", path: "../vagrant/scripts/install-operator.sh"
+    end
 end
