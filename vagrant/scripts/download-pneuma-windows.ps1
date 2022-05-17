@@ -12,6 +12,9 @@ New-Item -Path $install_dir -Type directory | Out-Null
 
 # S3 is blocking the download, loading from Operator directly
 
+while (-not (Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct -Filter "displayName like 'Elastic Security'")) {
+    Write-Verbose -Message "Waiting until Elastic Security replaces Defender"
+}
 
 Write-Output "Pulling Pneuma from Redops"
 $wc = New-Object System.Net.WebClient; 

@@ -10,7 +10,7 @@ SCRIPT
 Vagrant.configure("2") do |config|
 
   config.vm.define "ts.elastic", primary: true do |cfg|
-    cfg.vm.box = "dev-elastic-8"
+    cfg.vm.box = "dev-elastic"
     #cfg.vm.box_version = "0.9.30"
     cfg.vm.hostname = "elastic"
     cfg.disksize.size = "256GB"
@@ -34,7 +34,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "setdisk", type: "shell", path: "../vagrant/scripts/setup-disk.sh"
 
     # Fix network interface
-    cfg.vm.provision "set_interface", type: "shell", path: "../vagrant/scripts/set_interface.sh"
+    #cfg.vm.provision "set_interface", type: "shell", path: "../vagrant/scripts/set_interface.sh"
 
 
 

@@ -44,6 +44,7 @@
           - gedit
           - terminator
           - dos2unix
+          - unzip
 
     - name: Prep to start services
       command: systemctl daemon-reload
@@ -131,6 +132,20 @@
       ufw:
          rule: allow
          port: '3007'
+         proto: tcp
+         state: enabled
+
+    - name: Add Operator API Firewall Rule
+      ufw:
+         rule: allow
+         port: '8888'
+         proto: tcp
+         state: enabled
+
+    - name: Add Operator GRPC Firewall Rule
+      ufw:
+         rule: allow
+         port: '50051'
          proto: tcp
          state: enabled
 
