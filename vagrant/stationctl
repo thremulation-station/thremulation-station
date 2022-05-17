@@ -58,8 +58,8 @@ current_dir=$(pwd)
 cd ~/AppData/Roaming/Operator/portal.prelude.org
 
 export operator_session_key="$(sed -n -e 14p settings.yml | cut -d " " -f4)"
-export operator_login_email="$(sed -n -e 16p settings.yml | cut -d " " -f4)"
-export operator_login_token="$(sed -n -e 18p settings.yml | cut -d " " -f4)"
+export operator_login_email="$(sed -n -e 18p settings.yml | cut -d " " -f4)"
+export operator_login_token="$(sed -n -e 20p settings.yml | cut -d " " -f4)"
 
 cd $current_dir
 
