@@ -1,6 +1,6 @@
 {
   "variables": {
-    "version": "6.1.30"
+    "version": "6.1.34"
   },
   "builders": [
     {
