@@ -20,7 +20,7 @@ cd "C:\OpenSSH-Win64"
  Set-Service SSHD -StartupType Automatic
  Set-Service SSH-Agent -StartupType Automatic
 
- $content = (Get-Content -Path "C:\ProgramData\ssh\sshd_config_default")
+ $content = (Get-Content -Path "C:\ProgramData\ssh\sshd_config")
 
  $content = $content.Replace("#PasswordAuthentication yes","PasswordAuthentication yes").Replace("#PubkeyAuthentication yes","PubkeyAuthentication yes").Replace("Subsystem	sftp	sftp-server.exe","Subsystem powershell c:/progra~1/powershell/7/pwsh.exe -sshs -NoLogo") | Set-Content -Path "C:\ProgramData\ssh\sshd_config"
  
