@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
     # Enable PowerShell
     cfg.vm.provision "enable-psremoting", type: "shell", path: "../vagrant/scripts/enable-psremoting.sh"
     # Install Atomic Red Team
-    cfg.vm.provision "install atomic-redteam", type: "shell", path: "../vagrant/scripts/enable-psremoting.sh"
+    cfg.vm.provision "install atomic-redteam", type: "shell", path: "../vagrant/scripts/install-atomicredteam.ps1"
     # Download and Start Container Project
     cfg.vm.provision "download_container-project", type: "shell", path: "../vagrant/scripts/download-elastic-containers.sh"
 
