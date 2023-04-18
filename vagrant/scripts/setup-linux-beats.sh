@@ -4,11 +4,10 @@
 echo "This part takes about 2 minutes, please let it complete."
 while true
 do
-  STATUS=$(curl -I http://192.168.33.10:9200 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+  STATUS=$(curl -k -I https://192.168.56.10:9200 -u vagrant:vagrant 2>/dev/null | head -n 1 | cut -d$' ' -f2)
   if [ "${STATUS}" == "200" ]; then
     echo "Elasticsearch is up. Proceeding"
     sudo filebeat setup;
-    sudo auditbeat setup --dashboards;
     echo "Setup script complete!";
     break
   else
