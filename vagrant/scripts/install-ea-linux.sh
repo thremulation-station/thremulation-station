@@ -11,7 +11,7 @@ AGENT_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-ag
 
 function install_jq() {
     if ! command -v jq; then
-        sudo yum install -y jq
+        apt install -y jq
     fi
 }
 function download_and_install_agent() {
@@ -22,7 +22,7 @@ function download_and_install_agent() {
     cd "$(basename "$(basename "${AGENT_URL}")" .tar.gz)"
     #sudo ./elastic-agent install --force --insecure --kibana-url="${KIBANA_URL}" --enrollment-token="${ENROLLMENT_TOKEN}"
 
-    sudo ./elastic-agent install --force --insecure --url="${FLEET_SERVER_URL}" --enrollment-token="${ENROLLMENT_TOKEN}"
+    ./elastic-agent install --force --insecure --url="${FLEET_SERVER_URL}" --enrollment-token="${ENROLLMENT_TOKEN}"
 
     # Cleanup temporary directory
     cd ..

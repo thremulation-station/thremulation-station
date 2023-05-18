@@ -2,7 +2,8 @@
 Vagrant.configure("2") do |config|
 
   config.vm.define "ts.elastic", primary: true do |cfg|
-    cfg.vm.box = "bento/rockylinux-9"
+    cfg.vm.box = "bento/ubuntu-20.04"
+    #cfg.vm.box = "bento/rockylinux-9"
     #cfg.vm.box_version = "1.2.0"
     cfg.vm.hostname = "elastic"
     cfg.disksize.size = "256GB"
@@ -16,6 +17,9 @@ Vagrant.configure("2") do |config|
       vb.cpus = 2
       vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
     end
+
+    # Grow the disk
+    cfg.vm.provision "setup-disk", type: "shell", path: "../vagrant/scripts/setup-disk.sh"
 
     # Enable PowerShell
     cfg.vm.provision "enable-psremoting", type: "shell", path: "../vagrant/scripts/enable-psremoting.sh"
@@ -74,15 +78,16 @@ Vagrant.configure("2") do |config|
 
 
 
-  config.vm.define "ts.rocky9" do |cfg|
-    cfg.vm.box = "bento/rockylinux-9"
+  config.vm.define "ts.ubuntu20.04" do |cfg|
+    #cfg.vm.box = "bento/rockylinux-9"
+    cfg.vm.box = "bento/ubuntu-20.04"
     #cfg.vm.box_version = "1.2.0"
-    cfg.vm.hostname = "rocky9"
+    cfg.vm.hostname = "ubuntu20.04"
     cfg.vm.synced_folder '.', '/vagrant', disabled: true
     cfg.vm.network "private_network", ip: "192.168.56.12", auto_config: true
     cfg.vm.network "forwarded_port", guest: 80, host: 8080
     cfg.vm.provider :virtualbox do |vb|
-      vb.name = "ts.rocky9"
+      vb.name = "ts.ubuntu20.04"
       vb.memory = 1024
       vb.cpus = 1
       vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
