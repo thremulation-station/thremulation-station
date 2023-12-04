@@ -531,15 +531,14 @@ deploy_custom() {
         echo " You have chosen the following Custom Deployment:"
         echo ""
         echo " - STACK..: "${ELASTIC}" (required)"
-        echo " - CONTROL...: "${REDOPS}" (required)"
         echo " - target...: "${WINDOWS}""
         echo " - target...: "${UBUNTU}""
         echo ""
         read -rp "Confirm to proceed with deployment [Y/N]: " yn
         case $yn in
             [Yy]* )
-                echo "You have chosen the "${ELASTIC}" "${REDOPS}" "${WINDOWS}" "${UBUNTU}""
-                vagrant up ${ELASTIC} ${REDOPS} ${WINDOWS} ${UBUNTU};
+                echo "You have chosen the "${ELASTIC}" "${WINDOWS}" "${UBUNTU}""
+                vagrant up ${ELASTIC} ${WINDOWS} ${UBUNTU};
                 sleep 10;
                 snapshot;
                 break;;

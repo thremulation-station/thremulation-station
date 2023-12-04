@@ -239,7 +239,7 @@ function main() {
 
     policy_result=$(curl -k --silent -XGET "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/agent_policies/${POLICY_ID}" | jq '.[].package_policies[] | select(.name=="endpoint-1")')
     endpoint_policy_id=$(echo -n "${policy_result}" | jq --raw-output '.id')
-    endpoint_policy_request=$(echo -n "${policy_result}" | jq 'del(.id,.revision,.created_by,.created_at,.updated_by,.updated_at) | (.inputs[].config.policy.value.windows.antivirus_registration.enabled) |= "true" | (.inputs[].config.policy.value[].malware.mode) |= "detect"')
+    endpoint_policy_request=$(echo -n "${policy_result}" | jq 'del(.id,.revision,.created_by,.created_at,.updated_by,.updated_at) | (.inputs[].config.policy.value.windows.antivirus_registration.enabled) |= "true" | (.inputs[].config.policy.value.windows.malware.mode) |= "detect" | (.inputs[].config.policy.value.linux.malware.mode) |= "detect"')
     
     endpoint_change_request=$(echo -n "${endpoint_policy_request}" | curl -k --silent -XPUT "${HEADERS[@]}" "${KIBANA_URL}/api/fleet/package_policies/${endpoint_policy_id}" -d @-)
 
