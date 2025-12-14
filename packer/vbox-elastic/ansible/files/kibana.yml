@@ -1,0 +1,18 @@
+# Kibana is served by a back end server. This setting specifies the port to use.
+
+xpack.encryptedSavedObjects.encryptionKey: "thirty-two-or-more-random-characters"
+server.host: "0.0.0.0"
+telemetry.enabled: "false"
+xpack.fleet.packages:
+  - name: fleet_server
+    version: latest
+  - name: system
+    version: latest
+xpack.fleet.agentPolicies:
+  - name: Default Fleet Server policy
+    id: fleet-server-policy
+    namespace: default
+    package_policies:
+      - name: fleet_server-1
+        package:
+          name: fleet_server

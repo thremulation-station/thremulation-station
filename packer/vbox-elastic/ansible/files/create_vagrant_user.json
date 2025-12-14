@@ -1,0 +1,5 @@
+{
+  "password" : "vagrant",
+  "roles" : [ "superuser" ],
+  "full_name" : "Vagrant User"
+}

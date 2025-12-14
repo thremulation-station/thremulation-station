@@ -1,14 +1,17 @@
-#!/bin/bash
+#!/bin/bash -eu
+
+# Define variables
+ELASTICSEARCH_URL="https://192.168.56.10:9200"
+ELASTICSEARCH_AUTH="elastic:vagrant"
 
 # Wait for Elasticsearch to become available
 echo "This part takes about 2 minutes, please let it complete."
 while true
 do
-  STATUS=$(curl -I http://192.168.33.10:9200 2>/dev/null | head -n 1 | cut -d$' ' -f2)
-  if [ "${STATUS}" == "200" ]; then
+  STATUS=$(curl -s -k -u "${ELASTICSEARCH_AUTH}" -o /dev/null -w "%{http_code}" "${ELASTICSEARCH_URL}")
+if [ "${STATUS}" == "200" ]; then
     echo "Elasticsearch is up. Proceeding"
-    sudo filebeat setup;
-    sudo auditbeat setup --dashboards;
+    filebeat setup;
     echo "Setup script complete!";
     break
   else

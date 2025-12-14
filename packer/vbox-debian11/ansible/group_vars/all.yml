@@ -1,0 +1,4 @@
+---
+# Elastic version management
+lab:
+   stack_version: "7.16.3"

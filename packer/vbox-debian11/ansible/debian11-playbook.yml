@@ -1,0 +1,448 @@
+---
+  - hosts: all
+    become: yes
+    gather_facts: no
+
+    tasks:
+  
+    - name: Install gnupg (required for apt_repository)
+      ansible.builtin.apt:
+        name: gnupg
+        state: present
+        update_cache: yes
+
+    - name: Download Microsoft rolling GPG key
+      ansible.builtin.get_url:
+        url: https://packages.microsoft.com/keys/microsoft-rolling.asc
+        dest: /etc/apt/keyrings/packages.microsoft.com.asc
+        mode: '0644'
+
+    - name: Download Microsoft legacy GPG key
+      ansible.builtin.get_url:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        dest: /etc/apt/keyrings/legacy.packages.microsoft.com.asc
+        mode: '0644'
+
+    - name: Configure apt pinning for packages.microsoft.com
+      ansible.builtin.copy:
+        content: |
+          Package: *
+          Pin: origin packages.microsoft.com
+          Pin-Priority: 600
+        dest: /etc/apt/preferences.d/01-packages.microsoft.com.pref
+        mode: '0644'
+
+    - name: Add Microsoft repositories
+      ansible.builtin.copy:
+        content: |
+          Enabled: yes
+          Types: deb
+          URIs: https://packages.microsoft.com/debian/13/prod
+          Suites: trixie
+          Components: main
+          Signed-By: /etc/apt/keyrings/packages.microsoft.com.asc
+
+          Enabled: yes
+          Types: deb
+          URIs: https://packages.microsoft.com/debian/12/prod
+          Suites: bookworm
+          Components: main
+          Signed-By: /etc/apt/keyrings/legacy.packages.microsoft.com.asc
+        dest: /etc/apt/sources.list.d/packages.microsoft.com.sources
+        mode: '0644'
+
+    - name: Configure apt pinning for Debian repositories
+      ansible.builtin.copy:
+        content: |
+          Package: *
+          Pin: release n=trixie*
+          Pin-Priority: 500
+
+          # temporary workaround for powershell
+          Package: *
+          Pin: release n=bookworm*
+          Pin-Priority: -1
+
+          Package: libicu72
+          Pin: release n=bookworm*
+          Pin-Priority: 500
+          # temporary workaround end
+        dest: /etc/apt/preferences.d/debian.pref
+        mode: '0644'
+
+    - name: Add Debian 12 and 13 repositories
+      ansible.builtin.copy:
+        content: |
+          Enabled: yes
+          Types: deb
+          URIs: https://deb.debian.org/debian
+          Suites: trixie trixie-updates
+          Components: main non-free-firmware
+          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+          Enabled: yes
+          Types: deb
+          URIs: https://deb.debian.org/debian-security
+          Suites: trixie-security
+          Components: main non-free-firmware
+          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+          # temporary workaround for powershell
+          Enabled: yes
+          Types: deb
+          URIs: https://deb.debian.org/debian
+          Suites: bookworm bookworm-updates
+          Components: main non-free-firmware
+          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+          Enabled: yes
+          Types: deb
+          URIs: https://deb.debian.org/debian-security
+          Suites: bookworm-security
+          Components: main non-free-firmware
+          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+          # temporary workaround end
+        dest: /etc/apt/sources.list.d/debian.sources
+        mode: '0644'
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+
+    #- name: Import APT Keys
+    #  apt_key:
+    #    state: present
+    #    url: "{{ item }}"
+    #  loop:
+    #    - https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    #    - https://packages.microsoft.com/keys/microsoft.asc
+
+    - name: Add Elastic GPG key
+      ansible.builtin.get_url:
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        dest: /usr/share/keyrings/elasticsearch-keyring.asc
+        mode: '0644'
+
+    #- name: Add Elastic repository
+    #  ansible.builtin.apt_repository:
+    #    repo: "deb [signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    #    state: present
+
+    - name: Add Elastic Repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.asc] https://artifacts.elastic.co/packages/9.x/apt stable main"
+        state: present
+        update_cache: yes
+
+    #- name: Add Microsoft Repository
+    #  apt_repository:
+    #    repo: deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-bullseye-prod bullseye main
+    #    state: present
+    #    update_cache: yes
+
+    - name: Clean Cache
+      command: apt-get clean
+
+    - name: Refresh apt-cache
+      command: apt-get update
+
+    - name: Install System Tools
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - ufw
+          - auditd
+          - vim
+          - nano
+          - tmux
+          - git
+          - golang
+          - wget
+          - apt-transport-https
+
+    - name: Prep to start services
+      command: systemctl daemon-reload
+
+    - name: Start & Enable Firewall Service
+      systemd: 
+        name: ufw
+        state: started
+        enabled: yes
+
+
+###################################
+# Web Server
+###################################
+
+    - name: Install Nginx Webserver
+      apt: 
+        name: nginx
+        state: present
+
+    - name: Start & Enable Nginx Webserver
+      systemd: 
+        name: nginx
+        state: started
+        enabled: yes
+    
+    - name: Add Nginx Firewall Rule
+      ufw:
+        rule: allow
+        port: '80'
+        proto: tcp
+        state: enabled
+
+
+####################################
+# Auditd
+###################################
+
+    - name: Copy Auditd Configuration
+      copy:
+        src: ./files/audit.rules
+        dest: /etc/audit/audit.rules
+        owner: root
+        group: root
+        mode: '0700'
+
+    - name: Disable Auditd Service
+      systemd:
+        name: auditd
+        enabled: no
+  
+
+
+###################################
+# Syslog Server
+###################################
+
+    - name: Install Rsyslog
+      apt:
+        name: rsyslog
+        state: present
+
+    - name: Start and Enable Rsyslog
+      systemd: 
+        name: rsyslog
+        state: started
+        enabled: yes
+
+
+###################################
+# Samba Server
+# Initial effort is anonymous file sharing
+###################################
+
+    - name: Install Samba Server
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - samba
+          - samba-client
+          - samba-common
+    
+    - name: Start & Enable SMB Service
+      systemd: 
+        name: smbd
+        state: started
+        enabled: yes
+        
+    - name: Start & Enable NMB Service
+      systemd: 
+        name: nmbd
+        state: started
+        enabled: yes
+
+    - name: Add Samba Firewall Rule
+      ufw:
+        rule: allow
+        port: '445'
+        proto: tcp
+        state: enabled
+    
+    - name: Create Samba Share Directory
+      file:
+        path: /srv/samba/anonymous
+        state: directory
+        mode: '0755'
+        owner: nobody
+        group: nogroup
+
+    - name: Configure Samba
+      copy:
+        src: ./files/smb.conf
+        dest: /etc/samba/smb.conf
+        owner: root
+        group: root
+        mode: '0544'
+
+    - name: Copy Data to SMB Share
+      copy:
+        src: ./files/executive-credentials.secret
+        dest: /srv/samba/anonymous
+        
+    #- name: Set SELinux Context on Samba Share
+    #  command: chcon -Rt samba_share_t /srv/samba/anonymous
+
+
+###################################
+# Filebeat
+###################################
+
+    - name: Install Filebeat
+      apt:
+        name: filebeat
+        state: present    
+
+    - name: Copy Filebeat Configuration
+      copy:
+        src: ./files/filebeat.yml
+        dest: /etc/filebeat/filebeat.yml
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Enable Filebeat Modules
+      command: "filebeat modules enable nginx system"
+
+    # - name: Run Filebeat Setup
+    #   command: "filebeat setup"
+
+    - name: Start & Enable Filebeat
+      systemd:
+        name: filebeat
+        state: started
+        enabled: yes    
+
+
+###################################
+# Auditbeat
+###################################
+
+    # - name: Install Auditbeat
+    #   yum:
+    #     name: auditbeat
+    #     state: present
+
+    # - name: Copy Auditbeat Configuration
+    #   copy:
+    #     src: ./files/auditbeat.yml
+    #     dest: /etc/auditbeat/auditbeat.yml
+    #     owner: root
+    #     group: root
+    #     mode: '0600'
+
+    # # - name: Run Auditbeat Setup
+    # #   command: auditbeat setup --dashboards
+
+    # - name: Start & Enable Auditbeat
+    #   systemd:
+    #     name: auditbeat
+    #     state: started
+    #     enabled: yes
+
+
+###################################
+# Powershell
+###################################
+
+    - name: Install Powershell
+      apt:
+        name: powershell-lts
+        state: present
+
+    - name: Enable Powershell Remoting
+      command: pwsh -Command {Enable-PSRemoting -Force}
+
+
+###################################
+# SSH Configuration
+###################################
+
+    - name: Add SSH Rule for Vagrant
+      ufw:
+         rule: allow
+         port: '22'
+         proto: tcp
+         state: enabled
+
+    - name: Uncomment Pass Auth Yes
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#PasswordAuthentication\s+yes'
+        line: PasswordAuthentication yes
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Comment out Passauth No
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication\s+no'
+        line: '# PasswordAuthentication no'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Allow SSH Pubkey Auth
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#PubkeyAuthentication\s+yes'
+        line: 'PubkeyAuthentication yes'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Add PS Subsystem to PS remote over SSH
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: 'Subsystem powershell /usr/bin/pwsh -sshs -NoLogo'
+        create: yes
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Create Vagrant User SSH Directory
+      file:
+        path: /home/vagrant/.ssh
+        state: directory
+        owner: vagrant
+        mode: '0700'
+
+    - name: Retrieve Default Vagrant Pub Key
+      command: wget --no-check-certificate https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub -O /home/vagrant/.ssh/authorized_keys
+
+    # - name: Copy Authorizedkeys File
+    #   copy:
+    #     src: ./files/authorizedkeys
+    #     dest: /home/vagrant/.ssh/authorizedkeys
+    #     owner: vagrant
+    #     group: vagrant
+    #     mode: '0600'
+  
+    - name: Update Permissions of SSH Key
+      file:
+        path: /home/vagrant/.ssh/authorized_keys
+        state: file
+        owner: vagrant
+        mode: '0600'
+  
+    - name: Add AuthorizedKeysFile to Config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AuthorizedKeysFile\s+\.ssh/authorized_keys'
+        line: 'AuthorizedKeysFile %h/.ssh/authorized_keys'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Restart sshd service
+      systemd:
+        name: sshd
+        state: restarted
+     

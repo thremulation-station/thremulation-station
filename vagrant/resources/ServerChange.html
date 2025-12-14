@@ -1,0 +1,22 @@
+<div class="profile-heading-container">
+   <div class="body">
+     <strong class="profile-heading">My custom plugin</strong>
+     <p>
+       This plugin updates the settings.yml file with the ThremulationStation IP needed for the range to connect and then restart the API.
+     </p>
+   </div>
+ </div>
+
+ <div id="init-plugin">
+   <script>
+      
+    function change_settings()
+    {
+      Settings.settings.local.server = '192.168.56.13';
+      Settings.flushSettings();
+      Events.bus.emit('listeners');
+    }
+
+    setTimeout(change_settings, 15000);
+   </script>
+ </div> 

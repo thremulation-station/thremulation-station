@@ -1,0 +1,378 @@
+---
+  - hosts: all
+    become: yes
+    gather_facts: yes
+
+    tasks:
+
+    - name: Install gnupg (required for apt_repository)
+      ansible.builtin.apt:
+        name: gnupg
+        state: present
+        update_cache: yes
+
+    - name: Add Docker GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/debian/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+
+    - name: Add Docker repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+        state: present
+
+    #- name: Import APT Keys
+    #  ansible.builtin.apt_key:
+    #    state: present
+    #    url: "{{ item }}"
+    #  loop:
+    #    - https://download.docker.com/linux/debian/gpg
+    #    - https://packages.microsoft.com/keys/microsoft.asc
+
+    #- name: Add Docker GPG key
+    #  ansible.builtin.get_url:
+    #    url: https://download.docker.com/linux/debian/gpg
+    #    dest: /etc/apt/keyrings/docker.asc
+    #    mode: '0644'
+
+    #- name: Add Docker Repository
+    #  ansible.builtin.apt_repository:
+    #    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    #    state: present
+    #    update_cache: yes
+
+    #- name: Add Microsoft GPG key
+    #  apt_key:
+    #    url: https://packages.microsoft.com/keys/microsoft.asc
+    #    state: present
+
+    #- name: Download Microsoft 2025 GPG key
+    #  ansible.builtin.shell: |
+    #    curl -fsSL https://packages.microsoft.com/keys/microsoft-2025.asc | gpg --dearmor -o /etc/apt/keyrings/microsoft.gpg
+    #  args:
+    #    creates: /etc/apt/keyrings/microsoft.gpg
+
+    #- name: Add Microsoft Repository
+    #  apt_repository:
+    #    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/microsoft-debian-{{ ansible_distribution_release }}-prod {{ ansible_distribution_release }} main"
+    #    state: present
+    #    update_cache: yes
+
+
+    #- name: Download Microsoft repository package
+    #  ansible.builtin.get_url:
+    #    url: "https://packages.microsoft.com/config/debian/{{ ansible_distribution_major_version }}/packages-microsoft-prod.deb"
+    #    dest: /tmp/packages-microsoft-prod.deb
+    #    mode: '0644'
+
+    #- name: Install Microsoft repository package
+    #  ansible.builtin.apt:
+    #    deb: /tmp/packages-microsoft-prod.deb
+    #    state: present
+
+    #- name: Download and install Microsoft repository package for PowerShell
+    #  ansible.builtin.apt:
+    #    deb: https://packages.microsoft.com/config/debian/{{ ansible_distribution_major_version }}/packages-microsoft-prod.deb
+    #    state: present
+
+    - name: Download Microsoft rolling GPG key
+      ansible.builtin.get_url:
+        url: https://packages.microsoft.com/keys/microsoft-rolling.asc
+        dest: /etc/apt/keyrings/packages.microsoft.com.asc
+        mode: '0644'
+
+    - name: Download Microsoft legacy GPG key
+      ansible.builtin.get_url:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        dest: /etc/apt/keyrings/legacy.packages.microsoft.com.asc
+        mode: '0644'
+
+    - name: Configure apt pinning for packages.microsoft.com
+      ansible.builtin.copy:
+        content: |
+          Package: *
+          Pin: origin packages.microsoft.com
+          Pin-Priority: 600
+        dest: /etc/apt/preferences.d/01-packages.microsoft.com.pref
+        mode: '0644'
+
+    - name: Add Microsoft repositories
+      ansible.builtin.copy:
+        content: |
+          Enabled: yes
+          Types: deb
+          URIs: https://packages.microsoft.com/debian/13/prod
+          Suites: trixie
+          Components: main
+          Signed-By: /etc/apt/keyrings/packages.microsoft.com.asc
+
+          Enabled: yes
+          Types: deb
+          URIs: https://packages.microsoft.com/debian/12/prod
+          Suites: bookworm
+          Components: main
+          Signed-By: /etc/apt/keyrings/legacy.packages.microsoft.com.asc
+        dest: /etc/apt/sources.list.d/packages.microsoft.com.sources
+        mode: '0644'
+
+    - name: Configure apt pinning for Debian repositories
+      ansible.builtin.copy:
+        content: |
+          Package: *
+          Pin: release n=trixie*
+          Pin-Priority: 500
+
+          # temporary workaround for powershell
+          Package: *
+          Pin: release n=bookworm*
+          Pin-Priority: -1
+
+          Package: libicu72
+          Pin: release n=bookworm*
+          Pin-Priority: 500
+          # temporary workaround end
+        dest: /etc/apt/preferences.d/debian.pref
+        mode: '0644'
+
+    - name: Add Debian 12 and 13 repositories
+      ansible.builtin.copy:
+        content: |
+          Enabled: yes
+          Types: deb
+          URIs: https://deb.debian.org/debian
+          Suites: trixie trixie-updates
+          Components: main non-free-firmware
+          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+          Enabled: yes
+          Types: deb
+          URIs: https://deb.debian.org/debian-security
+          Suites: trixie-security
+          Components: main non-free-firmware
+          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+          # temporary workaround for powershell
+          Enabled: yes
+          Types: deb
+          URIs: https://deb.debian.org/debian
+          Suites: bookworm bookworm-updates
+          Components: main non-free-firmware
+          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+          Enabled: yes
+          Types: deb
+          URIs: https://deb.debian.org/debian-security
+          Suites: bookworm-security
+          Components: main non-free-firmware
+          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+          # temporary workaround end
+        dest: /etc/apt/sources.list.d/debian.sources
+        mode: '0644'
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install PowerShell LTS
+      ansible.builtin.apt:
+        name: powershell-lts
+        state: present
+        install_recommends: no
+
+    - name: Clean Cache
+      command: apt-get clean
+
+    - name: Refresh apt-cache
+      command: apt-get update
+
+    - name: Install System Tools
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - vim
+          - nano
+          - jq
+          - tmux
+          - cockpit
+          - git
+          - ufw
+          - wget
+          - golang
+          - bzip2
+          - dos2unix
+          - containerd.io
+          - docker-ce 
+          - docker-ce-cli
+          - docker-compose-plugin
+
+
+###################################
+# Firewall
+###################################
+
+    - name: Start UFW Service
+      systemd:
+        name: ufw
+        state: started
+        enabled: yes
+
+    - name: Add Elasticsearch Firewall Rule
+      ufw:
+        rule: allow
+        port: '9200'
+        proto: tcp
+        state: enabled
+        
+    - name: Add Kibana Firewall Rule
+      ufw:
+        rule: allow
+        port: '5601'
+        proto: tcp
+        state: enabled
+        
+    - name: Add Fleet Server Rule
+      ufw:
+        rule: allow
+        port: '8220'
+        state: enabled
+
+    - name: Add SSH Rule for Vagrant
+      ufw:
+         rule: allow
+         port: '22'
+         proto: tcp
+         state: enabled 
+
+    #- name: Add AtomicGUI Firewall Rule
+    #  firewalld:
+    #    zone: public
+    #    port: 8487/tcp
+    #    permanent: yes
+    #    immediate: yes
+    #    state: enabled
+
+    #- name: Add Caldera Firewall Rule
+    #  firewalld:
+    #    zone: public
+    #    port: 8888/tcp
+    #    permanent: yes
+    #    immediate: yes
+    #    state: enabled
+
+# Elastic Container Project
+
+    - name: Start and Enable Docker
+      systemd: 
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Download ECP
+      git:
+        repo: https://github.com/peasead/elastic-container
+        dest: /home/vagrant/elastic-container/
+
+    - name: Add environment file
+      copy:
+        src: ./files/.env
+        dest: /home/vagrant/elastic-container/.env
+
+    - name: Confirm Directory Permissions
+      file:
+        path: /home/vagrant/elastic-container
+        state: directory
+        recurse: yes
+        owner: vagrant
+        group: vagrant
+    
+    - name: Run ECP Install
+      command: /home/vagrant/elastic-container/elastic-container.sh stage
+      args:
+        chdir: /home/vagrant/elastic-container/
+
+###################################
+# Powershell
+###################################
+
+    #- name: Install Powershell
+    #  apt:
+    #    name: powershell
+    #    state: present
+
+    - name: Enable Powershell Remoting
+      command: pwsh -Command {Enable-PSRemoting -Force}
+
+
+###################################
+# SSH Configuration
+###################################
+
+    - name: Uncomment Pass Auth Yes
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#PasswordAuthentication\s+yes'
+        line: PasswordAuthentication yes
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Comment out Passauth No
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication\s+no'
+        line: '# PasswordAuthentication no'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Allow SSH Pubkey Auth
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#PubkeyAuthentication\s+yes'
+        line: 'PubkeyAuthentication yes'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Add PS Subsystem to PS remote over SSH
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: 'Subsystem powershell /usr/bin/pwsh -sshs -NoLogo'
+        create: yes
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Create Vagrant User SSH Directory
+      file:
+        path: /home/vagrant/.ssh
+        state: directory
+        owner: vagrant
+        mode: '0700'
+
+    - name: Retrieve Default Vagrant Pub Key
+      command: wget --no-check-certificate https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub -O /home/vagrant/.ssh/authorized_keys
+
+    - name: Update Permissions of SSH Key
+      file:
+        path: /home/vagrant/.ssh/authorized_keys
+        state: file
+        owner: vagrant
+        mode: '0600'
+        
+    - name: Add AuthorizedKeysFile to Config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AuthorizedKeysFile\s+\.ssh/authorized_keys'
+        line: 'AuthorizedKeysFile %h/.ssh/authorized_keys'
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Restart sshd service
+      systemd:
+        name: sshd
+        state: restarted
