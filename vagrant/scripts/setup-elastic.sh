@@ -333,8 +333,8 @@ function main() {
     policy_id=$(get_default_policy)
     configure_index_replicas
     add_detection_engine_index
-    add_detection_engine_rules
-    enable_detection_rules
+    #add_detection_engine_rules
+    #enable_detection_rules
 
     # Rename the default endpoint policy to match our naming convention
     rename_package_policy "${policy_id}" "endpoint" "endpoint-1"

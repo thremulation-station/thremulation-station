@@ -76,109 +76,109 @@
     #    deb: https://packages.microsoft.com/config/debian/{{ ansible_distribution_major_version }}/packages-microsoft-prod.deb
     #    state: present
 
-    - name: Download Microsoft rolling GPG key
-      ansible.builtin.get_url:
-        url: https://packages.microsoft.com/keys/microsoft-rolling.asc
-        dest: /etc/apt/keyrings/packages.microsoft.com.asc
-        mode: '0644'
+    # - name: Download Microsoft rolling GPG key
+    #   ansible.builtin.get_url:
+    #     url: https://packages.microsoft.com/keys/microsoft-rolling.asc
+    #     dest: /etc/apt/keyrings/packages.microsoft.com.asc
+    #     mode: '0644'
 
-    - name: Download Microsoft legacy GPG key
-      ansible.builtin.get_url:
-        url: https://packages.microsoft.com/keys/microsoft.asc
-        dest: /etc/apt/keyrings/legacy.packages.microsoft.com.asc
-        mode: '0644'
+    # - name: Download Microsoft legacy GPG key
+    #   ansible.builtin.get_url:
+    #     url: https://packages.microsoft.com/keys/microsoft.asc
+    #     dest: /etc/apt/keyrings/legacy.packages.microsoft.com.asc
+    #     mode: '0644'
 
-    - name: Configure apt pinning for packages.microsoft.com
-      ansible.builtin.copy:
-        content: |
-          Package: *
-          Pin: origin packages.microsoft.com
-          Pin-Priority: 600
-        dest: /etc/apt/preferences.d/01-packages.microsoft.com.pref
-        mode: '0644'
+    # - name: Configure apt pinning for packages.microsoft.com
+    #   ansible.builtin.copy:
+    #     content: |
+    #       Package: *
+    #       Pin: origin packages.microsoft.com
+    #       Pin-Priority: 600
+    #     dest: /etc/apt/preferences.d/01-packages.microsoft.com.pref
+    #     mode: '0644'
 
-    - name: Add Microsoft repositories
-      ansible.builtin.copy:
-        content: |
-          Enabled: yes
-          Types: deb
-          URIs: https://packages.microsoft.com/debian/13/prod
-          Suites: trixie
-          Components: main
-          Signed-By: /etc/apt/keyrings/packages.microsoft.com.asc
+    # - name: Add Microsoft repositories
+    #   ansible.builtin.copy:
+    #     content: |
+    #       Enabled: yes
+    #       Types: deb
+    #       URIs: https://packages.microsoft.com/debian/13/prod
+    #       Suites: trixie
+    #       Components: main
+    #       Signed-By: /etc/apt/keyrings/packages.microsoft.com.asc
 
-          Enabled: yes
-          Types: deb
-          URIs: https://packages.microsoft.com/debian/12/prod
-          Suites: bookworm
-          Components: main
-          Signed-By: /etc/apt/keyrings/legacy.packages.microsoft.com.asc
-        dest: /etc/apt/sources.list.d/packages.microsoft.com.sources
-        mode: '0644'
+    #       Enabled: yes
+    #       Types: deb
+    #       URIs: https://packages.microsoft.com/debian/12/prod
+    #       Suites: bookworm
+    #       Components: main
+    #       Signed-By: /etc/apt/keyrings/legacy.packages.microsoft.com.asc
+    #     dest: /etc/apt/sources.list.d/packages.microsoft.com.sources
+    #     mode: '0644'
 
-    - name: Configure apt pinning for Debian repositories
-      ansible.builtin.copy:
-        content: |
-          Package: *
-          Pin: release n=trixie*
-          Pin-Priority: 500
+    # - name: Configure apt pinning for Debian repositories
+    #   ansible.builtin.copy:
+    #     content: |
+    #       Package: *
+    #       Pin: release n=trixie*
+    #       Pin-Priority: 500
 
-          # temporary workaround for powershell
-          Package: *
-          Pin: release n=bookworm*
-          Pin-Priority: -1
+    #       # temporary workaround for powershell
+    #       Package: *
+    #       Pin: release n=bookworm*
+    #       Pin-Priority: -1
 
-          Package: libicu72
-          Pin: release n=bookworm*
-          Pin-Priority: 500
-          # temporary workaround end
-        dest: /etc/apt/preferences.d/debian.pref
-        mode: '0644'
+    #       Package: libicu72
+    #       Pin: release n=bookworm*
+    #       Pin-Priority: 500
+    #       # temporary workaround end
+    #     dest: /etc/apt/preferences.d/debian.pref
+    #     mode: '0644'
 
-    - name: Add Debian 12 and 13 repositories
-      ansible.builtin.copy:
-        content: |
-          Enabled: yes
-          Types: deb
-          URIs: https://deb.debian.org/debian
-          Suites: trixie trixie-updates
-          Components: main non-free-firmware
-          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+    # - name: Add Debian 12 and 13 repositories
+    #   ansible.builtin.copy:
+    #     content: |
+    #       Enabled: yes
+    #       Types: deb
+    #       URIs: https://deb.debian.org/debian
+    #       Suites: trixie trixie-updates
+    #       Components: main non-free-firmware
+    #       Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 
-          Enabled: yes
-          Types: deb
-          URIs: https://deb.debian.org/debian-security
-          Suites: trixie-security
-          Components: main non-free-firmware
-          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+    #       Enabled: yes
+    #       Types: deb
+    #       URIs: https://deb.debian.org/debian-security
+    #       Suites: trixie-security
+    #       Components: main non-free-firmware
+    #       Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 
-          # temporary workaround for powershell
-          Enabled: yes
-          Types: deb
-          URIs: https://deb.debian.org/debian
-          Suites: bookworm bookworm-updates
-          Components: main non-free-firmware
-          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+    #       # temporary workaround for powershell
+    #       Enabled: yes
+    #       Types: deb
+    #       URIs: https://deb.debian.org/debian
+    #       Suites: bookworm bookworm-updates
+    #       Components: main non-free-firmware
+    #       Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 
-          Enabled: yes
-          Types: deb
-          URIs: https://deb.debian.org/debian-security
-          Suites: bookworm-security
-          Components: main non-free-firmware
-          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
-          # temporary workaround end
-        dest: /etc/apt/sources.list.d/debian.sources
-        mode: '0644'
+    #       Enabled: yes
+    #       Types: deb
+    #       URIs: https://deb.debian.org/debian-security
+    #       Suites: bookworm-security
+    #       Components: main non-free-firmware
+    #       Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+    #       # temporary workaround end
+    #     dest: /etc/apt/sources.list.d/debian.sources
+    #     mode: '0644'
 
-    - name: Update apt cache
-      ansible.builtin.apt:
-        update_cache: yes
+    # - name: Update apt cache
+    #   ansible.builtin.apt:
+    #     update_cache: yes
 
-    - name: Install PowerShell LTS
-      ansible.builtin.apt:
-        name: powershell-lts
-        state: present
-        install_recommends: no
+    # - name: Install PowerShell LTS
+    #   ansible.builtin.apt:
+    #     name: powershell-lts
+    #     state: present
+    #     install_recommends: no
 
     - name: Clean Cache
       command: apt-get clean
@@ -297,13 +297,37 @@
 # Powershell
 ###################################
 
+    - name: Install libicu72 from Debian 12 repo (for Debian 13)
+      ansible.builtin.apt:
+        deb: "http://ftp.debian.org/debian/pool/main/i/icu/libicu72_72.1-3+deb12u1_amd64.deb"
+        state: present
+      #when: "'13' in debian_version.stdout or 'trixie' in debian_version.stdout
+
+    - name: Download PowerShell 7 package
+      ansible.builtin.get_url:
+        url: "{{ pwsh_download_url }}"
+        dest: "/tmp/powershell_{{ pwsh_version }}-1.deb_amd64.deb"
+        mode: '0644'
+      vars:
+        pwsh_version: "7.5.4"
+        pwsh_download_url: "https://github.com/PowerShell/PowerShell/releases/download/v{{ pwsh_version }}/powershell_{{ pwsh_version }}-1.deb_amd64.deb"
+
+    - name: Install PowerShell 7 package
+      ansible.builtin.apt:
+        deb: "/tmp/powershell_{{ pwsh_version }}-1.deb_amd64.deb"
+        state: present
+      register: pwsh_install
+      vars:
+        pwsh_version: "7.5.4"
+
+
     #- name: Install Powershell
     #  apt:
     #    name: powershell
     #    state: present
 
-    - name: Enable Powershell Remoting
-      command: pwsh -Command {Enable-PSRemoting -Force}
+    #- name: Enable Powershell Remoting
+    #  command: pwsh -Command {Enable-PSRemoting -Force}
 
 
 ###################################
