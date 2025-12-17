@@ -66,6 +66,14 @@ build {
   }
 
   provisioner "shell" {
+    scripts         = ["scripts/install-atomicredteam.ps1"]
+  }
+
+  #provisioner "shell" {
+  #  scripts         = ["scripts/install-caldera.sh"]
+  #}
+
+  provisioner "shell" {
     execute_command = "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     scripts         = ["scripts/cleanup.sh"]
   }
